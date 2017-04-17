@@ -26,17 +26,51 @@ namespace STVRogue.GameLogic
     public class Monster : Creature
     {
         public Pack pack;
+
+        /* Create a monster with a random HP */
         public Monster(String id)
         {
             this.id = id; name = "Orc";
+            HP = 1 + RandomGenerator.rnd.Next(6);
         }
     }
 
     public class Player : Creature
     {
-        public int HPmax = 100;
+        public Dungeon dungeon;
+        public int HPbase = 100;
+        public Boolean  accelerated = false ;
         public uint KillPoint = 0;
         List<Item> bag = new List<Item>();
-        public Player() { id = "player"; }
+        public Player() {
+            id = "player";
+            AttackRating = 5;
+        }
+
+        public void use(Item item)
+        {
+            if (!bag.Contains(item)) throw new ArgumentException();
+            item.use(this);
+            bag.Remove(item);
+        }
+
+        public void Attack(Creature foe)
+        {
+            if (!(foe is Monster)) throw new ArgumentException();
+            Monster foe_ = foe as Monster;
+            if (!accelerated)
+            {
+                base.Attack(foe);
+                if (foe.HP == 0) KillPoint++;
+            }
+            else
+            {
+                foreach (Monster target in foe_.pack.members)
+                {
+                    base.Attack(target);
+                    if (target.HP == 0) KillPoint++;
+                }
+            }
+        }
     }
 }

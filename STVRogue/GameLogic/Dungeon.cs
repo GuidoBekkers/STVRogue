@@ -24,7 +24,7 @@ namespace STVRogue.GameLogic
         }
         
         public List<Node> shortestpath(Node u, Node v) { throw new NotImplementedException(); }
-        public void destroy(Bridge b) {
+        public void destroyConnectionsAtFromSide(Bridge b) {
             Logger.log($"Destroying the bridge {b.id}");
             throw new NotImplementedException();
         }
@@ -41,6 +41,15 @@ namespace STVRogue.GameLogic
 
         public Node() { }
         public Node(String id) { this.id = id; }
+        public void connect(Node nd)
+        {
+            neighbors.Add(nd); nd.neighbors.Add(this);
+        }
+        public void disconnect(Node nd)
+        {
+            neighbors.Remove(nd); nd.neighbors.Remove(this);
+        }
+
 
         /* Execute a fight between the player and the packs in this node.
          * Such a fight can take multiple rounds as describe in the Project Document.
@@ -57,7 +66,22 @@ namespace STVRogue.GameLogic
 
     public class Bridge : Node
     {
+        List<Node> fromNodes = new List<Node>();
+        List<Node> toNodes = new List<Node>();
         public Bridge(String id) : base(id) {  }
+
+        public void connectAtFromSide(Node nd) 
+        {
+            base.connect(nd);
+            fromNodes.Add(nd);
+        }
+
+        public void connectAtToSide(Node nd)
+        {
+            base.connect(nd);
+            toNodes.Add(nd);
+        }
+
     }
 
 }
