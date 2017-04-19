@@ -9,12 +9,18 @@ namespace STVRogue.GameLogic
     public class Item
     {
         public String id;
+	public Boolean used = false ;
         public Item() { }
         public Item(String id) { this.id = id; }
 
         public void use(Player player)
         {
-            Logger.log($"Using {this.GetType().Name} {id}");
+            if (used) {
+                Logger.log($"{Player.id} is trying to use an expired item: {this.GetType().Name} {id}. Rejected.");
+                return ;
+            }
+            Logger.log($"{Player.id} uses {this.GetType().Name} {id}");
+            used = true ;
         }
     }
 
@@ -28,21 +34,21 @@ namespace STVRogue.GameLogic
             HPvalue = (uint) RandomGenerator.rnd.Next(10) + 1;
         }
 
-        public void use(Player player)
+        new public void use(Player player)
         {
-            player.HP = (int) Math.Min(player.HPbase, player.HP + HPvalue);
             base.use(player);
+            player.HP = (int) Math.Min(player.HPbase, player.HP + HPvalue);   
         }
     }
 
     public class Crystal : Item
     {
         public Crystal(String id) : base(id) { }
-        public void use(Player player)
+        new public void use(Player player)
         {
-            player.accelerated = true;
-            if (player.location is Bridge) player.dungeon.destroyConnectionsAtFromSide(player.location as Bridge);
             base.use(player);
+            player.accelerated = true;
+            if (player.location is Bridge) player.dungeon.disconnect(player.location as Bridge);    
         }
     }
 }

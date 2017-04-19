@@ -54,22 +54,29 @@ namespace STVRogue.GameLogic
             bag.Remove(item);
         }
 
-        public void Attack(Creature foe)
+        new public void Attack(Creature foe)
         {
             if (!(foe is Monster)) throw new ArgumentException();
             Monster foe_ = foe as Monster;
             if (!accelerated)
             {
                 base.Attack(foe);
-                if (foe.HP == 0) KillPoint++;
+                if (foe_.HP == 0) {
+                   foe_.pack.members.Remove(foe_);
+                   KillPoint++;
+                }
             }
             else
             {
                 foreach (Monster target in foe_.pack.members)
                 {
                     base.Attack(target);
-                    if (target.HP == 0) KillPoint++;
-                }
+                    if (target.HP == 0) { 
+                       foe_.pack.members.Remove(foe_);
+                       KillPoint++;
+                    }
+		}
+		accelerated = false;
             }
         }
     }

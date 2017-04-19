@@ -11,13 +11,16 @@ namespace STVRogue.GameLogic
         public Player player;
         public Dungeon dungeon;
 
-        /* This creates a player and a dungeon of the given level. The player is positioned at the
-         * dungeon's starting-node.
-         * The constructor also seeds monster-packs and items into the dungeon.
+        /* This creates a player and a random dungeon of the given level and node-capacity
+         * The player is positioned at the dungeon's starting-node.
+         * The constructor also randomly seeds monster-packs and items into the dungeon. The total
+         * number of monsters are as specified. Monster-packs should be seeded as such that
+         * the nodes' capacity are not violated. Furthermore the seeding of the monsters
+         * and items should meet the balance requirements stated in the Project Document.
          */
-        public Game(uint level)
+        public Game(uint level, uint nodeCapcityMultiplier, uint numberOfMonsters)
         {
-            Logger.log($"Creating a game of level {level}");
+            Logger.log($"Creating a game of level {level}, node capacity multiplier {nodeCapcityMultiplier}, and {numberOfMonsters} monsters.");
             player = new Player();
         }
 

@@ -14,21 +14,29 @@ namespace STVRogue.GameLogic
         public Node startNode;
         public Node exitNode;
         public uint dungeonLevel;
+        /* a constant multiplier that determines the maximum number of monster-packs per node: */
+        public uint M ; 
         
-        /// To create a new dungeon with the specified level.
-        public Dungeon(uint level)
+        /* To create a new dungeon with the specified level and capacity multiplier */
+        public Dungeon(uint level, uint nodeCapacityMultiplier)
         {
-            Logger.log($"Creating a dungeon of level {level}");
+            Logger.log($"Creating a dungeon of level {level}, node capacity multiplier {nodeCapacityMultiplier}.");
             dungeonLevel = level;
+            M = nodeCapacityMultiplier ;
             throw new NotImplementedException();
         }
         
+        /* Return a shortest path between node u and node v */
         public List<Node> shortestpath(Node u, Node v) { throw new NotImplementedException(); }
-        public void destroyConnectionsAtFromSide(Bridge b) {
-            Logger.log($"Destroying the bridge {b.id}");
+        
+        
+        /* To disconnect a bridge from the rest of the zone the bridge is in. */
+        public void disconnect(Bridge b) {
+            Logger.log($"Disconnecting the bridge {b.id} from its zone.");
             throw new NotImplementedException();
         }
 
+        /* To calculate the level of the given node. */
         public uint level(Node d) { throw new NotImplementedException(); }
     } 
 
@@ -41,10 +49,14 @@ namespace STVRogue.GameLogic
 
         public Node() { }
         public Node(String id) { this.id = id; }
+        
+        /* To connect this node to another node. */
         public void connect(Node nd)
         {
             neighbors.Add(nd); nd.neighbors.Add(this);
         }
+        
+        /* To disconnect this node from the given node. */
         public void disconnect(Node nd)
         {
             neighbors.Remove(nd); nd.neighbors.Remove(this);
@@ -69,14 +81,16 @@ namespace STVRogue.GameLogic
         List<Node> fromNodes = new List<Node>();
         List<Node> toNodes = new List<Node>();
         public Bridge(String id) : base(id) {  }
-
-        public void connectAtFromSide(Node nd) 
+        
+        /* Use this to connect the bridge to a node from the same zone. */
+        public void connectToNodeOfSameZone(Node nd) 
         {
             base.connect(nd);
             fromNodes.Add(nd);
         }
 
-        public void connectAtToSide(Node nd)
+        /* Use this to connect the bridge to a node from the next zone. */
+        public void connectToNodeOfNextZone(Node nd)
         {
             base.connect(nd);
             toNodes.Add(nd);
