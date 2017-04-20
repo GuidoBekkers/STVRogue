@@ -9,9 +9,19 @@ namespace STVRogue.GameLogic
     public class Pack
     {
         String id;
-        public List<Monster> members;
+        public List<Monster> members = new List<Monster>() ;
+        int startingHP = 0 ;
         public Node location;
         public Dungeon dungeon;
+        
+        public Pack(String id, uint n) {
+           this.id = id ;
+           for (int i=0; i<n; i++) {
+              Monster m = new Monster($"{id}_{i}") ;
+              members.Add(m) ; 
+              startingHP += m.HP ; 
+           }
+        }
 
         public void Attack(Player p)
         {
@@ -22,7 +32,7 @@ namespace STVRogue.GameLogic
         }
         
         /* Move the pack to an adjacent node. */
-        public void move1(Node u) {
+        public void move(Node u) {
              if (!location.neighbors.Contains(u)) throw new ArgumentException() ; 
              uint capacity = dungeon.M * (dungeon.level(u) + 1) ;
              if (u.packs.Count >= capacity) {

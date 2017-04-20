@@ -13,15 +13,15 @@ namespace STVRogue.GameLogic
     {
         public Node startNode;
         public Node exitNode;
-        public uint dungeonLevel;
+        public uint difficultyLevel;
         /* a constant multiplier that determines the maximum number of monster-packs per node: */
         public uint M ; 
         
-        /* To create a new dungeon with the specified level and capacity multiplier */
+        /* To create a new dungeon with the specified difficult level and capacity multiplier */
         public Dungeon(uint level, uint nodeCapacityMultiplier)
         {
-            Logger.log($"Creating a dungeon of level {level}, node capacity multiplier {nodeCapacityMultiplier}.");
-            dungeonLevel = level;
+            Logger.log($"Creating a dungeon of difficulty level {level}, node capacity multiplier {nodeCapacityMultiplier}.");
+            difficultyLevel = level;
             M = nodeCapacityMultiplier ;
             throw new NotImplementedException();
         }
@@ -65,8 +65,6 @@ namespace STVRogue.GameLogic
 
         /* Execute a fight between the player and the packs in this node.
          * Such a fight can take multiple rounds as describe in the Project Document.
-         * When during these rounds a monster's HP becomes 0 it is removed from its pack. 
-         * And when a pack has no more member, it is removed from the node.
          * A fight terminates when either the node has no more monster-pack, or when
          * the player's HP is reduced to 0. 
          */
