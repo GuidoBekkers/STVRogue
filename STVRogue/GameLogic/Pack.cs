@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using STVRogue.Utils;
 
 namespace STVRogue.GameLogic
 {
@@ -48,7 +49,7 @@ namespace STVRogue.GameLogic
         /* Move the pack one node further along a shortest path to u. */
         public void moveTowards(Node u) {
             List<Node> path = dungeon.shortestpath(location,u) ;
-            move1(path[0]) ;
+            move(path[0]) ;
         }
     }
 }

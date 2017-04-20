@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STVRogue
+namespace STVRogue.Utils
 {
     class Utils
     {
@@ -12,6 +12,7 @@ namespace STVRogue
 
     public class Logger
     {
+        /* You can change the behavior of this logger. */
         public static void log(String s)
         {
             Console.Out.WriteLine("** " + s);

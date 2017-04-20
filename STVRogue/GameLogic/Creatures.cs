@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using STVRogue.Utils;
 
 namespace STVRogue.GameLogic
 {
@@ -14,7 +15,7 @@ namespace STVRogue.GameLogic
         public uint AttackRating = 1;
         public Node location;
         public Creature() { }
-        public void Attack(Creature foe)
+        virtual public void Attack(Creature foe)
         {
             foe.HP = (int)Math.Max(0, foe.HP - AttackRating);
             String killMsg = foe.HP == 0 ? ", KILLING it" : "";
@@ -41,7 +42,7 @@ namespace STVRogue.GameLogic
         public int HPbase = 100;
         public Boolean  accelerated = false ;
         public uint KillPoint = 0;
-        List<Item> bag = new List<Item>();
+        public List<Item> bag = new List<Item>();
         public Player() {
             id = "player";
             AttackRating = 5;
@@ -54,7 +55,7 @@ namespace STVRogue.GameLogic
             bag.Remove(item);
         }
 
-        new public void Attack(Creature foe)
+        override public void Attack(Creature foe)
         {
             if (!(foe is Monster)) throw new ArgumentException();
             Monster foe_ = foe as Monster;

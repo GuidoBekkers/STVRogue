@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using STVRogue.GameLogic;
 
-namespace STVRogue.GameLogic
+namespace STVRogue.Utils
 {
     /* Providing some useful predicates and functions to extract information from various
      * game entities.

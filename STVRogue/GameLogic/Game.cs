@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using STVRogue.Utils;
 
 namespace STVRogue.GameLogic
 {
@@ -29,7 +30,7 @@ namespace STVRogue.GameLogic
          */
         public Boolean update(Command userCommand)
         {
-            Logger.log($"Player moves from {player.location.id} to {playerNextPosition.id}");
+            Logger.log("Player does " +  userCommand);
             return true;
         }
     }

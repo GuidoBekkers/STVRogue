@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using STVRogue.Utils;
 
 namespace STVRogue.GameLogic
 {
@@ -13,13 +14,13 @@ namespace STVRogue.GameLogic
         public Item() { }
         public Item(String id) { this.id = id; }
 
-        public void use(Player player)
+        virtual public void use(Player player)
         {
             if (used) {
-                Logger.log($"{Player.id} is trying to use an expired item: {this.GetType().Name} {id}. Rejected.");
+                Logger.log($"{player.id} is trying to use an expired item: {this.GetType().Name} {id}. Rejected.");
                 return ;
             }
-            Logger.log($"{Player.id} uses {this.GetType().Name} {id}");
+            Logger.log($"{player.id} uses {this.GetType().Name} {id}");
             used = true ;
         }
     }
@@ -34,7 +35,7 @@ namespace STVRogue.GameLogic
             HPvalue = (uint) RandomGenerator.rnd.Next(10) + 1;
         }
 
-        new public void use(Player player)
+        override public void use(Player player)
         {
             base.use(player);
             player.HP = (int) Math.Min(player.HPbase, player.HP + HPvalue);   
@@ -44,7 +45,7 @@ namespace STVRogue.GameLogic
     public class Crystal : Item
     {
         public Crystal(String id) : base(id) { }
-        new public void use(Player player)
+        override public void use(Player player)
         {
             base.use(player);
             player.accelerated = true;
