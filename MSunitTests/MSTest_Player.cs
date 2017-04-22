@@ -5,9 +5,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace STVRogue.GameLogic
 {
 
-    /* An example of a test class. This one is to unit-test the
-     * class Player. The test is incomplete though, as it only contains
-     * two test cases. 
+    /* An example of a test class written using VisualStudio's own testing
+     * framework. 
+     * This one is to unit-test the class Player. The test is incomplete though, 
+     * as it only contains two test cases. 
      */
     [TestClass]
     public class MSTest_Player
