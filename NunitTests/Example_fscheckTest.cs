@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using FsCheck;
 
+/* This file contains some examples of using the automated testing tool
+ * FSCheck (sometimes I also simply call it QuickCheck, because it is where
+ * it was derived from).
+ */ 
 namespace SomeNameClass
 {
     /* An example of a class to test */
