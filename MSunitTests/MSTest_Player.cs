@@ -10,18 +10,18 @@ namespace STVRogue.GameLogic
      * two test cases. 
      */
     [TestClass]
-    public class Test_Player
+    public class MSTest_Player
     {
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void Test_use_onEmptyBag()
+        public void MSTest_use_onEmptyBag()
         {
             Player P = new Player();
             P.use(new Item());
         }
 
         [TestMethod]
-        public void Test_use_item_in_bag()
+        public void MSTest_use_item_in_bag()
         {
             Player P = new Player();
             Item x = new HealingPotion("pot1");

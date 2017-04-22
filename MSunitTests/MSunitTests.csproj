@@ -50,12 +50,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Test_Player.cs" />
+    <Compile Include="MSTest_Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\STVRogue\STVRogue.csproj">
-      <Project>{68170c03-71df-4d27-943c-9a1a0bf6cf5a}</Project>
+      <Project>{8342123c-972a-4273-a3af-94a12674445b}</Project>
       <Name>STVRogue</Name>
     </ProjectReference>
   </ItemGroup>

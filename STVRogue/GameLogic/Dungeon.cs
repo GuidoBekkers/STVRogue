@@ -21,7 +21,7 @@ namespace STVRogue.GameLogic
         /* To create a new dungeon with the specified difficult level and capacity multiplier */
         public Dungeon(uint level, uint nodeCapacityMultiplier)
         {
-            Logger.log($"Creating a dungeon of difficulty level {level}, node capacity multiplier {nodeCapacityMultiplier}.");
+            Logger.log("Creating a dungeon of difficulty level " + level + ", node capacity multiplier " + nodeCapacityMultiplier + ".");
             difficultyLevel = level;
             M = nodeCapacityMultiplier ;
             throw new NotImplementedException();
@@ -33,7 +33,7 @@ namespace STVRogue.GameLogic
         
         /* To disconnect a bridge from the rest of the zone the bridge is in. */
         public void disconnect(Bridge b) {
-            Logger.log($"Disconnecting the bridge {b.id} from its zone.");
+            Logger.log("Disconnecting the bridge " + b.id + " from its zone.");
             throw new NotImplementedException();
         }
 

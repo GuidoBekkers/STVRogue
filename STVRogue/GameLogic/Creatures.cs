@@ -19,7 +19,7 @@ namespace STVRogue.GameLogic
         {
             foe.HP = (int)Math.Max(0, foe.HP - AttackRating);
             String killMsg = foe.HP == 0 ? ", KILLING it" : "";
-            Logger.log($"Creature {id} attacks {foe.id}{killMsg}.");
+            Logger.log("Creature " + id + " attacks " + foe.id + killMsg + ".");
         }
     }
 
@@ -50,7 +50,7 @@ namespace STVRogue.GameLogic
 
         public void use(Item item)
         {
-            if (!bag.Contains(item)) throw new ArgumentException();
+            if (!bag.Contains(item) || item.used) throw new ArgumentException();
             item.use(this);
             bag.Remove(item);
         }

@@ -18,7 +18,7 @@ namespace STVRogue.GameLogic
         public Pack(String id, uint n) {
            this.id = id ;
            for (int i=0; i<n; i++) {
-              Monster m = new Monster($"{id}_{i}") ;
+              Monster m = new Monster("" + id + "_" + i) ;
               members.Add(m) ; 
               startingHP += m.HP ; 
            }
@@ -37,12 +37,12 @@ namespace STVRogue.GameLogic
              if (!location.neighbors.Contains(u)) throw new ArgumentException() ; 
              uint capacity = dungeon.M * (dungeon.level(u) + 1) ;
              if (u.packs.Count >= capacity) {
-                 Logger.log($"Pack {id} is trying to move to an already full node {u.id}. Rejected.");
+                 Logger.log("Pack " +  id + " is trying to move to an already full node " + u.id + ". Rejected.");
                  return ;
              }
              location = u ;
              u.packs.Add(this);
-             Logger.log($"Pack {id} moves to an already full node {u.id}. Rejected.");
+             Logger.log("Pack " + id + " moves to an already full node " + u.id + ". Rejected.");
         
         }
         
