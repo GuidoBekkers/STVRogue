@@ -13,7 +13,6 @@ namespace STVRogue.GameLogic
      */
     public class XTest_Player
     {
-
         [Fact]
         public void XTest_use_onEmptyBag()
         {
@@ -30,6 +29,5 @@ namespace STVRogue.GameLogic
             P.use(x);
             Assert.False(P.bag.Contains(x));
         }
-
     }
 }

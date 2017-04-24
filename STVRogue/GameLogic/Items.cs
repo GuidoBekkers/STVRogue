@@ -10,20 +10,21 @@ namespace STVRogue.GameLogic
     public class Item
     {
         public String id;
-	public Boolean used = false ;
+        public Boolean used = false;
         public Item() { }
         public Item(String id) { this.id = id; }
 
         virtual public void use(Player player)
         {
-            if (used) {
+            if (used)
+            {
                 Logger.log("" + player.id + " is trying to use an expired item: "
-                              + this.GetType().Name + " " +  id 
+                              + this.GetType().Name + " " + id
                               + ". Rejected.");
-                return ;
+                return;
             }
-            Logger.log(""+ player.id + " uses " + this.GetType().Name + " " + id);
-            used = true ;
+            Logger.log("" + player.id + " uses " + this.GetType().Name + " " + id);
+            used = true;
         }
     }
 
@@ -32,15 +33,16 @@ namespace STVRogue.GameLogic
         public uint HPvalue;
 
         /* Create a healing potion with random HP-value */
-        public HealingPotion(String id) : base(id)
+        public HealingPotion(String id)
+            : base(id)
         {
-            HPvalue = (uint) RandomGenerator.rnd.Next(10) + 1;
+            HPvalue = (uint)RandomGenerator.rnd.Next(10) + 1;
         }
 
         override public void use(Player player)
         {
             base.use(player);
-            player.HP = (int) Math.Min(player.HPbase, player.HP + HPvalue);   
+            player.HP = (int)Math.Min(player.HPbase, player.HP + HPvalue);
         }
     }
 
@@ -51,7 +53,7 @@ namespace STVRogue.GameLogic
         {
             base.use(player);
             player.accelerated = true;
-            if (player.location is Bridge) player.dungeon.disconnect(player.location as Bridge);    
+            if (player.location is Bridge) player.dungeon.disconnect(player.location as Bridge);
         }
     }
 }

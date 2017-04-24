@@ -1,10 +1,8 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-//using STVRogue.GameLogic;
 
 namespace STVRogue.GameLogic
 {
-
     /* An example of a test class written using VisualStudio's own testing
      * framework. 
      * This one is to unit-test the class Player. The test is incomplete though, 
