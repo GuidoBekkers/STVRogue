@@ -245,3 +245,4 @@ ModelManifest.xml
 # Rider & OpenCover
 .idea/
 OpenCover/
+.axoCover/
