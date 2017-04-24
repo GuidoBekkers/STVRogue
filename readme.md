@@ -81,6 +81,8 @@ install the standard distribution, install from this fork instead: https://githu
 The fork works with VS 2013 and VS 2015. I haven't checked 2017. However,
 **it only works in combination with NUnit tests**.
 
+To work with Visual Studio 2013 you might need to install the [.NET Framework 4.5.2 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=42637) and update NuGet to at least 2.12 (you can do this from `Tools -> Extensions and Updates -> Updates -> Visual Studio Gallery` and select `Update` for the NuGet extension).
+
 The manual should tell you how to start and configure a mutation test. There is
 **one annoying quirk** of VisualMutator: after the mutation test, it retains the lock
 to classes under test (the classes you let it mutate), so you can't save changes into
