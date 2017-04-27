@@ -9,7 +9,7 @@ namespace STVRogue.Utils
 {
     /* Providing some useful predicates and functions to extract information from various
      * game entities.
-     */ 
+     */
     public class Predicates
     {
         public Boolean isPath(List<Node> path)
@@ -93,13 +93,12 @@ namespace STVRogue.Utils
                 totalConnectivityDegree += nd.neighbors.Count;
                 // check bridge
                 Boolean isBridge_ = isBridge(startNode, exitNode, nd);
-                if (nd is Bridge && !isBridge_)   return false;
+                if (nd is Bridge && !isBridge_) return false;
                 if (!(nd is Bridge) && isBridge_) return false;
             }
             float avrgConnectivity = (float)totalConnectivityDegree / (float)nodes.Count;
             if (avrgConnectivity > 3) return false;
             return true;
         }
-
     }
 }

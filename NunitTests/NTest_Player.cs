@@ -7,7 +7,6 @@ using NUnit.Framework;
 
 namespace STVRogue.GameLogic
 {
-
     /* An example of a test class written using NUnit testing framework. 
      * This one is to unit-test the class Player. The test is incomplete though, 
      * as it only contains two test cases. 
@@ -15,7 +14,6 @@ namespace STVRogue.GameLogic
     [TestFixture]
     public class NTest_Player
     {
-
         [Test]
         public void NTest_use_onEmptyBag()
         {
@@ -30,7 +28,7 @@ namespace STVRogue.GameLogic
             Item x = new HealingPotion("pot1");
             P.bag.Add(x);
             P.use(x);
-            Assert.True(x.used) ;
+            Assert.True(x.used);
             Assert.False(P.bag.Contains(x));
         }
     }

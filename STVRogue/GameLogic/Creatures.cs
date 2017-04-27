@@ -23,7 +23,6 @@ namespace STVRogue.GameLogic
         }
     }
 
-
     public class Monster : Creature
     {
         public Pack pack;
@@ -40,10 +39,11 @@ namespace STVRogue.GameLogic
     {
         public Dungeon dungeon;
         public int HPbase = 100;
-        public Boolean  accelerated = false ;
+        public Boolean accelerated = false;
         public uint KillPoint = 0;
         public List<Item> bag = new List<Item>();
-        public Player() {
+        public Player()
+        {
             id = "player";
             AttackRating = 5;
         }
@@ -62,9 +62,10 @@ namespace STVRogue.GameLogic
             if (!accelerated)
             {
                 base.Attack(foe);
-                if (foe_.HP == 0) {
-                   foe_.pack.members.Remove(foe_);
-                   KillPoint++;
+                if (foe_.HP == 0)
+                {
+                    foe_.pack.members.Remove(foe_);
+                    KillPoint++;
                 }
             }
             else
@@ -72,12 +73,13 @@ namespace STVRogue.GameLogic
                 foreach (Monster target in foe_.pack.members)
                 {
                     base.Attack(target);
-                    if (target.HP == 0) { 
-                       foe_.pack.members.Remove(foe_);
-                       KillPoint++;
+                    if (target.HP == 0)
+                    {
+                        foe_.pack.members.Remove(foe_);
+                        KillPoint++;
                     }
-		}
-		accelerated = false;
+                }
+                accelerated = false;
             }
         }
     }
