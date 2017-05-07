@@ -39,10 +39,15 @@ namespace STVRogue.GameLogic
         public void move(Node u)
         {
             if (!location.neighbors.Contains(u)) throw new ArgumentException();
-            uint capacity = dungeon.M * (dungeon.level(u) + 1);
-            if (u.packs.Count >= capacity)
+            int capacity = (int) (dungeon.M * (dungeon.level(u) + 1));
+            // count monsters already in the node:
+            foreach (Pack Q in location.packs) {
+                capacity = capacity - Q.members.Count;
+            }
+            // capacity now expresses how much space the node has left
+            if (members.Count > capacity)
             {
-                Logger.log("Pack " + id + " is trying to move to an already full node " + u.id + ". Rejected.");
+                Logger.log("Pack " + id + " is trying to move to a full node " + u.id + ", but this would cause the node to exceed its capacity. Rejected.");
                 return;
             }
             location = u;
