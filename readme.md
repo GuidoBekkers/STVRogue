@@ -5,34 +5,34 @@ Some methods are left unimplemented for you. You can extend the project, but
 please stick to the imposed architecture and keep the signatures of the current
 methods.
 
-Load the solution file (.sln) in Visual Studio. The solution contains the following projects:
-   * STVRogue: contains an initial implementation of the game entities.
-   * STVRogue_Main: a dummy console application for running the game.
-   * MSunitTests: an example a test project that uses Miscrosoft's own Visual Studio testing framework.
-   * NunitTests: an example a test project that uses NUnit testing framework.
-   * XunitTests: an example a test project that uses XUnit testing framework.
-   
-When extending the game logic, stick to pure C#. Avoid adding XNA classes to it, for example,
-since XNA does not interact well with the above unit testing frameworks (you will then
-need to write your own tetsing framework).
-   
-## Which VS to use?
-   
-You will need the Enterprise edition of Visual Studio to be able to measure the 
- coverage of your tests. The Enterprise edition also allows you to obtain
- code metrics from your solition (the size of every class, its complexity, etc).
+The project contains the following directories:
+   * `src`:  the source files, in Java
+   * `test`: here you can find few examples of unit tests
+
+In Java the names of packages are reflected in the directory path. For example
+the class `C` of the package `X.Y.Z` would reside in the path `src/X/Y/Z`, and the source
+file would be called `C.java`.
+
+Some notable packages:
+* `STVRogue.GameLogic` : this contains the game entities that you need to work out and test.
+* `STVRogue.Examples`  : contain some example classes; these are not relevant for the game you implement. The examples are mainly used to demonstrate unit testing.
+* `STVRogue.TestInfrastructure`: this contains classes relevant for Iteration-2. Ignore them for now.
+
+Some notable classes:
+* `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. to check if a zone forms a connected graph.
+* `STVRogue.PathCoverageTracker` contains a utility to track coverage over a finite state machine. Check it out if you do Optional-1.
+* `STVRogue.Utils` contains few utility methods, e.g. to create a pseudo-random generator.
+
+
+## Use Eclipse instead of VS
+
+Since you will be developing in Java, the easiest IDE to get you started is Eclipse. Once you have Eclipse, install the EclEmma plugin to help you track the code coverage of your unit tests.
+
 
 ## Which unit testing framework to use?
 
-There are three popular unit testing framework: Miscrosoft's own Visual Studio testing framework,
-the NUnit framework, and the XUnit framework. They all support the same basic functionalities,
-but there are small differences in their usage. I have included an example test project
-for each in the above solution.
+JUnit. It should already be part of your Eclipse install.
 
-If you want to try [NUnit](https://nunit.org/) or [XUnit](https://xunit.github.io/), visit their website for instructions on how to 
- install them in your solution. Install their respective VS runner too; this will allow
- you to run them from VS (rather than from Console). NUnit has beter documentation, but
- XUnit claims to be more modern :)
 
 ## Automated Testing (an optional part of your project)
 
@@ -43,54 +43,26 @@ cannot read our mind, so they have no clue what the intended definition of corre
 of a given program is.
 
 Automated generation of test inputs is however possible. As oracles, it makes sense to use
-so-called _properties_, which are predicates. 
+so-called _properties_, which are predicates.
 
-You can always build your own automated testing infrastructure, custom made for 
-the program at hand. There is also this framework called [FSCheck] (https://fscheck.github.io/FsCheck/index.html)
-which can do that for you. It is a variant of QuickCheck for .NET.
-I have included several examples of testing using FSCheck which you
-can find in the project _NunitTests_.
-
-Do keep in mind that all QuickCheck-like testing tools heavily rely on random generators
-to generate the test inputs. As such, you can't expect it perform well
+You can always build your own automated testing infrastructure, custom made for
+the program at hand. There is also this tool called T3
+(https://git.science.uu.nl/prase101/t3/wikis/home)
+which can do that for you. T3 belongs to the family of random testing tool, like QuickCheck. However, since Java is an OO language, T3 does a bit more. Given a target class C to test, it generates random sequences of calls to C's methods, and passing to them randomly generated inputs. Random testing tools are usually fast and easy to use, however you also can't expect them to perform well
 for generating inputs with very specific formats, e.g. valid email addresses.
-However, the framework allows you to write custom generators to get
+However, T3 allows you to write custom generators to get
 around this problem.
 
 We won't have any lecture on how to use tool-X; it is part of your optional fun
 to study its documentation and discover it on your own how to use it.
 I won't spoil the fun :)
 Besides, the lectures are to be used to focus more on the underlying concepts.
- 
+
 ## Mutation Tests (an optional part of your project)
 
 Mutation test is NOT a test against your System Under Test. Instead, it is
 a test to measure the strength of your test suite, so it is also quite useful.
 In fact, it should actually be a standard tool to support unit testing.
-There are a number of mutation testing tool for C#, unfortunately none
-seem to work anymore, except perhaps one.
-
-It's fun to do, and would be a useful experience too, if you manage to get
-the tool sufficiently working for you. For now, we will just do this for 
-experiment, and simply hope that the maturity of the tooling would become
-beter in the future.
-
-One tool that works is [VisualMutator] (https://visualmutator.github.io/web/). Do not
-install the standard distribution, install from this fork instead: https://github.com/pavzaj/visualmutator/releases
-
-The fork works with VS 2013 and VS 2015. I haven't checked 2017. However,
-**it only works in combination with NUnit tests**.
-
-To work with Visual Studio 2013 you might need to install the [.NET Framework 4.5.2 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=42637) and update NuGet to at least 2.12 (you can do this from `Tools -> Extensions and Updates -> Updates -> Visual Studio Gallery` and select `Update` for the NuGet extension).
-
-The manual should tell you how to start and configure a mutation test. There is
-**one annoying quirk** of VisualMutator: after the mutation test, it retains the lock
-to classes under test (the classes you let it mutate), so you can't save changes into
-those files. Since the idea is to test your test suites, in principle you don't
-want to change the classes under test. The lock is realeased if you quite VS.
-It could be that this is a phenomenon that only happens on my Windows-7 machine :|
-
-
- 
-
-
+There are fortunately a number of mutation testing tools for Java.
+We will use Pitest (http://pitest.org/).
+It's fun to do, and would be a useful experience too.
