@@ -1,7 +1,8 @@
 package STVRogue.Examples;
 
 /**
- * Just an example of some class, to demonstrate unit testing. 
+ * Just an example of some class. We use this as the target in some
+ * examples of unit tests. See the directory test/
  * 
  * This is a class representing thermometers in Celcius.
  */
