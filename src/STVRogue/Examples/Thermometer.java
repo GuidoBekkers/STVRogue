@@ -12,7 +12,8 @@ public class Thermometer {
 	private double offset ;
 	
 	public Thermometer(double s, double o) {
-		val    = o - 273.15 ; // bug
+		// val    = o - 273.15 ; // bug
+		val = o ;
 		scale  = s ;
 		offset = 0 ;
 	}

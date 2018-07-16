@@ -1,0 +1,18 @@
+
+* to build: ant compile
+* to run a unit test: java -ea -cp "./bin:./libs/*" org.junit.runner.JUnitCore STVRogue.Examples.Test_Theremometer
+*
+
+java -ea -cp "./bin:./libs/*" \
+    org.pitest.mutationtest.commandline.MutationCoverageReport \
+    --reportDir ./mutation \
+    --targetClasses STVRogue.Examples.Thermometer \
+    --targetTests STVRogue.Examples.Test_Theremometer \
+    --sourceDirs ./src
+
+java -cp "./bin:./libs/*" \
+    org.pitest.mutationtest.commandline.MutationCoverageReport \
+    --reportDir ./mutation \
+    --targetClasses STVRogue.Examples.SimpleIntSortedList \
+    --targetTests STVRogue.Examples.Test_SimpleIntSortedList \
+    --sourceDirs ./src

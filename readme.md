@@ -1,40 +1,66 @@
 # The STV Rogue Project
 
-This provides an initial implementation of the logical game entities of STV Rogue.
-Some methods are left unimplemented for you. You can extend the project, but
-please stick to the imposed architecture and keep the signatures of the current
-methods.
+### Needed Software
 
-The project contains the following directories:
-   * `src`:  the source files, in Java
-   * `test`: here you can find few examples of unit tests
+* __Java 8__.
+* __Eclipse__ Integrated Development Environment (IDE).
+* __JUnit 4__. This should be included in your Eclipse install. Else I include its jars in `libs`.
+* __EclEmma__ (https://www.eclemma.org/) Plugin for Eclipse.
+* For the Optionals assignements you need: the random testing tool __T3__ (https://git.science.uu.nl/prase101/t3/wikis/home), the mutation testing tool __Pitest__ (http://pitest.org/), and the build tool Apache __Ant__.
 
-In Java the names of packages are reflected in the directory path. For example
-the class `C` of the package `X.Y.Z` would reside in the path `src/X/Y/Z`, and the source
-file would be called `C.java`.
+### What Is in The Project?
 
-Some notable packages:
-* `STVRogue.GameLogic` : this contains the game entities that you need to work out and test.
-* `STVRogue.Examples`  : contain some example classes; these are not relevant for the game you implement. The examples are mainly used to demonstrate unit testing.
-* `STVRogue.TestInfrastructure`: this contains classes relevant for Iteration-2. Ignore them for now.
+This provides an initial Java implementation of the logical game entities of STV Rogue.
+Some methods are left unimplemented for you. You can extend the project,
+but please stick to the imposed architecture and keep the signatures of the current methods.
 
-Some notable classes:
-* `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. to check if a zone forms a connected graph.
-* `STVRogue.PathCoverageTracker` contains a utility to track coverage over a finite state machine. Check it out if you do Optional-1.
-* `STVRogue.Utils` contains few utility methods, e.g. to create a pseudo-random generator.
+At the top level, the project directory contains the following items:
+   * `src` : a directory containing the source files.
+   In Java the names of packages are reflected in the directory path.
+   For example the class `C` of the package `X.Y.Z` would reside in the path `src/X/Y/Z`, and the source
+   file would be called `C.java`.
 
+   You should focus on the package `STVRogue.GameLogic`. This contains the game entities that you need to work out in Iteration-1.
 
-## Use Eclipse instead of VS
+   The package `STVRogue.TestInfrastructure` contains classes relevant for Iteration-2. Ignore them for now.
 
-Since you will be developing in Java, the easiest IDE to get you started is Eclipse. Once you have Eclipse, install the EclEmma plugin to help you track the code coverage of your unit tests.
+   Some support classes you find useful:
 
-
-## Which unit testing framework to use?
-
-JUnit. It should already be part of your Eclipse install.
+      * `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. to check if a zone forms a fully connected graph.
+      * `STVRogue.PathCoverageTracker` contains a basic utility to track the coverage over a finite state machine. Check it out if you do Optional-1.
+      * `STVRogue.Utils` contains few utility methods, e.g. to create a pseudo-random generator.
 
 
-## Automated Testing (an optional part of your project)
+   * `test`: a directory containing few examples of writing unit tests.
+
+   The package `STVRogue.Examples` in `src` contains some example of simple target classes (classes to be tested).
+   The corresponding tests can be found in the same package in the directory `test`,
+   taking the form of classes named `Test_`_nameOfTargetClass_.
+
+   * `libs` : a directory containing the jars of various tools relevant for the Optionals. I put them there for your convenience.
+
+   * `build.xml` : Ant's build configuration.
+   You only need this if you insist on compiling the project with Ant rather than using Eclipse.
+
+   * `bin` and `mutation` : empty directories. You can ignore them, but if you want to know, the Ant build file I mention above will put resulting compiled code in `bin`.
+   I use `mutation` to put the generated mutation test results.
+
+#### Use Eclipse instead of VS
+
+Since you will be developing in Java, the easiest IDE to get you started is __Eclipse__. Once you have Eclipse, install the __EclEmma__ plugin to help you track the code coverage of your unit tests.
+
+#### Which unit testing framework to use?
+
+__JUnit__. It should already be part of your Eclipse install. When you 'run' a class C from within Eclipse (try to first figure out how to 'run' a file in Eclipse), the IDE is automatically aware whether C is a normal program or a Test class. In Java, 'running' a class means invoking its `main` method. So, for a class to be runnable from the top level it needs to have a method with the signature:
+
+> `static public void main(String[] args) { ... }`
+
+A JUnit test class uses however a different method to run it. It needs JUnit runner to run. This is however done implictly for you by Eclipse (so you don't have to worry about invoking the JUnit runner yourself).
+
+If you have installed EclEmma, there should be a separate button appearing in Eclipse to run a class with coverage tracking enabled.
+
+
+### Automated Testing (an optional part of your project)
 
 Among professionals, _Automated Testing_ usually mean automating the execution of your tests.
 Here I mean something stronger, namely automatically generating your test inputs, or even test
@@ -42,16 +68,39 @@ sequences. Unfortunately, test oracles cannot be generated by a machine, since m
 cannot read our mind, so they have no clue what the intended definition of correctness
 of a given program is.
 
-Automated generation of test inputs is however possible. As oracles, it makes sense to use
+Automated generation of test sequences and inputs is however possible. As oracles, it makes sense to use
 so-called _properties_, which are predicates.
 
-You can always build your own automated testing infrastructure, custom made for
-the program at hand. There is also this tool called T3
-(https://git.science.uu.nl/prase101/t3/wikis/home)
-which can do that for you. T3 belongs to the family of random testing tool, like QuickCheck. However, since Java is an OO language, T3 does a bit more. Given a target class C to test, it generates random sequences of calls to C's methods, and passing to them randomly generated inputs. Random testing tools are usually fast and easy to use, however you also can't expect them to perform well
-for generating inputs with very specific formats, e.g. valid email addresses.
+Use the tool __T3__
+(https://git.science.uu.nl/prase101/t3/wikis/home).
+You can download T3 jar from there, but for your convenience I already put it in `libs`.
+
+T3 belongs to the family of random testing tools, like QuickCheck. However, since Java is an OO language, T3 does a bit more.
+Given a target class C to test, T3 does not test each method of C individually. T3 preceives an OO class as implementing a data structure which is interacted to through the class' methods. The more proper way to test these methods is to test them together so we can also test if they interact correctly. To do this T3 generates generates random sequences of calls to C's methods, called _test sequences_, and passing to them randomly generated inputs.
+
+You can find an example of using T3 from a JUnit test class in the test class `STVRogue.Examples.Test_SimpleIntSortedList` in `test`. This test class invokes T3 to test the class `STVRogue.Examples.SimpleIntSortedList` in `src`. Note that this target class deliberately contains errors.
+
+##### In-code specifications
+
+A random testing tool compensates for its lack of intelligence by generating a large amount of test sequences in a single burst. Since an automated tool cannot generate test oracles, it means that __you__ will have to manually add the oracles. However, doing this for every individual test sequence is not going to scale up. For this reason, random-based testing is almost always used in conjunction with __property-based testing__.  The latter means that we formulate oracles in the form of _specifications_ that are expected to hold over all executions of your target class.
+T3 expects you to write these specifications in the form of `assert` statements inside your target class. T3 also allows you to specify a class invariant, which you can formulate in a method named **classinv__**.
+
+See the class `STVRogue.Examples.SimpleIntSortedList` to see examples how you can express such in-code specifications. Also note that T3 distinguishes between assertions taking the role of pre-conditions and assertions taking the role of post-conditions.
+
+##### Enabling assertions checking
+
+By default Java actually ignore `assert` statements, but when using T3 this is **not** what we want.
+
+   * If you execute tests with T3 from the command line, invoke Java with the -ea option to enable `assert` checking. So: `>java -ea ...`.
+
+   * If you execute tests with T3 from Eclipse, check out the Run configuration of your test classes. Add the option `-ea` to the field _VM argguments_.
+
+##### Custom value generators
+
+The down side of a random-based testing tool is that it might be very difficult for it to generate inputs with very specific formats,
+e.g. plain strings which are supposed to represent valid email addresses.
 However, T3 allows you to write custom generators to get
-around this problem.
+around this problem. Check out its documentation to see how you can write and hook them.
 
 We won't have any lecture on how to use tool-X; it is part of your optional fun
 to study its documentation and discover it on your own how to use it.
@@ -64,5 +113,28 @@ Mutation test is NOT a test against your System Under Test. Instead, it is
 a test to measure the strength of your test suite, so it is also quite useful.
 In fact, it should actually be a standard tool to support unit testing.
 There are fortunately a number of mutation testing tools for Java.
-We will use Pitest (http://pitest.org/).
+We will use __Pitest__ (http://pitest.org/).
 It's fun to do, and would be a useful experience too.
+
+The easiest start for you is to just use Pitest from command line, the Quickstart documentation in its website will show you how to do this.
+
+   * Just download all Pitest jars, and put them under `libs`. Actually, for your convenience I already put them there.
+
+   * For your convenience I also put an Ant build file, the file `build.xml`. This will allow you to compile all the source files and test files, and put the binary in `bin`. You need to install Apache `ant` first. To build, do this from the command shell in the directory of STVRogue:
+
+   > `ant compile`
+
+   * To run mutation test from the command shell, do something like:
+
+    ```
+    java -ea -cp "./bin:./libs/*" \
+       org.pitest.mutationtest.commandline.MutationCoverageReport \
+       --reportDir ./mutation \
+       --targetClasses STVRogue.Examples.Thermometer \
+       --targetTests STVRogue.Examples.Test_Theremometer \
+       --sourceDirs ./src```
+
+    This will dump the report to the `mutation` directory.
+
+   * Do keep in mind that Pitest mutation test assumes your test to be __green__, which means that it does not throw any violation.
+   If it does, you are supposed to fix it first, before running a mutation test.
