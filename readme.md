@@ -24,7 +24,7 @@ At the top level, the project directory contains the following items:
 
      The package `STVRogue.TestInfrastructure` contains classes relevant for Iteration-2. Ignore them for now.
 
-     Some support classes you find useful:
+     Some support classes you may find useful:
 
      The class `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. to check if a zone forms a fully connected graph.
 
