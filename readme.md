@@ -27,7 +27,9 @@ At the top level, the project directory contains the following items:
    Some support classes you find useful:
 
       * `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. to check if a zone forms a fully connected graph.
+
       * `STVRogue.PathCoverageTracker` contains a basic utility to track the coverage over a finite state machine. Check it out if you do Optional-1.
+      
       * `STVRogue.Utils` contains few utility methods, e.g. to create a pseudo-random generator.
 
 
