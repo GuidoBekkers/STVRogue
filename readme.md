@@ -16,36 +16,37 @@ but please stick to the imposed architecture and keep the signatures of the curr
 
 At the top level, the project directory contains the following items:
    * `src` : a directory containing the source files.
-   In Java the names of packages are reflected in the directory path.
-   For example the class `C` of the package `X.Y.Z` would reside in the path `src/X/Y/Z`, and the source
-   file would be called `C.java`.
+     In Java the names of packages are reflected in the directory path.
+     For example the class `C` of the package `X.Y.Z` would reside in the path `src/X/Y/Z`, and the source
+     file would be called `C.java`.
 
-   You should focus on the package `STVRogue.GameLogic`. This contains the game entities that you need to work out in Iteration-1.
+     You should focus on the package `STVRogue.GameLogic`. This contains the game entities that you need to work out in Iteration-1.
 
-   The package `STVRogue.TestInfrastructure` contains classes relevant for Iteration-2. Ignore them for now.
+     The package `STVRogue.TestInfrastructure` contains classes relevant for Iteration-2. Ignore them for now.
 
-   Some support classes you find useful:
+     Some support classes you find useful:
 
-      The class `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. to check if a zone forms a fully connected graph.
+        The class `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. to check if a zone forms a fully connected graph.
 
-      The class `STVRogue.PathCoverageTracker` contains a basic utility to track the coverage over a finite state machine. Check it out if you do Optional-1.
+        The class `STVRogue.PathCoverageTracker` contains a basic utility to track the coverage over a finite state machine. Check it out if you do Optional-1.
 
-      The class `STVRogue.Utils` contains few utility methods, e.g. to create a pseudo-random generator.
+        The class `STVRogue.Utils` contains few utility methods, e.g. to create a pseudo-random generator.
 
 
    * `test`: a directory containing few examples of writing unit tests.
 
-   The package `STVRogue.Examples` in `src` contains some example of simple target classes (classes to be tested).
-   The corresponding tests can be found in the same package in the directory `test`,
-   taking the form of classes named `Test_`_nameOfTargetClass_.
+     The package `STVRogue.Examples` in `src` contains some example of simple target classes (classes to be tested).
+     The corresponding tests can be found in the same package in the directory `test`,
+     taking the form of classes named `Test_`_nameOfTargetClass_.
 
    * `libs` : a directory containing the jars of various tools relevant for the Optionals. I put them there for your convenience.
 
    * `build.xml` : Ant's build configuration.
-   You only need this if you insist on compiling the project with Ant rather than using Eclipse.
+     You only need this if you insist on compiling the project with Ant rather than using Eclipse.
 
-   * `bin` and `mutation` : empty directories. You can ignore them, but if you want to know, the Ant build file I mention above will put resulting compiled code in `bin`.
-   I use `mutation` to put the generated mutation test results.
+   * `bin` and `mutation` : empty directories.
+     You can ignore them, but if you want to know, the Ant build file I mention above will put resulting compiled code in `bin`.
+     I use `mutation` to put the generated mutation test results.
 
 #### Use Eclipse instead of VS
 
