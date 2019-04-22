@@ -8,5 +8,6 @@
   <ItemGroup>
     <Folder Include="GameLogic\" />
     <Folder Include="GameControl\" />
+    <Folder Include="TestInfrastructure\" />
   </ItemGroup>
 </Project>
