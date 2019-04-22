@@ -25,8 +25,11 @@ public class Node extends GameEntity {
     public Zone zone ; 
     
     public NodeType type ;
+    
     /** the capacity of this node */
-    public int capacity ;
+    public int getCapacity() {
+    	throw new UnsupportedOperationException() ;
+    }
 
 	public Node(NodeType ty, String iD) {
 		super(iD);
@@ -63,5 +66,10 @@ public class Node extends GameEntity {
         }
         return seen;
     }
+	
+	/** Check if the node nd is reachable from this node. */
+	public boolean isReachable(Node nd) {
+		return reachableNodes().contains(nd) ;
+	}
 
 }

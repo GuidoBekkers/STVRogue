@@ -8,22 +8,30 @@ import java.util.LinkedList;
 public class Game {
 	
      public Player player ;
-      
-     /** the creature currently has the turn, either the player or a monster */
-     public Creature turn ;
+     /** all monsters currently live in the game. */
+     public List<Monster> monsters  = new LinkedList<Monster>() ;
+     /** all items in the game */
+     public List<Item> items = new LinkedList<Item>() ;
+     /** The dungeon */
+     public Dungeon dungeon ;
+        
+     
+     /** To count the number of passed turns. */
+     public int turnNumber = 0 ;
      
      public enum PlayerState {
     	 NOTinCombat,  
-    	 CombatS0, CombatS1, CombatS2, CombatS3, CombatS4, CombatS5, CombatS6
+    	 CombatStart, CombatCommitted, CombatMTR, 
+    	 CombatStartAndBoosted, CombatComittedAndBoosted, CombatMTRAndBoosted, 
+    	 CombatEnd
      }
-     
-     
      public PlayerState playerstate ;
      
-     /** all monsters currently live in the game. */
-     public List<Monster> monsters  = new LinkedList<Monster>() ;
-     public Dungeon dungeon ;
-       
+     /**
+      * The creature that currently has the turn.
+      */
+     public Creature whoHasTheTurn ;
+     
      public int z_ ; // no real use except for debug purposes
      
      public Game(){}
@@ -38,39 +46,54 @@ public class Game {
      
      /** return all monsters currently alive */
      public List<Monster> monsters() { return monsters ; }
+     /** return all items currently in the game */
+     public List<Item> items() { return items ; }
      public List<Node> nodes() { throw new UnsupportedOperationException() ; }   // Iteration-2
      public List<Node> bridges() { throw new UnsupportedOperationException() ; } // Iteration-2
      public List<Zone> zones() { return dungeon.zones ; }
+
      
-     /** Return the monster that still lives in the game, with the given id. 
-      *  If the monster does not exist anymore, null is returned.
+     /** 
+      * Return the monster with the given id, if it still lives in the game. 
+      * If the monster does not exist anymore, null is returned.
       */
      public Monster monster(String id) { throw new UnsupportedOperationException() ; } // Iteration-2
      public Node node(String id) { throw new UnsupportedOperationException() ; }   // Iteration-2
      public Node bridge(String id) { throw new UnsupportedOperationException() ; } // Iteration-2
      public Zone zone(String id) { throw new UnsupportedOperationException() ;   } // Iteration-2
      
-     /** Check is a monster with the given id still lives in the game. */
+     /** Check if a monster with the given id still lives in the game. */
      public boolean monsterExists(String id) { return monster(id) != null ; }
      public boolean nodeExists(String id) { return node(id) != null ; }
      public boolean bridgeExists(String id) { return bridge(id) != null ; }
      public boolean zoneExists(String id) { return zone(id) != null ; }
      
+
      /**
-      * Update the game state by **one turn**. If the turn belongs to a monster,
-      * then do that monster's turn, else interpret the given user-command to
-      * do a player-turn. 
-      * 
-      * Keep track if the player is in a combat or not in a combat. When he is in
-      * combat, keep track in which state the combat is. Use the variable playerstate
-      * to keep track of this. 
-      * 
-      * At the end of update, you should also decide who has the next turn, and
-      * what the next playerstate is (set it to NOTinCombat if the player is not
-      * in combat).
+      * Update the game by a single turn, carried out by the creature C (which can
+      * be either the player or a monster). The command cmd specifies which action
+      * C wants to do.
+      * It returns true if the command can be successfully carried out, and else
+      * false.
       */
- 	 public void update(Command usercommand) {
+ 	 public boolean doNCTurn(Creature C, Command cmd) {
 		throw new UnsupportedOperationException() ;
 	 }
+ 	 
+ 	 /**
+ 	  * Update the game with an entire combat round. This can only be executed if
+ 	  * a combat is possible (if the player's current node is contested).
+ 	  * The command cmd specifies the player's command for the coming combat round
+ 	  * (either use item, attack, or flee). Note that using an item should automatically
+ 	  * cause the player to attack after using the item.
+ 	  * 
+ 	  * Also note that a single combat round could take multiple turns.
+ 	  * 
+ 	  * The method returns true if the combat round terminates the combat, and else
+ 	  * false.
+ 	  */
+ 	 public boolean doOneCombatRound(Command cmd) {
+ 		throw new UnsupportedOperationException() ;
+ 	 }
      
 }

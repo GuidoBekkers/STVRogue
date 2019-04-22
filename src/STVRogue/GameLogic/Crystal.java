@@ -8,11 +8,12 @@ public class Crystal extends Item {
 	}
 	
 	/**
-	 * Using a crystal grants superhuman speed to the player. At the next turn (and only at the next turn)
-	 * the player's attack will hurt all monsters in the combat.
+	 * Using a crystal during a combat temporarily doubles the player's 
+	 * attack rating. The effect is gone once the combat ends.
+	 * Using a crystal while not in combat has no effect.
 	 */
 	@Override
-	public void use(Player player) { 
+	public void use(Game G, Player player) { 
 		throw new UnsupportedOperationException() ; 
 	}
 

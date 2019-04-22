@@ -10,11 +10,11 @@ import STVRogue.HelperPredicates;
 
 /** 
  * Iteration-2.
- * Contain some examples demonstrating how to test using instances of Specification.
+ * Contain some examples demonstrating how to test using instances of TemporalSpecification.
  * I am using dummy game-plays for this demonstration. 
  * Note that these are just example-tests, and are not actual tests for your STV-Rogue game.
  */
-public class Example_of_testing_with_Specifications {
+public class Example_of_testing_with_TemporalSpecifications {
 	
 	/** creating a bunch of dummy gameplays for demonstration. */
 	List<GamePlay> createDummyPlays() {
@@ -36,11 +36,11 @@ public class Example_of_testing_with_Specifications {
 		// the game plays used as test cases: 
 		List<GamePlay> plays = createDummyPlays() ;
 		// the specification we want to check on the game plays:
-		Specification spec = new Always(G -> G.z_ <= 3) ; /* [](z_ <= 3) */
+		TemporalSpecification spec = new Always(G -> G.z_ <= 3) ; /* [](z_ <= 3) */
 		// checking the specifation on the gameplays. 
 		// Require that the specification holds on all gameplays, and that at least 3 of them
 		// are non-trivial (for "Always"-type of specification any gameplay is non-trivial).
-		assertTrue(spec.evaluate(plays,3) == Specification.RelevantlyValid) ;
+		assertTrue(spec.evaluate(plays,3) == TemporalSpecification.RelevantlyValid) ;
 	}
 	
 	@Test
@@ -48,11 +48,11 @@ public class Example_of_testing_with_Specifications {
 		// the game plays used as test cases: 
 		List<GamePlay> plays = createDummyPlays() ;
 		// the specification we want to check on the game plays:
-		Specification spec = new Unless(G -> G.z_ <= 0, G -> G.z_ >= 3) ; /* z_ <= 0  UNLESS  z_ >= 3 */
+		TemporalSpecification spec = new Unless(G -> G.z_ <= 0, G -> G.z_ >= 3) ; /* z_ <= 0  UNLESS  z_ >= 3 */
 		// checking the specifation on the gameplays. 
 		// Require that the specification holds on all gameplays, and that at least 3 of them
 		// are non-trivial.
-		assertTrue(spec.evaluate(plays,3) == Specification.RelevantlyValid) ;
+		assertTrue(spec.evaluate(plays,3) == TemporalSpecification.RelevantlyValid) ;
 	}
 	
 	@Test
@@ -63,15 +63,15 @@ public class Example_of_testing_with_Specifications {
 		for(int k_ = 0 ; k_ < 5 ; k_ ++) {
 			final int k = k_ ;
 			/* An "unless" specification, parameterized with k:  z_ <= k  UNLESS  z_ >= 3-k */
-			Specification spec = new Unless(G -> G.z_ <= k, G -> G.z_ >= 3 - k) ; 
-			assertTrue(spec.evaluate(plays,3) == Specification.RelevantlyValid) ;
+			TemporalSpecification spec = new Unless(G -> G.z_ <= k, G -> G.z_ >= 3 - k) ; 
+			assertTrue(spec.evaluate(plays,3) == TemporalSpecification.RelevantlyValid) ;
 		}
 	}
 	
 	// @Test  disabled, you need to create an actual GamePlaye first
 	public void example_test4() {
 		GamePlay sigma = null ; // well you need to create one yourself
-		Specification spec = new Always(G -> HelperPredicates.forall(G.monsters(), m -> m.HP >= 0)) ;
-		assertTrue(spec.evaluate(sigma) == Specification.RelevantlyValid) ;
+		TemporalSpecification spec = new Always(G -> HelperPredicates.forall(G.monsters(), m -> m.HP >= 0)) ;
+		assertTrue(spec.evaluate(sigma) == TemporalSpecification.RelevantlyValid) ;
 	}
 }

@@ -2,12 +2,18 @@ package STVRogue.GameControl;
 
 import java.io.Serializable;
 
-/** Representing a user/player command. */
+/** Representing a command. */
 public class Command implements Serializable {
 	
 	public enum CommandType { DoNOTHING, MOVE, ATTACK, USE, FLEE }
 	
 	CommandType name ;
+	
+	/**
+	 * Some commands have arguments. For example, "USE" should specify
+	 * what item to use (e.g. a healing potion). You should decide the format
+	 * of the arguments.
+	 */
 	String[] args ;
 	
 	public Command(CommandType name, String[] args) {

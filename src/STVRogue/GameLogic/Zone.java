@@ -7,7 +7,7 @@ import STVRogue.HelperPredicates;
 import java.util.LinkedList; 
 
 /**
- * Representing a "Zone" in a dungeon. A Zone consists of nodes
+ * Representing a "Zone" in a dungeon. A Zone consists of at least two nodes
  * connected to each other. The nodes in a Zone should form a connected graph.
  * That is, there is always a path in this graph from which we can go from
  * any node x to any node y in the graph.
@@ -20,9 +20,7 @@ public class Zone extends GameEntity {
 	public enum zoneType { 
 		STARTzone,  // should contain a single start node
 		EXITzone,   // should contain a single exit node
-		InBETWEENzone, // should not contain start nor exit nodes, has at least two nodes, and of shape except linear
-		DUMMYzone, // an in-between zone with exactly one node
-		Corridor  // an in-between zone, with at least two nodes connected to form a linear sequence
+		InBETWEENzone, // should not contain start nor exit nodes
 		}
 	
 	List<Node> nodes = new LinkedList<Node>();
@@ -57,11 +55,9 @@ public class Zone extends GameEntity {
 		
 		// check if the zone is fully connected, and is of the right shape
 		if (DEBUG) {
-			assert nodes.size() >= 1 ;
-			assert ty == Zone.zoneType.STARTzone ? HelperPredicates.hasStartZone(this) : true ;
-			assert ty == Zone.zoneType.EXITzone  ? HelperPredicates.hasExitZone(this) : true ;
-			assert ty == Zone.zoneType.DUMMYzone ? nodes.size() == 1 : true ;
-			assert ty == Zone.zoneType.Corridor ? HelperPredicates.isCorridor(this) : true ;
+			assert nodes.size() >= 2 ;
+			assert ty == Zone.zoneType.STARTzone ? HelperPredicates.hasOneStartZone(this) : true ;
+			assert ty == Zone.zoneType.EXITzone  ? HelperPredicates.hasOneExitZone(this) : true ;
 			assert HelperPredicates.isConnected(this) ;
 		}
 	}

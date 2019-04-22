@@ -13,6 +13,6 @@ public class Item extends GameEntity {
 	 * Implementing the logic of what happen when the player uses this item.
 	 * Here it does nothing. Override this accordingly in the subclasses.
 	 */
-	public void use(Player player) { }
+	public void use(Game G, Player player) { }
 
 }

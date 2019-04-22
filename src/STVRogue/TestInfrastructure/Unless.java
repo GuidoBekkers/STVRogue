@@ -5,16 +5,16 @@ import java.util.function.Predicate;
 import STVRogue.Utils;
 import STVRogue.GameLogic.Game;
 
-public class Unless extends Specification {
+public class Unless extends TemporalSpecification {
 
 	Predicate<Game> p ;
 	Predicate<Game> q ;
 	public Unless(Predicate<Game> p, Predicate<Game> q) { this.p = p ; this.q = q ; }
 	
 	int judgement(boolean ok, boolean relevant) {
-		if (ok && relevant)  return Specification.RelevantlyValid ;
-		if (ok && !relevant) return Specification.TriviallyValid ;
-		return Specification.Invalid ;
+		if (ok && relevant)  return TemporalSpecification.RelevantlyValid ;
+		if (ok && !relevant) return TemporalSpecification.TriviallyValid ;
+		return TemporalSpecification.Invalid ;
 	}
 	
 	@Override
@@ -30,7 +30,7 @@ public class Unless extends Specification {
 		relevant = relevant || previous_pAndNotq ;
 		
 		while (!sigma.atTheEnd()) {
-			sigma.replayTurn();
+			sigma.replayCurrentTurn();
 			currentState = sigma.getState() ;
 			if (previous_pAndNotq) ok = p.test(currentState) || q.test(currentState) ;
 			else ok = true ;

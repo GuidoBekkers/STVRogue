@@ -30,11 +30,13 @@ public class PathCoverageTracker {
 	
 	/** Start tracking a path. */
 	public void startPath() { currentPath = "" ; }
+	
 	/** Register that we pass the given node */
 	public void tickNode(String node) {
 		if (currentPath == "") currentPath += node ;
 		else currentPath += ":" + node ;
 	}
+	
 	/** Signal the end of the current path. It will then be added to the set of executed path. */
 	public void endPath() {
 		for (String p : executed) {
@@ -59,10 +61,13 @@ public class PathCoverageTracker {
 		List<String> covered = getCoveredPaths() ;
 		List<String> uncovered = new LinkedList<String>() ;
 		for (String p : testRerquirements) {
+			boolean cov = false ;
 			for (String pcov : covered) {
-				if(p.equals(pcov)) break ;
+				if(p.equals(pcov)) {
+					cov = true ; break ;
+				}
 			}
-			uncovered.add(p) ;
+			if (!cov) uncovered.add(p) ;
 		}
 		return uncovered ;
 	}
@@ -72,8 +77,8 @@ public class PathCoverageTracker {
 		return testRerquirements;
 	}
 
-	/** Return the currently executed paths */
-	public List<String> getCovered() {
+	/** Return the current set of test paths. */
+	public List<String> getTestPaths() {
 		return executed;
 	}
 
@@ -95,20 +100,30 @@ public class PathCoverageTracker {
 	
 	public String printUncovered() {
 		StringBuffer out = new StringBuffer() ;
-		List<String> covered = getUncoveredPaths() ;
-		for (int k=0; k<covered.size(); k++) {
-			out.append(covered.get(k)) ;
+		List<String> uncovered = getUncoveredPaths() ;
+		for (int k=0; k<uncovered.size(); k++) {
+			out.append(uncovered.get(k)) ;
 			out.append("\n") ;
 		}
-		out.append("Uncovered: " + covered.size() + " paths.") ;
+		out.append("Uncovered: " + uncovered.size() + " paths.") ;
 		return out.toString() ;
 	}
 	
 	public String printSummary() {
 		int N = testRerquirements.size() ;
 		int n = getCoveredPaths().size()  ;
-		String out = "** covered = " + n + "/" + N ;
+		String out = "** The tests cover " + n + " targets out of " + N ;
 		if (n>=N) out += ". Well done!" ;
+		else {
+			out += "\n** Covered:" ;
+			for (String s : getCoveredPaths()) {
+				out += "\n     " + s ;
+			}
+			out += "\n** Uncovered:" ;
+			for (String s : getUncoveredPaths()) {
+				out += "\n     " + s ;
+			}
+		}
         return out ;
  	}
 	
@@ -125,7 +140,10 @@ public class PathCoverageTracker {
 		tracker.tickNode("3");
 		tracker.tickNode("0");
 		tracker.endPath();
-		System.out.println(tracker.printCovered());
+		//System.out.println(tracker.printCovered());
+		//System.out.println(tracker.printUncovered());
+		System.out.println(tracker.printSummary());
+		
 	}
 
 }

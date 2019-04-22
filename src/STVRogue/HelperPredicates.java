@@ -12,11 +12,23 @@ import STVRogue.GameLogic.Zone;
 public class HelperPredicates {
 	
 	/** 
-	 * Forall-quantifier. Example: forall(C, x -> x>=0) checks whether all integers
-	 * in the collection C are non-negative.
+	 * Forall-quantifier over a collection. 
+	 * Example: forall(C, x -> x>=0) checks whether all integers in the collection 
+	 * C are non-negative.
 	 * */
 	static public <T> boolean forall(Collection<T> C, Predicate<T> p) {
 		for (T x : C) {
+			if (! p.test(x)) return false ;
+		}
+		return true ;
+	}
+	
+	/** 
+	 * Forall-quantifier over an array. Example: forall(a, x -> x>=0) checks whether 
+	 * all integers in the array a are non-negative.
+	 * */
+	static public <T> boolean forall(T[] a, Predicate<T> p) {
+		for (T x : a) {
 			if (! p.test(x)) return false ;
 		}
 		return true ;
@@ -33,11 +45,26 @@ public class HelperPredicates {
 	}
 	
 	/** 
-	 * Exist-quantifier. Example: forall(C, x -> x<0) checks whether C contaisn 
-	 * a negative integer.
+	 * Exist-quantifier over a collection. Example: forall(C, x -> x<0) checks whether 
+	 * the collection C contains a negative integer.
 	 */
 	static public <T> boolean exists(Collection<T> C, Predicate<T> p) {
 		return ! forall(C, x -> !p.test(x)) ;
+	}
+	
+	/**
+	 * Check if p implies q (which is equivalent to !p or q).
+	 */
+	static public boolean imp(boolean p, boolean q) {
+		return !p || q ;
+	}
+	
+	/** 
+	 * Exist-quantifier over an array. Example: forall(a, x -> x<0) checks whether 
+	 * the array a contains a negative integer.
+	 */
+	static public <T> boolean exists(T[] a, Predicate<T> p) {
+		return ! forall(a, x -> !p.test(x)) ;
 	}
 	
 	/** Check if U = {y} */
@@ -50,21 +77,10 @@ public class HelperPredicates {
 		return U.size() == 2 && U.contains(y1)  && U.contains(y2) && y1 != y2 ;
 	}
 	
-	/** Check if a zone has the corridor shape */
-	static public boolean isCorridor(Zone zone) {
-		List<Node> nodes = zone.getNodes() ;
-		// check node-0:
-		if (! isSingletonContaining(nodes.get(0).neighbors,nodes.get(1))) 
-			return false  ;
-		for (int k=1 ; k<nodes.size()-1 ; k++) {
-			if (! isPairContaining(nodes.get(k).neighbors, nodes.get(k-1), nodes.get(k+1)))
-					return false ;
-		}
-		return true ;
-	}
+
 
 	/** Check if a zone contains exactly one start-node. */
-	static public boolean hasStartZone(Zone zone) {
+	static public boolean hasOneStartZone(Zone zone) {
 		int count = 0 ;
 		for (Node x : zone.getNodes()) {
 			if (x.type == Node.NodeType.STARTnode) count++ ;
@@ -73,7 +89,7 @@ public class HelperPredicates {
 	}
 
 	/** Check if a zone contains exactly one exit-node. */
-	static public boolean hasExitZone(Zone zone) {
+	static public boolean hasOneExitZone(Zone zone) {
 		int count = 0 ;
 		for (Node x : zone.getNodes()) {
 			if (x.type == Node.NodeType.EXITnode) count++ ;
@@ -81,15 +97,9 @@ public class HelperPredicates {
 		return count == 1 ;
 	}
 	
+	
 	/** Check if the zone is indeed fully connected. */
 	static public boolean isConnected(Zone zone) {
-		List<Node> nodes = zone.getNodes() ;
-		for(Node x : nodes) {
-			for(Node y : nodes) {
-				if (! x.reachableNodes().contains(y) || ! y.reachableNodes().contains(x))
-					return false ;
-			}
-		}
-		return true ;
+		throw new UnsupportedOperationException() ;
 	}
 }

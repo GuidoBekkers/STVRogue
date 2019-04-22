@@ -7,15 +7,41 @@ public class Player extends Creature{
 
 	/** kill point */
 	int KP = 0 ;
-	
-    public Dungeon dungeon;
-    public boolean accelerated = false;
+	int HPmax ;
+    public boolean boosted  = false;
     public boolean inCombat = false ;
     public List<Item> bag = new LinkedList<Item>();
 
-	public Player(String ID) { super(ID); }
+	public Player(String ID) { 
+		super(ID); 
+		// you need to decide how to initialize the other attributes
+	    throw new UnsupportedOperationException() ;
+	}
 	
 	@Override
-	public void Attack(Creature foe) { throw new UnsupportedOperationException() ; }
+	/**
+	 * Attack the foe.
+	 */
+	public void attack(Game G, Creature foe) { 
+		throw new UnsupportedOperationException() ; 
+	}
 
+	@Override
+	/**
+	 * Move the player to the given node. Return true if the move is
+	 * successful, else false.
+	 */
+	public boolean move(Game G, Node nd) { 
+		throw new UnsupportedOperationException() ; 
+	}
+	
+	@Override
+	/**
+	 * The player flees to the given node. Return true is this is successful,
+	 * else false.
+	 */
+	public boolean flee(Game G, Node nd) { 
+		throw new UnsupportedOperationException() ; 
+	}
+	
 }

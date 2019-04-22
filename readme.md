@@ -6,7 +6,8 @@
 * __Eclipse__ Integrated Development Environment (IDE).
 * __JUnit 4__. This should be included in your Eclipse install. Else I include its jars in `libs`.
 * __EclEmma__ (https://www.eclemma.org/) Plugin for Eclipse.
-* For the Optionals assignements you need: the random testing tool __T3__ (https://git.science.uu.nl/prase101/t3/wikis/home), the mutation testing tool __Pitest__ (http://pitest.org/), and the build tool Apache __Ant__.
+* For the Optionals assignements, and depending on offered optionals, you may need: the random testing tool __T3__ (https://git.science.uu.nl/prase101/t3/wikis/home), the mutation testing tool __Pitest__ (http://pitest.org/).
+* The build tool Apache __Ant__, if you want to build from command line rather than from the IDE.
 
 ### What Is in The Project?
 
@@ -15,22 +16,25 @@ Some methods are left unimplemented for you. You can extend the project,
 but please stick to the imposed architecture and keep the signatures of the current methods.
 
 At the top level, the project directory contains the following items:
+
    * `src` : a directory containing the source files.
      In Java the names of packages are reflected in the directory path.
      For example the class `C` of the package `X.Y.Z` would reside in the path `src/X/Y/Z`, and the source
      file would be called `C.java`.
 
-     You should focus on the package `STVRogue.GameLogic`. This contains the game entities that you need to work out in Iteration-1.
+     You should focus on the package `STVRogue.GameLogic`. This contains the game entities 
+     that you need to work out in Iteration-1.
 
-     The package `STVRogue.TestInfrastructure` contains classes relevant for Iteration-2. Ignore them for now.
+     The package `STVRogue.TestInfrastructure` contains classes relevant for Iteration-2. 
+     Ignore them for now.
 
      Some support classes you may find useful:
 
-     The class `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. to check if a zone forms a fully connected graph.
+      * The class `STVRogue.HelperPredicates` contains some predicates you might want to borrow, e.g. the forall and exists quantifiers you can use to write in-code specifications.
 
-     The class `STVRogue.PathCoverageTracker` contains a basic utility to track the coverage over a finite state machine. Check it out if you do Optional-1.
+      * The class `STVRogue.PathCoverageTracker` contains a basic utility to track the coverage over a finite state machine. Check it out if you do Optional-3.5.
 
-     The class `STVRogue.Utils` contains few utility methods, e.g. to create a pseudo-random generator.
+      * The class `STVRogue.Utils` contains few utility methods, e.g. to create a pseudo-random generator.
 
 
    * `test`: a directory containing few examples of writing unit tests.
@@ -63,7 +67,7 @@ A JUnit test class uses however a different method to run it. It needs JUnit run
 If you have installed EclEmma, there should be a separate button appearing in Eclipse to run a class with coverage tracking enabled.
 
 
-### Automated Testing (an optional part of your project)
+### Automated Testing (if this is an optional part of your project)
 
 Among professionals, _Automated Testing_ usually mean automating the execution of your tests.
 Here I mean something stronger, namely automatically generating your test inputs, or even test
@@ -110,7 +114,7 @@ to study its documentation and discover it on your own how to use it.
 I won't spoil the fun :)
 Besides, the lectures are to be used to focus more on the underlying concepts.
 
-## Mutation Tests (an optional part of your project)
+## Mutation Tests (if this is an optional part of your project)
 
 Mutation test is NOT a test against your System Under Test. Instead, it is
 a test to measure the strength of your test suite, so it is also quite useful.

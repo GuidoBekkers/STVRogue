@@ -26,7 +26,10 @@ public class GamePlay {
 	/** true if the gameplay is at the end, hence has no more turn to do. */
 	public boolean atTheEnd() { return turn >= length ; }
 	
-	/** replay the current turn, thus updating the game state; increase the turn nr. */
-	public void replayTurn() { throw new UnsupportedOperationException() ; }
+	/** 
+	 * Replay the current turn, thus updating the game state.
+	 * This also increases the turn nr, thus shifting the current turn to the next one. 
+	 */
+	public void replayCurrentTurn() { throw new UnsupportedOperationException() ; }
 	
 }
