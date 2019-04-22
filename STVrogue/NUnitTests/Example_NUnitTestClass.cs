@@ -1,13 +1,15 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using STVrogue.GameLogic;
 
-namespace MSUnitTests
+namespace NUnitTests
 {
-    [TestClass]
-    /* Just an example of a test class to show how to write one. */
-    public class TestClass1
+    /* Just an example of an NUnit test class to show how to write one. */
+    public class NUnitTestClass1
     {
-        [TestMethod]
+        [SetUp]
+        public void Setup(){ }
+
+        [Test]
         /* We will test the constructor of Creature. */
         public void test_Creature_contr()
         {
