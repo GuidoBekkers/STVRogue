@@ -49,7 +49,7 @@ public class Dungeon {
 		zones.add(exitZone) ;
 		connectWithBridge(previousZone,exitZone) ;
 
-		for (Node nd : startZone.nodes) {
+		for (Node nd : exitZone.nodes) {
 			if (nd.type == Node.NodeType.EXITnode) {
 				exitnode = nd ; break ;
 			}
