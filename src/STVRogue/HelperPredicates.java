@@ -66,18 +66,6 @@ public class HelperPredicates {
 	static public <T> boolean exists(T[] a, Predicate<T> p) {
 		return ! forall(a, x -> !p.test(x)) ;
 	}
-	
-	/** Check if U = {y} */
-	static private boolean isSingletonContaining(Collection<Node> U, Node y) {
-		return U.size() == 1 && U.contains(y) ;
-	}
-	
-	/** Check if U = {y1,Y2} */
-	static private boolean isPairContaining(Collection<Node> U, Node y1, Node y2) {
-		return U.size() == 2 && U.contains(y1)  && U.contains(y2) && y1 != y2 ;
-	}
-	
-
 
 	/** Check if a zone contains exactly one start-node. */
 	static public boolean hasOneStartZone(Zone zone) {
