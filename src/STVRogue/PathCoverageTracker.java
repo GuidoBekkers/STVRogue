@@ -45,6 +45,7 @@ public class PathCoverageTracker {
 		executed.add(currentPath) ;
 	}
 	
+	/** Return the list of covered targets. */
 	public List<String> getCoveredPaths() {
 		List<String> covered = new LinkedList<String>() ;
 		for (String target : testRerquirements) {
@@ -57,6 +58,7 @@ public class PathCoverageTracker {
 		return covered ;
 	}
 	
+	/** Return the list of still uncovered targets. */
 	public List<String> getUncoveredPaths() {
 		List<String> covered = getCoveredPaths() ;
 		List<String> uncovered = new LinkedList<String>() ;
@@ -109,6 +111,7 @@ public class PathCoverageTracker {
 		return out.toString() ;
 	}
 	
+	/** Printing a coverage report. */
 	public String printSummary() {
 		int N = testRerquirements.size() ;
 		int n = getCoveredPaths().size()  ;
