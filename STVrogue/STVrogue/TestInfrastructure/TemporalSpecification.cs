@@ -159,8 +159,8 @@ namespace STVrogue.TestInfrastructure
                     if (verdict == Judgement.Invalid) return Judgement.Invalid;
                     if (verdict == Judgement.RelevantlyValid) countRelevantlyValid++;
                 }
-                if (countRelevantlyValid >= threshold) return Judgement.RelevantlyValid;
             }
+            if (countRelevantlyValid >= threshold) return Judgement.RelevantlyValid;
             return Judgement.TriviallyValid;
         }
     }
