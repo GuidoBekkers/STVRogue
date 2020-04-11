@@ -10,7 +10,7 @@ namespace STVrogue.TestInfrastructure
     /// Representing three types of judgement of a specification.
     /// </summary>
     public enum Judgement {
-        Valid, DontKnow, Invalid
+        Valid, Inconclusive, Invalid
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ namespace STVrogue.TestInfrastructure
         ///    Invalid : the gameplay violates this specification (in other words this spec
         ///              is invalid on the gameplay).
         /// 
-        ///    DontKnow : the gameplay does not violate this specification, but it does so
+        ///    Inconclusive : the gameplay does not violate this specification, but it does so
         ///               by violating the assumption of this specification, and therefore
         ///               trivially satisfying it.
         ///               This verdict is only applicable for a specification that has a
@@ -50,7 +50,7 @@ namespace STVrogue.TestInfrastructure
         ///     Valid: if no gameplay results in Invalid, and there are enough gameplays
         ///            that give Valid verdict. The needed number is specified by the
         ///            threshold parameter.
-        ///     DontKnow: if none of the above two cases hold.
+        ///     Inconclusive: if none of the above two cases hold.
         /// </summary>
         public Judgement Evaluate(int threshold, params GamePlay[] gameplays)
         {
@@ -62,7 +62,7 @@ namespace STVrogue.TestInfrastructure
                 if (verdict == Judgement.Valid) countRelevantlyValid++;
             }
             if (countRelevantlyValid >= threshold) return Judgement.Valid;
-            return Judgement.DontKnow;
+            return Judgement.Inconclusive;
         }
 
         public Judgement Evaluate(int threshold, List<GamePlay> gameplays)
