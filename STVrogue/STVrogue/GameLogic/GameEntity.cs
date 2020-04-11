@@ -1,15 +1,19 @@
-﻿using System;
-namespace STVrogue.GameLogic
+﻿namespace STVrogue.GameLogic
 {
-    /* A parent class representing all game entities in STV Rogue. */
+    /// <summary>
+    /// A parent class representing all game entities in STV Rogue.
+    /// </summary>
     public class GameEntity
     {
-        /* Every entity is identified by a unique ID */
-        public String ID;
+        /// <summary>
+        /// Every entity is identified by a unique ID.
+        /// </summary>
+        string id;
 
-        public GameEntity(String uniqueID)
+        public GameEntity(string uniqueId)
         {
-            this.ID = uniqueID;
+            this.id = uniqueId;
         }
+        public string Id => id;
     }
 }

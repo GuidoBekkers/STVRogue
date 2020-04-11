@@ -1,169 +1,115 @@
 ﻿using System;
 using System.Collections.Generic;
 using STVrogue.GameLogic;
+using static STVrogue.Utils.Utils ;
 
 namespace STVrogue.TestInfrastructure
 {
 
+    /// <summary>
+    /// Representing three types of judgement of a specification.
+    /// </summary>
     public enum Judgement {
-        RelevantlyValid, TriviallyValid, Invalid
+        Valid, DontKnow, Invalid
     }
 
+    /// <summary>
+    /// This is for PART-2.
+    /// A "temporal specification" represents a correctness property that is judged over
+    /// an entire gameplay.
+    /// </summary>
     /* ITERATION 2.
-     * A "temporal specification" represents a correctness property that should hold over
-     * an entire gameplay.
+     * 
      */
     public abstract class TemporalSpecification
     {
 
-        /* 
-         * Check if this specification holds on the given gameplay. It returns a Judgement
-         * with the following meaning:
-         *    Invalid : the gameplay violates this specification (in other words this spec
-         *        is invalid on the gameplay).
-         *    TriviallyValid : the gameplay satisfies this specification, but only because it does not
-         *        meet this specification's assumptions (if there are any). Therefore
-         *        the specification is only trivially valid on the gameplay.
-         *    RelevantlyValid : the gameplay satisfies this specification's assumptions and its claim.
-         *        Therefore it is relevantly valid.
-         */
-        abstract public Judgement evaluate(GamePlay gameplay);
+        /// <summary>
+        /// Check if this specification holds on the given gameplay. It returns a Judgement
+        /// with the following meaning:
+        /// 
+        ///    Invalid : the gameplay violates this specification (in other words this spec
+        ///              is invalid on the gameplay).
+        /// 
+        ///    DontKnow : the gameplay does not violate this specification, but it does so
+        ///               by violating the assumption of this specification, and therefore
+        ///               trivially satisfying it.
+        ///               This verdict is only applicable for a specification that has a
+        ///               concept of "assumption".
+        ///
+        ///    Valid:     the gameplay does not violate this specification, nor its
+        ///               assumption, if this specification has a concept of "assumption".
+        ///
+        /// </summary>
+        abstract public Judgement Evaluate(GamePlay gameplay);
 
-        /*
-        *  Evaluate this specification on a bunch of gameplays. It only returns RelevantlyValid (2)
-        *  if there is no violation and furthermore the number of gameplays on which this
-        *  specification is relevantly valid is at least the specified threshold.
-        */
-        public Judgement evaluate(GamePlay[] gameplays, int threshold)
+        /// <summary>
+        /// Evaluate this specification on a bunch of gameplays. It returns three types of
+        /// verdict:
+        ///     Invalid: if the specification is invalid on one of the gameplay.
+        ///     Valid: if no gameplay results in Invalid, and there are enough gameplays
+        ///            that give Valid verdict. The needed number is specified by the
+        ///            threshold parameter.
+        ///     DontKnow: if none of the above two cases hold.
+        /// </summary>
+        public Judgement Evaluate(int threshold, params GamePlay[] gameplays)
         {
             int countRelevantlyValid = 0;
             for (int k = 0; k < gameplays.Length; k++)
             {
-                Judgement verdict = evaluate(gameplays[k]);
+                Judgement verdict = Evaluate(gameplays[k]);
                 if (verdict == Judgement.Invalid) return Judgement.Invalid;
-                if (verdict == Judgement.RelevantlyValid) countRelevantlyValid++;
+                if (verdict == Judgement.Valid) countRelevantlyValid++;
             }
-            if (countRelevantlyValid >= threshold) return Judgement.RelevantlyValid;
-            return Judgement.TriviallyValid;
+            if (countRelevantlyValid >= threshold) return Judgement.Valid;
+            return Judgement.DontKnow;
         }
 
-        /* Evaluate this specification on a bunch of gameplays. */
-        public Judgement evaluate(List<GamePlay> gameplays, int threshold)
+        public Judgement Evaluate(int threshold, List<GamePlay> gameplays)
         {
-            return evaluate(gameplays.ToArray(), threshold);
+            return Evaluate(threshold, gameplays.ToArray());
         }
     }
 
-    /*
-     * Representing a temporal property of the form "Always p". A gameplay
-     * satisfies this property if p holds on the game state through out the
-     * play.
-     */
+    /// <summary>
+    /// Representing a temporal property of the form "Always p", where p is a
+    /// state-predicate. A gameplay satisfies this property if the predicate p
+    /// holds on every game state through out the play.
+    /// </summary>
     public class Always : TemporalSpecification
     {
         Predicate<Game> p;
 
         public Always(Predicate<Game> p) { this.p = p; }
        
-        public override Judgement evaluate(GamePlay sigma)
+        public override Judgement Evaluate(GamePlay sigma)
         {
-            sigma.reset();
+            sigma.Reset();
             // check the initial state:
-            Boolean ok = p(sigma.getState());
+            Boolean ok = p(sigma.GetState());
             if (!ok)
             {
                 // the predicate p is violated!
-                Utils.log("violation of Always at turn " + sigma.getTurn());
+                Log("violation of Always at turn " + sigma.Turn);
                 return Judgement.Invalid;
             }
-            while (!sigma.atTheEnd())
+            while (!sigma.AtTheEnd())
             {
                 // replay the current turn (and get the next turn)
-                sigma.replayCurrentTurn();
+                sigma.ReplayCurrentTurn();
                 // check if p holds on the state that resulted from replaying the turn
-                ok = p(sigma.getState());
+                ok = p(sigma.GetState());
                 if (!ok)
                 {
                     // the predicate p is violated!
-                    Utils.log("violation of Always at turn " + sigma.getTurn());
+                    Log("violation of Always at turn " + sigma.Turn);
                     return Judgement.Invalid;
                 }
 
             }
             // if we reach this point than p holds on every state in the gameplay:
-            return Judgement.RelevantlyValid;
+            return Judgement.Valid;
         }
     }
-
-    public class Unless : TemporalSpecification
-    {
-        Predicate<Game> p;
-        Predicate<Game> q;
-        public Unless(Predicate<Game> p, Predicate<Game> q) { this.p = p; this.q = q; }
-
-        private Judgement judgement(Boolean ok, Boolean relevant)
-        {
-            if (ok && relevant) return Judgement.RelevantlyValid;
-            if (ok && !relevant) return Judgement.TriviallyValid;
-            return Judgement.Invalid;
-        }
-
-        public override Judgement evaluate(GamePlay sigma)
-        {
-            sigma.reset();
-            Boolean relevant = false;
-            Boolean ok = true;
-            Boolean previous_pAndNotq; // to keep track if p && ~q holds in the previous state
-            if (sigma.atTheEnd()) return judgement(ok, relevant);
-            // else we have at least one turn
-            Game currentState = sigma.getState();
-            previous_pAndNotq = p(currentState) && !q(currentState);
-            relevant = relevant || previous_pAndNotq;
-
-            while (!sigma.atTheEnd())
-            {
-                sigma.replayCurrentTurn();
-                currentState = sigma.getState();
-                if (previous_pAndNotq) ok = p(currentState) || q(currentState);
-                else ok = true;
-                if (!ok)
-                {
-                    // the predicate p is violated!
-                    Utils.log("violation of Unless at turn " + sigma.getTurn());
-                    return judgement(ok, relevant);
-                }
-                previous_pAndNotq = p(currentState) && !q(currentState);
-                relevant = relevant || previous_pAndNotq;
-            }
-            return judgement(ok, relevant);
-        }
-    }
-
-    /*
-     * Representing a family of temporal specifications as explained in the Document of Iteration-2.   
-     */    
-    public class SpecificationFamily{
-
-        List<TemporalSpecification> specs = new List<TemporalSpecification>();
-
-        public SpecificationFamily() { }
-        public SpecificationFamily add(TemporalSpecification phi) { specs.Add(phi); return this;  }
-
-        public Judgement evaluate(GamePlay[] gameplays, int threshold){
-            int countRelevantlyValid = 0;
-            foreach(TemporalSpecification phi in specs)
-            {
-                for (int k = 0; k < gameplays.Length; k++)
-                {
-                    Judgement verdict = phi.evaluate(gameplays[k]);
-                    if (verdict == Judgement.Invalid) return Judgement.Invalid;
-                    if (verdict == Judgement.RelevantlyValid) countRelevantlyValid++;
-                }
-            }
-            if (countRelevantlyValid >= threshold) return Judgement.RelevantlyValid;
-            return Judgement.TriviallyValid;
-        }
-    }
-
-
+    
 }

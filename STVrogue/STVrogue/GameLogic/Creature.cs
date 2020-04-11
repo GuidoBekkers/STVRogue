@@ -6,126 +6,130 @@ namespace STVrogue.GameLogic
     public class Creature : GameEntity
     {
 
-        public String name = "goblin";
-        public int HP = 1;     // current HP, should never exceed HPmax
-        public Node location;
-        public int AttackRating = 1;
-
-        public Creature(String ID) : base(ID){ }
-
-        /*
-         * Attack the foe. This one just throws an exception; you need to
-         * override it in the corresponding subclasses (Monster and Player).
-         */
-        public virtual void attack(Game G, Creature foe)
+        string name = "goblin";
+        int hpMax;
+        int hp ;     // current HP, should never exceed HPmax
+        bool alive ;
+        Room location;
+        int attackRating ;
+        
+        public Creature(string id, String name) : base(id)
         {
-            throw new NotImplementedException();
-        }
-
-        /*
-         * Move this creature to the given node. Return true if the move is
-         * successful, else false.
-         * This one just throws an exception; you need to
-         * override it in the corresponding subclasses (Monster and Player).
-         */
-        public virtual Boolean move(Game G, Node nd)
-        {
-            throw new NotImplementedException();
-        }
-
-        /*
-         * This creature flees to the given node. Return true is this is successful,
-         * else false.
-         * This one just throws an exception; you need to
-         * override it in the corresponding subclasses (Monster and Player).
-         */
-        public virtual Boolean flee(Game G, Node nd)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class Monster : Creature
-    {
-        public Monster(String ID) : base(ID)
-        {
+            this.name = name;
             // you need to decide how to initialize the other attributes
+        }
+
+        public Creature(string id, int hp, int ar) : base(id)
+        {
+            if(id==null || hp<=0 || ar<=0) 
+                throw new ArgumentException();
+            this.hp = hp;
+            hpMax = hp;
+            attackRating = ar;
+        }
+
+        #region getters setters
+        public string Name => name;
+
+        public int Hp
+        {
+            get => hp;
+            set => hp = value;
+        }
+
+        public int HpMax
+        {
+            get => hpMax;
+            set => hpMax = value;
+        }
+
+        public bool Alive
+        {
+            get => alive;
+            set => alive = value;
+        }
+
+        public Room Location
+        {
+            get => location;
+            set => location = value;
+        }
+
+        public int AttackRating
+        {
+            get => attackRating;
+            set => attackRating = value;
+        }
+        #endregion
+        
+        /// <summary>
+        /// Move this creature to the given room. This is only allowed if r
+        /// is a neigboring room of the creature's current location. Also
+        /// keep in mind that rooms have capacity.
+        /// The metod returns true if the move is successful, else false.
+        /// </summary>
+        public virtual bool Move(Room r)
+        {
+            throw new NotImplementedException();
+        }
+        
+        /// <summary>
+        /// Attack the given foe. This is only possible if this creature is alive and
+        /// if the foe is in the same room as this creature.
+        /// </summary>
+        public virtual void Attack(Creature foe)
+        {
             throw new NotImplementedException();
         }
        
-        /*
-         * Attack the foe. 
-         */
-        public override void attack(Game G, Creature foe)
-            {
-                throw new NotImplementedException();
-            }
+    }
 
-    
-        /*
-         * Move this monster to the given node. Return true if the move is
-         * successful, else false.
-         */
-        public override Boolean move(Game G, Node nd)
-            {
-                throw new NotImplementedException();
-            }
-
-        /*
-         * This monster flees to the given node. Return true is this is successful,
-         * else false.
-         */
-        public override Boolean flee(Game G, Node nd)
-            {
-                throw new NotImplementedException();
-            }
+    /// <summary>
+    /// Representing monsters.... you know, those scary things you don't want
+    /// to mess with.
+    /// </summary>
+    public class Monster : Creature
+    {
+        public Monster(String id, String name) : base(id,name)
+        {
+        }
+        
     }
 
     public class Player : Creature
     {
-        /** kill point */
-        int KP = 0;
-        int HPmax;
-        public Boolean boosted = false;
-        public Boolean inCombat = false;
-        public List<Item> bag = new List<Item>();
+        /* kill point */
+        int kp = 0;
+        List<Item> bag = new List<Item>();
 
-        public Player(String ID) : base(ID)
+        public Player(String id, String name) : base(id,name)
         {
             // you need to decide how to initialize the other attributes
             throw new NotImplementedException();
         }
 
-        /*
-         * Attack the foe. 
-         */
-        public override void attack(Game G, Creature foe)
+        #region getters setters
+        public int Kp
+        {
+            get => kp;
+            set => kp = value;
+        }
+
+        public List<Item> Bag
+        {
+            get => bag;
+            set => bag = value;
+        }
+        #endregion
+
+        /// <summary>
+        /// Use the given item. We also pass the current turn-number at which
+        /// this action happens.
+        /// </summary>
+        public void Use(long turnNr, Item i)
         {
             throw new NotImplementedException();
         }
-
-        /*
-         * Move the player to the given node. Return true if the move is
-         * successful, else false.
-         */
-        public override Boolean move(Game G, Node nd)
-        {
-            throw new NotImplementedException();
-        }
-
-        /*
-         * The player flees to the given node. Return true is this is successful,
-         * else false.
-         */
-        public override Boolean flee(Game G, Node nd)
-        {
-            throw new NotImplementedException();
-        }
-
-
     }
-
-
-
-
+    
 }

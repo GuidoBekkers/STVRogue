@@ -4,95 +4,115 @@ using STVrogue.GameControl;
 
 namespace STVrogue.GameLogic
 {
-
-    public enum PlayerState
+    /// <summary>
+    /// Representing the configuration of a level.
+    /// </summary>
+    [Serializable()]
+    public class GameConfiguration
     {
-        NOTinCombat,
-        CombatStart, CombatCommitted, CombatMTR,
-        CombatStartAndBoosted, CombatComittedAndBoosted, CombatMTRAndBoosted,
-        CombatEnd
+        public int numberOfRooms;
+        public int maxRoomCapacity;
+        public DungeonShapeType dungeonShape;
+        public int initialNumberOfMonsters;
+        public int initialNumberOfHealingPots;
+        public int initialNumberOfRagePots;
+        public DifficultyMode difficultyMode;
     }
-
-    /* This class represents the whole game state of STV-Rogue */
+    
+    [Serializable()]
+    public enum DifficultyMode {
+        NEWBIEmode,
+        NORMALmode,
+        ELITEmode
+    }
+    
+    /// <summary>
+    /// This class implements the logic of STV-Rogue. It holds its entire game-state
+    /// and provides an update-method which is invoked every turn to execute all
+    /// things that should happen at that turn.
+    ///
+    /// Some other methods are deliberately exposed as public to make it easier for
+    /// us to track that you indeed unit-test them.
+    /// </summary>
     public class Game
     {
 
-        public Player player;
-        /* all monsters currently live in the game. */
-        public List<Monster> monsters = new List<Monster>();
-        /* all items in the game */
-        public List<Item> items = new List<Item>();
-        /* The dungeon */
-        public Dungeon dungeon;
+        Player player;
+        Dungeon dungeon;
+        private bool gameover = false;
+
+        /// <summary>
+        /// Ignore this variable. It is added for some debug purpose.
+        /// </summary>
+        public int z_;
 
         /* To count the number of passed turns. */
-        public int turnNumber = 0;
-        /* The creature that currently has the turn. */
-        public Creature whoHasTheTurn;
+        int turnNumber = 0;
 
-        public PlayerState playerstate;
-
-        public int z_; // no real use except for debug purposes
-
-        public Game(){ }
-
-        /*
-         * Create a game with a dungeon of the specified level and capacityMultiplier.
-         * This also creates a proper instance of Player.
-         */
-        public Game(int level, int capacityMultiplier)
+        public Game() {}
+        
+        public Game(GameConfiguration conf)
         {
             throw new NotImplementedException();
         }
 
-        /* return all nodes in the game. */
-        public List<Node> nodes() { throw new NotImplementedException(); }   // Iteration-2
-        public List<Node> bridges() { throw new NotImplementedException(); } // Iteration-2
-        public List<Zone> zones() { return dungeon.getZones() ; }
+        public Player Player => player;
 
+        public Dungeon Dungeon => dungeon;
 
-        /* 
-         * Return the monster with the given id, if it still lives in the game. 
-         * If the monster does not exist anymore, null is returned.
-         */
-        public Monster monster(String id) { throw new NotImplementedException(); } // Iteration-2
-        public Node node(String id) { throw new NotImplementedException(); }   // Iteration-2
-        public Node bridge(String id) { throw new NotImplementedException(); } // Iteration-2
-        public Zone zone(String id) { throw new NotImplementedException(); } // Iteration-2
+        public int TurnNumber => turnNumber;
 
-        /* Check if a monster with the given id still lives in the game. */
-        public Boolean monsterExists(String id) { return monster(id) != null; }
-        public Boolean nodeExists(String id) { return node(id) != null; }
-        public Boolean bridgeExists(String id) { return bridge(id) != null; }
-        public Boolean zoneExists(String id) { return zone(id) != null; }
+        public bool Gameover => gameover;
 
-        /*
-         * Update the game by a single turn, carried out by the creature C (which can
-         * be either the player or a monster). The command cmd specifies which action
-         * C wants to do.
-         * It returns true if the command can be successfully carried out, and else
-         * false.
-         */
-        public Boolean doNCTurn(Creature C, Command cmd)
+        /// <summary>
+        /// Move the creature c from its current location to the given destination room.
+        /// This should only be done if the room is a neighboring room and if moving c
+        /// to the destination room would not exceed the room's capacity.
+        /// </summary>
+        public void Move(Creature c, Room destination)
         {
             throw new NotImplementedException();
         }
 
-        /*
-         * Update the game with an entire combat round. This can only be executed if
-         * a combat is possible (if the player's current node is contested).
-         * The command cmd specifies the player's command for the coming combat round
-         * (either use item, attack, or flee). Note that using an item should automatically
-         * cause the player to attack after using the item.
-         * 
-         * Also note that a single combat round could take multiple turns.
-         * 
-         * The method returns true if the combat round terminates the combat, and else
-         * false.
-         */
-        public Boolean doOneCombatRound(Command cmd)
+        /// <summary>
+        /// Execute an attack by the attacker on the defender. This should only be done when
+        /// the attacker is alive, and both attacker and defender are in the same room.
+        /// </summary>
+        public void Attack(Creature attacker, Creature defender)
+        {
+            
+        }
+
+        /// <summary>
+        /// Activate the effect of using the given item (by the player). Note an effect,
+        /// once activated, may last for several turns.
+        /// </summary>
+        public void UseItem(Item i)
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Cause a creature to flee a combat. This will take the creature to a neighboring
+        /// room. This should not breach the capacity of that room. Note that fleeing a
+        /// combat is not always possible --see the Project Document.
+        /// </summary>
+        public void Flee(Creature c)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Perform a single turn-update on the game. In every turn, each creature
+        /// is allowed to do one action. The player does and specified in the argument
+        /// of this method. A monster can either do nothing, move, attack, or flee.
+        /// See the Project Document that defines when these are possible.
+        /// The order in which creatures execute their actions is random.
+        /// </summary>
+        public void Update(Command playerAction)
+        {
+            throw new NotImplementedException();
+        }
+        
     }
 }

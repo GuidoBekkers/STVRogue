@@ -1,192 +1,161 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection.Metadata;
 
 namespace STVrogue.GameLogic
 {
-    /* A dungeon is made of a sequence of zones/levels. */
+    
+    /// <summary>
+    /// Representing a dungeon. A dungeon consists of rooms, connected to from a graph.
+    /// It has one unique starting room and one unique exit room. All rooms should be
+    /// reachable from the starting room.
+    /// </summary>
     public class Dungeon
     {
-        List<Zone> zones = new List<Zone>();
-        Node startnode;
-        Node exitnode = null;
-        int capacityMultiplier;
-
-        public List<Zone> getZones() { return zones; }
-        public Node getStartnode() { return startnode; }
-        public Node getExitnode() { return exitnode; }
-
-        /*
-         * Create a dungeon with the indicated number of zones (should be at least 3). This creates
-         * the start and exit zones. The zones should be linked linearly to each other with bridges.
-         */
-        public Dungeon(int numberOfZones, int capacityMultiplier)
-        {
-            if (numberOfZones < 3) throw new ArgumentException();
-            this.capacityMultiplier = capacityMultiplier;
-            // creating the start zone:
-            int numOfNodesInstartZone = -1; // FIX THIS! Decide how many nodes
-            Zone startZone = new Zone("Z1", zoneType.STARTzone, 1, numOfNodesInstartZone);
-            zones.Add(startZone);
-            foreach (Node nd in startZone.getNodes())
-            {
-                if (nd.type == NodeType.STARTnode)
-                {
-                    startnode = nd; break;
-                }
-            }
-            // adding in-between zones:
-            Zone previousZone = startZone;
-            for (int z = 2; z < numberOfZones; z++)
-            {
-                int numOfNodes = -1; // FIX THIS! Decide how many nodes
-                Zone zone = new Zone("Z" + z, zoneType.InBETWEENzone, 1, numOfNodes);
-                zones.Add(zone);
-                connectWithBridge(previousZone, zone);
-                previousZone = zone;
-            }
-            // creating the exit zone:
-            int numOfNodesInExitZone = -1; // FIX THIS! decide how many nodes
-            Zone exitZone = new Zone("Z" + numberOfZones, zoneType.EXITzone, 1, numOfNodesInExitZone);
-            zones.Add(exitZone);
-            connectWithBridge(previousZone, exitZone);
-
-            foreach(Node nd in exitZone.getNodes())
-            {
-                if (nd.type == NodeType.EXITnode)
-                {
-                    exitnode = nd; break;
-                }
-            }
-        }
-
-        /* Drop monsters and items into the dungeon. */
-        public void seedMonstersAndItems()
+        HashSet<Room> rooms = new HashSet<Room>();
+        Room startRoom;
+        Room exitRoom ;
+        
+        /// <summary>
+        /// Create a dungeon with the indicated number of rooms and the indicated shape.
+        /// A dungeon shape can be "linear" (list-shaped), "tree", or "random".
+        /// A dungeon should have
+        /// a unique start-room and a unique exit-room. All rooms in the dungeon must be
+        /// reachable from the start-room.
+        /// Each room is set to have a random capacity between 1 and the given maximum-capacity.
+        /// Start and exit-rooms should have capacity 0.
+        /// </summary>
+        public Dungeon(DungeonShapeType shape, int numberOfRooms, int maximumRoomCapacity)
         {
             throw new NotImplementedException();
         }
 
-
-        /* Link zone1 to zone2 through a bridge. The bridge should be part of zone1 (or, you can
-         * alternatively convert a node in zone1 to become a bridge. Make sure that all paths from
-         * zone1 to zone2 MUST pass through the bridge.
-         */
-        static private void connectWithBridge(Zone zone1, Zone zone2)
+        #region getters & setters
+        public HashSet<Room> Rooms
         {
-            throw new NotImplementedException();
-
-        }
-    }
-
-    /** Different types of zones. */
-    public enum zoneType
-    {
-        STARTzone,  // should contain a single start node
-        EXITzone,   // should contain a single exit node
-        InBETWEENzone, // should not contain start nor exit nodes
-    }
-
-    /*
-     * Representing a "Zone" in a dungeon. A Zone consists of at least two nodes
-     * connected to each other. The nodes in a Zone should form a connected graph.
-     * That is, there is always a path in this graph from which we can go from
-     * any node x to any node y in the graph.
-     */
-    public class Zone : GameEntity
-    {
-        List<Node> nodes = new List<Node>();
-        zoneType type;
-        int level;
-
-        public List<Node> getNodes(){ return nodes; }
-        public zoneType getType(){ return type; }
-        public int getLevel(){ return level; }
-
-        /* Create a zone of the specified type and number of nodes. */
-        public Zone(String ID, zoneType ty, int zoneLevel, int numberOfnodes) : base(ID)
-        {
-            if (zoneLevel < 1 || numberOfnodes < 2) throw new ArgumentException();
-            type = ty;
-            level = zoneLevel;
-            if (ty == zoneType.STARTzone) level = 1;
-            else level = zoneLevel;
-
-            // TODO .. the implementation here
-            if (true) throw new NotImplementedException();
-
-            // When compiled in the Debug-build, check the following conditions:
-            Debug.Assert(nodes.Count >= 2) ;
-            Debug.Assert(ty == zoneType.STARTzone ? HelperPredicates.hasOneStartZone(this) : true) ;
-            Debug.Assert(ty == zoneType.EXITzone ? HelperPredicates.hasOneExitZone(this) : true) ;
-            //Debug.Assert(HelperPredicates.isConnected(this)) ;
+            get => rooms;
+            set => rooms = value;
         }
 
+        public Room StartRoom
+        {
+            get => startRoom;
+            set => startRoom = value;
+        }
 
-    }
+        public Room ExitRoom
+        {
+            get => exitRoom;
+            set => exitRoom = value;
+        }
+        #endregion
 
-    /* Representing different types of nodes. */
-    public enum NodeType
-    {
-        STARTnode,  // the starting node of the player. 
-        EXITnode,   // representing the player's final destination.
-        BRIDGE,
-        COMMONnode  // the type of the rest of the nodes. 
-    }
-
-    /*
-     * Representing a node in a dungeon.
-     */
-    public class Node : GameEntity
-    {
-        /* 
-         * Neighbors are nodes that are considered connected to this node. 
-         * The connection is bidirectional. 
-         */
-        public List<Node> neighbors = new List<Node>();
-        public List<Creature> monsters = new List<Creature>();
-        public List<Item> items = new List<Item>();
-
-        /** the zone to which this node belongs to: */
-        public Zone zone;
-
-        public NodeType type;
-
-        /* the capacity of this node */
-        public int getCapacity()
+        /// <summary>
+        /// Drop the specified number of monsters and items into the dungeon.
+        /// They are dropped in random locations. Keep in mind that the number of
+        /// monsters in a room should not exceed the room's capacity.
+        /// </summary>
+        public void SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion, int numberOfRagePotion)
         {
             throw new NotImplementedException();
         }
+    }
 
-        public Node(NodeType ty, String ID) : base(ID)
+    [Serializable()]
+    public enum DungeonShapeType
+    {
+        LINEARshape, 
+        TREEshape,
+        RANDOMshape
+    }
+    
+    /// <summary>
+    /// Representing different types of rooms.
+    /// </summary>
+    public enum RoomType
+    {
+        STARTroom,  // the starting room of the player. 
+        EXITroom,   // representing the player's final destination.
+        ORDINARYroom  // the type of the rest of the rooms. 
+    }
+
+    /// <summary>
+    /// Representing a room in a dungeon.
+    /// </summary>
+    public class Room : GameEntity
+    {
+        /// <summary>
+        /// The number of monsters in this room cannot exceed this capacity.
+        /// </summary>
+        int capacity;
+        
+        /// <summary>
+        /// The type of this node: either start-node, exit-node, or common-node.
+        /// </summary>
+        RoomType roomType ;
+        
+        /// <summary>
+        /// Neighbors are nodes that are considered connected to this node.
+        /// The connection is bidirectional. If u is in this.neighbors of this room,
+        /// you have to make sure that this room is also in u.neighbors.
+        /// </summary>
+        HashSet<Room> neighbors = new HashSet<Room>();
+        HashSet<Creature> monsters = new HashSet<Creature>();
+        HashSet<Item> items = new HashSet<Item>();
+        
+        public Room(string uniqueId, RoomType roomTy, int capacity) : base(uniqueId)
         {
-            type = ty;
+            this.roomType = roomTy;
+            this.capacity = capacity;
         }
 
-        /* To connect this node to another node. */
-        public void connect(Node nd)
+        #region getters and setters
+        public int Capacity => capacity;
+        public HashSet<Room> Neighbors => neighbors;
+        public HashSet<Creature> Monsters => monsters;
+
+        public HashSet<Item> Items => items;
+
+        public RoomType RoomType
         {
-            neighbors.Add(nd); nd.neighbors.Add(this);
+            get => roomType;
+            set => roomType = value;
+        }
+        #endregion
+
+        /// <summary>
+        /// To add the given room as a neighbor of this room.
+        /// </summary>
+        public void Connect(Room r)
+        {
+            neighbors.Add(r); r.neighbors.Add(this);
         }
 
-        /* To disconnect this node from the given node. */
-        public void disconnect(Node nd)
+        /// <summary>
+        /// To disconnect the given room. That is, the room r will no longer be a
+        /// neighbor of this room.
+        /// </summary>
+        public void Disconnect(Room r)
         {
-            // this only removes the first occurrence
-            neighbors.Remove(nd); nd.neighbors.Remove(this);
+            neighbors.Remove(r); r.neighbors.Remove(this);
         }
 
-        /* return the set of nodes reachable from this node. */
-        public List<Node> reachableNodes()
+        /// <summary>
+        /// return the set of all rooms which are reachable from this room.
+        /// </summary>
+        public List<Room> ReachableRooms()
         {
-            Node x = this;
-            List<Node> seen = new List<Node>();
-            List<Node> todo = new List<Node>();
+            Room x = this;
+            List<Room> seen = new List<Room>();
+            List<Room> todo = new List<Room>();
             todo.Add(x);
             while (todo.Count > 0)
             {
                 x = todo[0] ; todo.RemoveAt(0) ;
                 seen.Add(x);
-                foreach (Node y in x.neighbors)
+                foreach (Room y in x.neighbors)
                 {
                     if (seen.Contains(y) || todo.Contains(y)) continue;
                     todo.Add(y);
@@ -195,10 +164,12 @@ namespace STVrogue.GameLogic
             return seen;
         }
 
-        /* Check if the node nd is reachable from this node. */
-        public Boolean isReachable(Node nd)
+        /// <summary>
+        /// Check if the given room is reachable from this room.
+        /// </summary>
+        public bool CanReach(Room r)
         {
-            return reachableNodes().Contains(nd);
+            return ReachableRooms().Contains(r); // not the most efficient way of checking it btw
         }
     }
 
