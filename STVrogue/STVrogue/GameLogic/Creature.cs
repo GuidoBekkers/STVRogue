@@ -105,7 +105,6 @@ namespace STVrogue.GameLogic
         public Player(String id, String name) : base(id,name)
         {
             // you need to decide how to initialize the other attributes
-            throw new NotImplementedException();
         }
 
         #region getters setters

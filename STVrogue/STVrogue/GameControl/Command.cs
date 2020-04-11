@@ -22,13 +22,14 @@ namespace STVrogue.GameControl
         /// </summary>
         string[] args;
 
-        public Command(CommandType name, string[] args)
+        public Command(CommandType name, params string[] args)
         {
             this.name = name;
             this.args = args;
         }
-        
-        // well.. add the getters yourself
+
+        public CommandType Name => name;
+        public string[] Args => args;
         
         public override string ToString()
         {

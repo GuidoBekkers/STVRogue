@@ -49,7 +49,10 @@ namespace STVrogue.GameLogic
         /* To count the number of passed turns. */
         int turnNumber = 0;
 
-        public Game() {}
+        public Game()
+        {
+            player = new Player("0", "Bagginssess");
+        }
         
         public Game(GameConfiguration conf)
         {
@@ -111,7 +114,20 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Update(Command playerAction)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("** Turn " + TurnNumber + ": "  + Player.Name + " " + playerAction);
+            if (playerAction.Name == CommandType.ATTACK)
+            {
+                Console.WriteLine("      Clang! Wooosh. WHACK!");
+            }
+            if (playerAction.Name == CommandType.FLEE)
+            {
+                Console.WriteLine("      We knew you are a coward.");
+            }
+            if (playerAction.Name == CommandType.DoNOTHING)
+            {
+                Console.WriteLine("      Lazy. Start working!");
+            }
+            turnNumber++;
         }
         
     }
