@@ -38,10 +38,10 @@ in Rider or VS. It will contain four projects:
 
    Of the three, [NUnit](https://nunit.org/) offers the most features such as Theory and combinatoric test. We will use NUnit. Finding tutorial for NUnit might be a bit challenging. I will list some below:
 
-      * From the lectures you should already know the key concepts of unit testing. The examples  provided in STV Rogue itself is the shortest route to learn NUnit.
+       1. From the lectures you should already know the key concepts of unit testing. The examples  provided in STV Rogue itself are the shortest route to learn NUnit.
 
-      * If you prefer formal documentation, check [Microsoft doc on NUnit](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-nunit), though this doc is pretty verbose.
+       2. If you prefer formal documentation, check [Microsoft doc on NUnit](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-nunit), though this doc is pretty verbose.
 
-      * There is an __old__ [NUnit Quick Start tutorial](https://nunit.org/docs/2.5.9/quickStart.html) which is still useful to learn its main concepts.
+       3. There is an __old__ [NUnit Quick Start tutorial](https://nunit.org/docs/2.5.9/quickStart.html) which is still useful to learn its main concepts.
       For the more advanced stuffs, either look at
-      the examples in STV Rogue or consult [NUnit reference doc](https://github.com/nunit/docs/wiki/NUnit-Documentation), but this reference might be a bit dry for new users.
+      the examples in STV Rogue or consult [NUnit reference doc](https://github.com/nunit/docs/wiki/NUnit-Documentation), but this reference might be a bit dry (lack of examples) for new users.
