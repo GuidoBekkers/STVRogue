@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using STVrogue;
+using STVrogue.Utils;
 using STVrogue.GameLogic;
 
 namespace NUnitTests
@@ -27,12 +27,19 @@ namespace NUnitTests
             dungeon.Rooms.Add(r1);
             dungeon.Rooms.Add(r2);
             dungeon.Rooms.Add(exit);
+            Assert.IsFalse(HelperPredicates.IsLinear(dungeon));
             dungeon.StartRoom = start;
             dungeon.ExitRoom = exit;
             Assert.IsTrue(HelperPredicates.IsLinear(dungeon));
+            
+            // start -- r1 -- r2     exit
+            r2.Disconnect(exit);
+            Assert.IsFalse(HelperPredicates.IsLinear(dungeon));
+
 
             // start -- r1 -- r2 -- exit
             //           |___________|
+            r2.Connect(exit);
             r1.Connect(exit);
             Assert.IsFalse(HelperPredicates.IsLinear(dungeon));
             

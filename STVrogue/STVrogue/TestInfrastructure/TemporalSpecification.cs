@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using STVrogue.GameLogic;
-using static STVrogue.Utils.Utils ;
+using static STVrogue.Utils.SomeUtils ;
 
 namespace STVrogue.TestInfrastructure
 {

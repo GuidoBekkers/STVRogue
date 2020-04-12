@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace STVrogue.Utils
 {
-    public class Utils
+    public class SomeUtils
     {
         /// <summary>
         /// Log the string. The current behavior is to simply print the string to

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace STVrogue
+namespace STVrogue.Utils
 {
     /// <summary>
     /// A utility class to help you track path-coverage. Use addTargetPath to specify

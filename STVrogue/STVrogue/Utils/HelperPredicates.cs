@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using STVrogue.GameLogic;
 
-namespace STVrogue
+namespace STVrogue.Utils
 {
     /// <summary>
     /// Contain the forall and exists quantifiers, and some additional predicate
