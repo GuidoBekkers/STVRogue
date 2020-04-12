@@ -66,20 +66,33 @@ namespace STVrogue.GameLogic
         /// Move this creature to the given room. This is only allowed if r
         /// is a neigboring room of the creature's current location. Also
         /// keep in mind that rooms have capacity.
-        /// The metod returns true if the move is successful, else false.
+        ///
+        /// The code below provides a base implementation. You may have to override
+        /// it for Player as Player is not restricted by room capacity.
         /// </summary>
-        public virtual bool Move(Room r)
+        public virtual void Move(Room r)
         {
-            throw new NotImplementedException();
+            if (!Location.Neighbors.Contains(r))
+                throw new ArgumentException();
+            if (r.Monsters.Count >= r.Capacity)
+                throw new ArgumentException();
+            r.Monsters.Add(this);
+            Location.Monsters.Remove(this);
+            Location = r;
         }
         
         /// <summary>
         /// Attack the given foe. This is only possible if this creature is alive and
         /// if the foe is in the same room as this creature.
+        /// The code below provides a base implementation of this method. You may have
+        /// to override this for Player.
         /// </summary>
         public virtual void Attack(Creature foe)
         {
-            throw new NotImplementedException();
+            if (!Alive || Location != foe.Location || !foe.Alive)
+                throw new ArgumentException();
+            foe.Hp = Math.Max(0,foe.Hp - AttackRating);
+            if (foe.Hp == 0) foe.Alive = false;
         }
        
     }

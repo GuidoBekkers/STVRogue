@@ -7,7 +7,7 @@ namespace STVrogue
     /// <summary>
     /// This is the Main of STV Rogue. It loops over, reading user command.
     /// </summary>
-f    class Program
+    class Program
     {
         static void Main(string[] args)
         {
@@ -22,9 +22,12 @@ f    class Program
             Console.WriteLine("\\_______)   )_(      \\_/     |/   \\__/(_______)(_______)(_______)(_______/");
             
             Console.WriteLine("Welcome stranger...");
-            while (true)
+            bool gameover = false;
+            while (!gameover)
             {
-                Console.Write("Your action: Move(m) | Attack(a) | Use-item(u) | Flee(f) | Nothing(SPACE) | Quit(q)");
+                Console.WriteLine("You are in a room. It is dark, and it feels dangerous...");
+                Console.WriteLine("Your action: Move(m)   | Pick-item(p)  | Do-nothing(SPACE) | Quit(q)");
+                Console.Write    ("             Attack(a) |    Flee(f)    | Use-item(u) ");
                 var c = Console.ReadKey().KeyChar;
                 Console.WriteLine("");
                 switch (c)
@@ -39,10 +42,11 @@ f    class Program
                         break;
                     case ' ' : game.Update(new Command(CommandType.DoNOTHING, ""));
                         break;
-                    case 'q' : return;
+                    case 'q' : gameover = true ;
+                        break;
                 }
             }
-            
+            Console.WriteLine("** YOU WIN! Score:" + game.Player.Kp + ". Go ahead and brag it out.");
         }
 
     

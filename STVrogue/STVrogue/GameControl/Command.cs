@@ -2,7 +2,7 @@
 namespace STVrogue.GameControl
 {
     [Serializable()]
-    public enum CommandType { DoNOTHING, MOVE, ATTACK, USE, FLEE }
+    public enum CommandType { DoNOTHING, MOVE, ATTACK, PICKUP, USE, FLEE }
 
     
     

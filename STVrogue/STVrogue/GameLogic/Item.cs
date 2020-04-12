@@ -10,14 +10,14 @@ namespace STVrogue.GameLogic
     public class HealingPotion : Item
     {
         /* it can heal this many HP */
-        int HPvalue;
+        int healValue;
 
         public HealingPotion(String ID, int heal) : base(ID)
         {
-            this.HPvalue = heal;
+            this.healValue = heal;
         }
         
-        public int HPvalue1 => HPvalue;
+        public int HealValue1 => healValue;
 
     }
 

@@ -18,6 +18,8 @@ namespace STVrogue.GameLogic
         Room startRoom;
         Room exitRoom ;
         
+        protected Dungeon() { }
+        
         /// <summary>
         /// Create a dungeon with the indicated number of rooms and the indicated shape.
         /// A dungeon shape can be "linear" (list-shaped), "tree", or "random".
@@ -53,11 +55,15 @@ namespace STVrogue.GameLogic
         #endregion
 
         /// <summary>
-        /// Drop the specified number of monsters and items into the dungeon.
+        /// Populate the dungeon with the specified number of monsters and items.
         /// They are dropped in random locations. Keep in mind that the number of
-        /// monsters in a room should not exceed the room's capacity.
+        /// monsters in a room should not exceed the room's capacity. There are also
+        /// other constraints; see the Project Document.
+        ///
+        /// The method returns true if it manages to populate the dungeon as specified.
+        /// If it is impossible to do it, it returns false.
         /// </summary>
-        public void SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion, int numberOfRagePotion)
+        public bool SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion, int numberOfRagePotion)
         {
             throw new NotImplementedException();
         }
