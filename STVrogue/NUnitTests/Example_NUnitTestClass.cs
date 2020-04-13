@@ -43,6 +43,7 @@ namespace NUnitTests
         [Test, Combinatorial]
         public void fullCombinatoricTest_execeptionCase_Creature_contr([Values(-1, 0, 1)] int hp, [Values(-1, 0, 1)] int ar)
         {
+            //TestContext.Out.WriteLine("** (" + hp + "," + ar + ")");
             Debug.WriteLine("** (" + hp + "," + ar + ")");
             if (hp <= 0 || ar <= 0)
             {
