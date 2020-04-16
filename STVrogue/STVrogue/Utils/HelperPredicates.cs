@@ -39,7 +39,7 @@ namespace STVrogue.Utils
             return !Forall(C, x => !p(x));
         }
         
-        public static bool IndForall<T>(T[] a, Predicate<int> P) {
+        public static bool ForallInd<T>(T[] a, Predicate<int> P) {
             for (int k = 0; k < a.Length; k++)
             {
                 if (!P(k)) return false;
@@ -48,9 +48,9 @@ namespace STVrogue.Utils
             return true;
         }
         
-        public static bool IndExists<T>(T[] a, Predicate<int> P)
+        public static bool ExistsInd<T>(T[] a, Predicate<int> P)
         {
-            return !IndForall(a, P) ;
+            return !ForallInd(a, P) ;
         }
 
         // just for demonstrating the syntax to you:
@@ -112,8 +112,8 @@ namespace STVrogue.Utils
             }
             var ids_ = ids.ToArray();
             // unique if forall i,k: ids[i]=ids[k]  ==>  i=k :
-            return IndForall(ids_, i =>
-                   IndForall(ids_, k => Imp(ids_[i] == ids_[k], i == k)));
+            return ForallInd(ids_, i =>
+                   ForallInd(ids_, k => Imp(ids_[i] == ids_[k], i == k)));
         }
 
         /// <summary>
