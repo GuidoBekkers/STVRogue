@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace NUnitTests
@@ -99,6 +101,8 @@ namespace NUnitTests
         public void Test_Expr30()
         {
             SomeClassToTest.Expr(3,0);
+            int[] a = {1, 2};
         }
+
     }
 }
