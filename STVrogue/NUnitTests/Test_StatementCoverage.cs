@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using static STVrogue.Utils.HelperPredicates;
 
 namespace NUnitTests
 {
@@ -102,6 +103,14 @@ namespace NUnitTests
         {
             SomeClassToTest.Expr(3,0);
             int[] a = {1, 2};
+        }
+
+        [Test]
+        public void Test_ForallArray()
+        {
+            int[] a = {3,3};
+            Assert.False(Forall(a, x => x == 3));
+            Assert.True(Forall(a, i => a[i]==3));
         }
 
     }

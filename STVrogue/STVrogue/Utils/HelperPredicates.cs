@@ -14,8 +14,7 @@ namespace STVrogue.Utils
     public class HelperPredicates
     {
         /// <summary>
-        /// A forall-quantifier over a collections (you can also use them
-        /// to quantify over arrays).
+        /// A forall-quantifier over a collection.
         /// Example: Forall(C, x => x>=0) checks whether all integers in the collection
         /// C are non-negative.
         /// </summary>
@@ -29,8 +28,7 @@ namespace STVrogue.Utils
         }
 
         /// <summary>
-        /// An exist-quantifier over a collections (you can also use them
-        /// to quantify over arrays).
+        /// An exist-quantifier over a collection.
         /// Example: Exists(C, x => x>=0) checks whether there is a non-negative integer
         /// in the collection C.
         /// </summary>
@@ -39,18 +37,27 @@ namespace STVrogue.Utils
             return !Forall(C, x => !p(x));
         }
         
-        public static bool ForallInd<T>(T[] a, Predicate<int> P) {
+        /// <summary>
+        /// A forall-quantifier over an array.
+        /// Example: Forall(a, i => a[i]==0) checks whether for all valid indices i
+        /// of the array a, a[i]==0.
+        /// </summary>
+        public static bool Forall<T>(T[] a, Predicate<int> P) {
             for (int k = 0; k < a.Length; k++)
             {
                 if (!P(k)) return false;
             }
-
             return true;
         }
         
-        public static bool ExistsInd<T>(T[] a, Predicate<int> P)
+        /// <summary>
+        /// An exists-quatifier over an array.
+        /// Example: Exists(a, i => a[i]==0) checks whether for all valid indices i
+        /// of the array a, a[i]==0.
+        /// </summary>
+        public static bool Exists<T>(T[] a, Predicate<int> P)
         {
-            return !ForallInd(a, P) ;
+            return !Forall(a, k => !P(k)) ;
         }
 
         // just for demonstrating the syntax to you:
@@ -112,8 +119,8 @@ namespace STVrogue.Utils
             }
             var ids_ = ids.ToArray();
             // unique if forall i,k: ids[i]=ids[k]  ==>  i=k :
-            return ForallInd(ids_, i =>
-                   ForallInd(ids_, k => Imp(ids_[i] == ids_[k], i == k)));
+            return Forall(ids_, i =>
+                   Forall(ids_, k => Imp(ids_[i] == ids_[k], i == k)));
         }
 
         /// <summary>
