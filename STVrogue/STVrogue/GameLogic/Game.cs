@@ -39,7 +39,8 @@ namespace STVrogue.GameLogic
 
         Player player;
         Dungeon dungeon;
-        private bool gameover = false;
+        DifficultyMode difficultyMode;
+        bool gameover = false;
 
         /// <summary>
         /// Ignore this variable. It is added for some debug purpose.
@@ -71,6 +72,8 @@ namespace STVrogue.GameLogic
         public int TurnNumber => turnNumber;
 
         public bool Gameover => gameover;
+
+        public DifficultyMode DifficultyMode => difficultyMode;
 
         /// <summary>
         /// Move the creature c from its current location to the given destination room.
