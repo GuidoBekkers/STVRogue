@@ -69,10 +69,14 @@ namespace STVrogue.GameLogic
 
         public Dungeon Dungeon => dungeon;
 
-        public int TurnNumber => turnNumber;
+        public int TurnNumber
+        {
+            get => turnNumber;
+            set => turnNumber = value;
+        }
 
         public bool Gameover => gameover;
-
+        
         public DifficultyMode DifficultyMode => difficultyMode;
 
         /// <summary>
