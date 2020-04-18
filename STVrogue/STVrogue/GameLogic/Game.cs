@@ -99,8 +99,9 @@ namespace STVrogue.GameLogic
         /// Cause a creature to flee a combat. This will take the creature to a neighboring
         /// room. This should not breach the capacity of that room. Note that fleeing a
         /// combat is not always possible --see the Project Document.
+        /// The method returns true if fleeing was successful, else false.
         /// </summary>
-        public void Flee(Creature c)
+        public bool Flee(Creature c)
         {
             throw new NotImplementedException();
         }
