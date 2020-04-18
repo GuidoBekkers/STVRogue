@@ -115,6 +115,12 @@ namespace STVrogue.GameLogic
         int kp = 0;
         List<Item> bag = new List<Item>();
 
+        /// <summary>
+        /// True if the player is enraged. The player enters this state whenever it uses a rage potion.
+        /// The effect last for 5 turns including the turn when the potion is used.
+        /// </summary>
+        bool enraged = false;
+
         public Player(String id, String name) : base(id,name)
         {
             // you need to decide how to initialize the other attributes
@@ -131,6 +137,12 @@ namespace STVrogue.GameLogic
         {
             get => bag;
             set => bag = value;
+        }
+        
+        public bool Enraged
+        {
+            get => enraged;
+            set => enraged = value;
         }
         #endregion
 
