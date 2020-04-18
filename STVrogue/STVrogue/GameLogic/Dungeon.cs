@@ -60,7 +60,12 @@ namespace STVrogue.GameLogic
         /// monsters in a room should not exceed the room's capacity. There are also
         /// other constraints; see the Project Document.
         ///
-        /// The method returns true if it manages to populate the dungeon as specified.
+        /// Note that it is not always possible to populate the dungeon according to
+        /// the specified parameters. E.g. in a dungeon with N rooms whose capacity
+        /// are between 0 and k, it is definitely not possible to populate it with
+        /// (N-2)*k monsters or more.
+        /// The method returns true if it manages to populate the dungeon as specified,
+        /// else it returns false.
         /// If it is impossible to do it, it returns false.
         /// </summary>
         public bool SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion, int numberOfRagePotion)

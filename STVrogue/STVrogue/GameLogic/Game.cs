@@ -54,6 +54,11 @@ namespace STVrogue.GameLogic
             player = new Player("0", "Bagginssess");
         }
         
+        /// <summary>
+        /// Try to create an instance of Game satisfying the specified configuration.
+        /// It should throw an exception if it does not manage to generate a dungeon
+        /// satisfying the configuration.
+        /// </summary>
         public Game(GameConfiguration conf)
         {
             throw new NotImplementedException();
