@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Transactions;
 
 namespace STVrogue.GameLogic
 {
@@ -15,9 +16,12 @@ namespace STVrogue.GameLogic
     public class Dungeon
     {
         HashSet<Room> rooms = new HashSet<Room>();
+        private readonly int _maximumRoomCapacity;
+        private int _numberOfRooms;
         Room startRoom;
-        Room exitRoom ;
-        
+        Room exitRoom;
+        private readonly Random random;
+
         protected Dungeon() { }
         
         /// <summary>
@@ -31,12 +35,116 @@ namespace STVrogue.GameLogic
         /// </summary>
         public Dungeon(DungeonShapeType shape, int numberOfRooms, int maximumRoomCapacity)
         {
+            if (numberOfRooms < 2)
+            {
+                throw new System.Exception("Not enough number of rooms. " +
+                                           "Dungeon must consist of at least 2 rooms "); //wat voor exception?
+            }
+
+            random = new Random(5);
+            _maximumRoomCapacity = maximumRoomCapacity;
+            _numberOfRooms = numberOfRooms;
+            
+            switch (shape)
+            {
+                case DungeonShapeType.LINEARshape: 
+                    startRoom = new Room("RS", RoomType.STARTroom, 0);
+                    exitRoom = new Room("RE", RoomType.EXITroom, 0);
+                    rooms.Add(startRoom);
+                    Room prevRoom = startRoom;
+                    for (int i = 0; i < numberOfRooms - 2; i++)
+                    {
+                        Room currRoom = new Room("R" + i, RoomType.ORDINARYroom, RoomCapacity());
+                        rooms.Add(currRoom);
+                        currRoom.Connect(prevRoom);
+                        prevRoom = currRoom;
+                    }
+                    rooms.Add(exitRoom);
+                    prevRoom.Connect(exitRoom);
+                    break;
+                case DungeonShapeType.TREEshape:
+                    rooms.Add(startRoom);
+                    int remainingRooms = _numberOfRooms - 2;
+                    int reservableRooms = remainingRooms;
+                    startRoom = TreeGenerator(ref reservableRooms, 
+                        ref remainingRooms, true); //numberOfRooms - 2 om boom te garanderen
+                    while (remainingRooms > 0)
+                    {
+                        foreach (Room r in rooms)
+                        {
+                            if (r.Neighbors.Count < 4)
+                            {
+                                remainingRooms--;
+                                reservableRooms--;
+                                Room room = TreeGenerator(ref reservableRooms, 
+                                    ref remainingRooms);
+                                r.Connect(room);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                case DungeonShapeType.RANDOMshape:
+                    break;
+                default:
+                    throw new Exception("Invalid shape"); //volgens mij is dit niet nodig
+            }
             throw new NotImplementedException();
         }
+        
+        public Room TreeGenerator(/*int maxDepth,*/ ref int reservableRooms, ref int remainingRooms, bool root = false) 
+        {
+            Room room = root ? new Room("RS", RoomType.STARTroom, 0) :  
+                new Room("R" + remainingRooms,  RoomType.ORDINARYroom, RoomCapacity());
+            rooms.Add(room);
+            remainingRooms--;
 
+            if (reservableRooms > 0 /*&& maxDepth > 0*/)
+            {
+                int childsCount = reservableRooms > 2 ? random.Next(4) 
+                    : random.Next(reservableRooms + 1); //dit is als er max 4 connecties mogen
+                reservableRooms -= childsCount;
+                for (int i = 0; i < childsCount; i++)
+                {
+                    room.Connect(TreeGenerator(ref reservableRooms, ref remainingRooms));
+                }
+            }
+
+            if (remainingRooms == 0 /* || maxDepth == 1 && remainingRooms == 1 */)
+            {
+                exitRoom = new Room("RE", RoomType.EXITroom, 0);
+                exitRoom.Connect(room);
+                rooms.Add(exitRoom);
+            }
+            
+
+            return room;
+        }
+
+        void test() //Dit of onderaan bij laatste kinderen aanplakken.
+        {
+            while (true)
+            {
+                int element = random.Next(rooms.Count);
+                Room room = rooms.ElementAt(element);
+                if (room.Neighbors.Count < 4)
+                {
+                    exitRoom.Connect(rooms.ElementAt(element));
+                    break;
+                }
+            }
+        }
+
+        private int RoomCapacity()
+        {
+            return random.Next(1, _maximumRoomCapacity + 1);
+        }
+        
+        
+ 
         #region getters & setters
         public HashSet<Room> Rooms
-        {
+        { 
             get => rooms;
             set => rooms = value;
         }
