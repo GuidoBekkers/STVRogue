@@ -15,6 +15,11 @@ namespace STVrogue.GameLogic
 
         public HealingPotion(String ID, int heal) : base(ID)
         {
+            // Check if the given heal value is above 0
+            if (heal < 0)
+                throw new ArgumentException();
+            
+            // Set the healValue to the given int
             this.healValue = heal;
         }
         
