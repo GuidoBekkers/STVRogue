@@ -34,7 +34,17 @@ namespace STVrogue.GameLogic
         public int Hp
         {
             get => hp;
-            set => hp = value;
+            set
+            {
+                if (value > HpMax)
+                {
+                    hp = HpMax;
+                }
+                else
+                {
+                    hp = value;
+                }
+            }
         }
 
         public int HpMax
@@ -153,6 +163,25 @@ namespace STVrogue.GameLogic
         public void Use(long turnNr, Item i)
         {
             throw new NotImplementedException();
+        }
+
+        // Player moves, only to neighboring rooms
+        public override void Move(Room r)
+        {
+            if (!Location.Neighbors.Contains(r))
+                throw new ArgumentException();
+            Location = r;
+        }
+        
+        // Player attacks monster 
+        public override void Attack(Creature foe)
+        {
+            base.Attack(foe);
+            if (foe.Hp == 0)
+            {
+                Kp++;
+                Location.Monsters.Remove(foe);
+            }
         }
     }
     
