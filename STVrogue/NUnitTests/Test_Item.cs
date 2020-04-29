@@ -34,7 +34,7 @@ namespace NUnitTests
             }
 
             // Pre-Condition
-            if (healVal < 0)
+            if (healVal <= 0)
             {
                 Assert.Throws<ArgumentException>(() => new HealingPotion(id, healVal));
             }

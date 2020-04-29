@@ -3,7 +3,7 @@ namespace STVrogue.GameLogic
 {
     public class Item : GameEntity
     {
-        public Item(String ID) : base(ID){ }
+        public Item(String id) : base(id){ }
         
         public virtual void Use(Player player){ }
     }
@@ -13,7 +13,7 @@ namespace STVrogue.GameLogic
         /* it can heal this many HP */
         int healValue;
 
-        public HealingPotion(String ID, int heal) : base(ID)
+        public HealingPotion(String id, int heal) : base(id)
         {
             // Check if the given heal value is above 0
             if (heal <= 0)
@@ -35,7 +35,7 @@ namespace STVrogue.GameLogic
             if (player.Bag.Contains(this))
             {
                 // Record the old hp
-                int prevHP = player.Hp;
+                var prevHp = player.Hp;
                 
                 // Heal the player
                 player.Hp += this.healValue;
@@ -50,7 +50,7 @@ namespace STVrogue.GameLogic
 
     public class RagePotion : Item
     {
-        public RagePotion(String ID) : base(ID){ }
+        public RagePotion(String id) : base(id){ }
         
         /// <summary>
         /// Use the rage potion, enraging the player
