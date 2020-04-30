@@ -34,8 +34,7 @@ namespace STVrogue.GameLogic
             // Check if the player actually has this item in their bag
             if (!player.Bag.Contains(this))
             {
-                // TODO: write to the console that this potion is not in the players' possession
-                return;
+                throw new Exception($"The used item {this.Id} was not present in the bag");
             }
 
             // Check if the player is already at max HP
@@ -71,8 +70,7 @@ namespace STVrogue.GameLogic
             // Check if the player actually has this item in their bag
             if (!player.Bag.Contains(this)) 
             {
-                // TODO: write to the console that this potion is not in the players' possession
-                return;
+                throw new Exception($"The used item {this.Id} was not present in the bag");
             }
             
             // Enrage the player
