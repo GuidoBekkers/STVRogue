@@ -10,8 +10,8 @@ namespace STVrogue.GameLogic
 
     public class HealingPotion : Item
     {
+        private readonly int _healValue;
         /* it can heal this many HP */
-        int healValue;
 
         public HealingPotion(String id, int heal) : base(id)
         {
@@ -20,31 +20,41 @@ namespace STVrogue.GameLogic
                 throw new ArgumentException();
             
             // Set the healValue to the given int
-            this.healValue = heal;
+            _healValue = heal;
         }
-        
-        public int HealValue1 => healValue;
-        
+
+        public int HealValue => _healValue;
+
         /// <summary>
-        /// Use the healing potion, adding it's healValue to the players' HP
+        /// Use the healing potion, adding it's healValue to the player's HP
         /// </summary>
         /// <param name="player">The player object</param>
         public override void Use(Player player)
         {
             // Check if the player actually has this item in their bag
-            if (player.Bag.Contains(this))
+            if (!player.Bag.Contains(this))
             {
-                // Record the old hp
-                var prevHp = player.Hp;
-                
-                // Heal the player
-                player.Hp += this.healValue;
-                
-                // Remove this item from the players' bag
-                player.Bag.Remove(this);
-                
-                // TODO: write to the console that this potion was used
+                // TODO: write to the console that this potion is not in the players' possession
+                return;
             }
+
+            // Check if the player is already at max HP
+            if (player.Hp == player.HpMax)
+            {
+                // TODO: write tot the console that the player is already at max HP
+                return;
+            }
+            
+            // Record the old hp
+            var prevHp = player.Hp;
+                
+            // Heal the player
+            player.Hp += this.HealValue;
+                
+            // Remove this item from the player's bag
+            player.Bag.Remove(this);
+                
+            // TODO: write to the console that this potion was used
         }
     }
 
@@ -59,17 +69,19 @@ namespace STVrogue.GameLogic
         public override void Use(Player player)
         {
             // Check if the player actually has this item in their bag
-            if (player.Bag.Contains(this))
+            if (!player.Bag.Contains(this)) 
             {
-                // Enrage the player
-                player.Enraged = true;
-                
-                // Remove this item from the players' bag
-                player.Bag.Remove(this);
-                
-                // TODO: write to the console that this potion was used
+                // TODO: write to the console that this potion is not in the players' possession
+                return;
             }
+            
+            // Enrage the player
+            player.Enraged = true;
+                
+            // Remove this item from the player's bag
+            player.Bag.Remove(this);
+                
+            // TODO: write to the console that this potion was used
         }
     }
-
 }
