@@ -110,31 +110,23 @@ namespace NUnitTests
             // Add the potion to the players' bag
             player.Bag.Add(hPotion);
 
-            // Pre-Condition
-            if (!player.Bag.Contains(hPotion))
+            // Try using the potion
+            try
             {
-                // TODO: handle the potion not being in the player's bag
+                hPotion.Use(player);
             }
-            else
+            catch (Exception e)
             {
-                // Try using the potion
-                try
-                {
-                    hPotion.Use(player);
-                }
-                catch (Exception e)
-                {
-                    exc = e;
-                }
-
-                // Post-Conditions
-                // Check that the player's hp has not exceeded it's max hp
-                // TODO: uncomment when hp capping has been implemented
-                //Assert.IsTrue(player.Hp <= player.HpMax);
-
-                // Check that the player has been healed the appropriate amount, or got capped at the max hp
-                Assert.IsTrue(player.Hp == playerStartHp + hPotion.HealValue || player.Hp == player.HpMax);
+                exc = e;
             }
+
+            // Post-Conditions
+            // Check that the player's hp has not exceeded it's max hp
+            // TODO: uncomment when hp capping has been implemented
+            //Assert.IsTrue(player.Hp <= player.HpMax);
+
+            // Check that the player has been healed the appropriate amount, or got capped at the max hp
+            Assert.IsTrue(player.Hp == playerStartHp + hPotion.HealValue || player.Hp == player.HpMax);
         }
 
         [Test]
@@ -156,10 +148,8 @@ namespace NUnitTests
 
             // Pre-Condition
             // Check if the correct exception is thrown when the potion is not in the player's bag
-            //Assert.Throws<ArgumentNullException>(() => hPotion.Use(player));
-            
-            hPotion.Use(player);
-            
+            Assert.Throws<Exception>(() => hPotion.Use(player));
+
             // Post-Condition
             // Check if the player's health remained the same
             Assert.IsTrue(player.Hp == 1);
@@ -177,31 +167,23 @@ namespace NUnitTests
             // TODO: implement actual player constructor
             // Create the player
             Player player = new Player("playerId", "playerName");
-            
+
             // Add the potion to the players' bag
             player.Bag.Add(rPotion);
-            
-            // Pre-Condition
-            if (!player.Bag.Contains(rPotion))
-            {
-                // TODO: handle the potion not being in the player's bag
-            }
-            else
-            {
-                // Try using the potion
-                try
-                {
-                    rPotion.Use(player);
-                }
-                catch (Exception e)
-                {
-                    exc = e;
-                }
 
-                // Post-Conditions
-                // Check if the player became enraged
-                Assert.IsTrue(player.Enraged);
+            // Try using the potion
+            try
+            {
+                rPotion.Use(player);
             }
+            catch (Exception e)
+            {
+                exc = e;
+            }
+
+            // Post-Conditions
+            // Check if the player became enraged
+            Assert.IsTrue(player.Enraged);
         }
 
         [Test]
@@ -216,13 +198,11 @@ namespace NUnitTests
             // TODO: implement actual player constructor
             // Create the player
             Player player = new Player("playerId", "playerName");
-            
+
             // Pre-Condition
             // Check if the correct exception is thrown when the potion is not in the player's bag
-            //Assert.Throws<ArgumentNullException>(() => hPotion.Use(player));
-            
-            rPotion.Use(player);
-            
+            Assert.Throws<Exception>(() => rPotion.Use(player));
+
             // Post-Condition
             // Check if the player's health remained the same
             Assert.IsFalse(player.Enraged);
