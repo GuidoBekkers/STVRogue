@@ -156,9 +156,48 @@ namespace STVrogue.Utils
         /// </summary>
         public static bool IsTree(Dungeon dungeon)
         {
-            throw new NotImplementedException();
+            if (!HasUniqueStartAndExit(dungeon)) return false;
+            if (!AllReachableFromStart(dungeon)) return false;
+            // all rooms are reachable from the start-room
+            // we check if there is a cycle using the isCyclic function:
+            
+            //Mark all the rooms as not visited
+            Dictionary<Room, bool> visited = new Dictionary<Room, bool>();
+            foreach (Room r in dungeon.Rooms)
+                visited[r] = false;
+            
+            if (isCyclic(dungeon.StartRoom, visited, null))
+                return false;
+
+            return true;
         }
 
+        public static bool isCyclic(Room room, Dictionary<Room, bool> visited, Room parent)
+        {
+            //Mark the current room as visited
+            visited[room] = true;
+            Room i;
+
+            //Recur for all neighbor rooms to this room
+            foreach (Room r in room.Neighbors)
+            {
+                i = r;
+                
+                //if a neighbor is not visited, then recur for that neighbor
+                if (!visited[i])
+                {
+                    if (isCyclic(i, visited, room))
+                        return true;
+                }
+                //if a neighbor is visited and not parent of the
+                //current room, then there is a cycle
+                else if (i != parent)
+                    return true;
+            }
+            return false;
+        }
+
+        
 
     }
 
