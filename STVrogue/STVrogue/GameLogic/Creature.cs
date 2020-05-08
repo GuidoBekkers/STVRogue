@@ -16,7 +16,7 @@ namespace STVrogue.GameLogic
         public Creature(string id, String name) : base(id)
         {
             this.name = name;
-            // you need to decide how to initialize the other attributes
+            Alive = true;
         }
 
         public Creature(string id, int hp, int ar) : base(id)
@@ -26,11 +26,24 @@ namespace STVrogue.GameLogic
             this.hp = hp;
             hpMax = hp;
             attackRating = ar;
+            Alive = true;
+        }
+        
+        public Creature(string id, string name, int hp, int ar) : base(id)
+        {
+            if(id==null || hp<=0 || ar<=0) 
+                throw new ArgumentException();
+            this.name = name;
+            this.hp = hp;
+            hpMax = hp;
+            attackRating = ar;
+            Alive = true;
         }
 
         #region getters setters
         public string Name => name;
 
+        // Set hp to hpMax if set to higher then hpMax otherwise normal set
         public int Hp
         {
             get => hp;
@@ -113,7 +126,7 @@ namespace STVrogue.GameLogic
     /// </summary>
     public class Monster : Creature
     {
-        public Monster(String id, String name) : base(id,name)
+        public Monster(string id, string name, int hp, int ar) : base(id, name, hp, ar)
         {
         }
         
@@ -131,9 +144,10 @@ namespace STVrogue.GameLogic
         /// </summary>
         bool enraged = false;
 
-        public Player(String id, String name) : base(id,name)
+        // Constructor for player
+        public Player(string id, string name, int hp, int ar) : base(id, name, hp, ar)
         {
-            // you need to decide how to initialize the other attributes
+            
         }
 
         #region getters setters
@@ -163,6 +177,7 @@ namespace STVrogue.GameLogic
         public void Use(long turnNr, Item i)
         {
             throw new NotImplementedException();
+            // TODO
         }
 
         // Player moves, only to neighboring rooms
@@ -173,14 +188,15 @@ namespace STVrogue.GameLogic
             Location = r;
         }
         
-        // Player attacks monster 
+        // Player attacks a creature
         public override void Attack(Creature foe)
         {
             base.Attack(foe);
+            
+            // If it kill the other creature, kill points increase
             if (foe.Hp == 0)
             {
                 Kp++;
-                Location.Monsters.Remove(foe);
             }
         }
     }
