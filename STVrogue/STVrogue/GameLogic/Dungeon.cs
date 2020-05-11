@@ -157,7 +157,77 @@ namespace STVrogue.GameLogic
         /// </summary>
         public bool SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion, int numberOfRagePotion)
         {
-            throw new NotImplementedException();
+            //Count the max monsters we can spawn near the exit
+            int maxExitMonsters = MaxNeighMonsters(exitRoom);
+            
+            //Check the lowest capacity room of exit neighbors.
+            int lowestCap = LowestNeighCap(exitRoom);
+            //Calculate the max monsters we can spawn not near the exit
+            int maxNonExitMonsters = 0;
+            foreach (Room room in Rooms
+                .Where(x => !x.Neighbors.Contains(exitRoom)))
+            {
+                int cap = room.Capacity;
+                maxNonExitMonsters += cap >= lowestCap ? lowestCap - 1 : cap;
+            }
+            
+            //Check if there is enough capacity to seed the monsters 
+            if (numberOfMonster - maxExitMonsters > maxNonExitMonsters)
+                return false;
+            
+            //Seed the monsters
+            seedMonsters(lowestCap, numberOfMonster);
+            
+            
+            
+            return true;
+        }
+        
+        //Returns the maximum monsters that can be seeded in room.Neighbors
+        private int MaxNeighMonsters(Room room)
+        {
+            int maxExitMonsters = 0;
+            foreach (Room neigh in exitRoom.Neighbors)
+            {
+                maxExitMonsters += neigh.Capacity;
+            }
+
+            return maxExitMonsters;
+        }
+        
+        //Returns the lowest capacity of room.Neighbors
+        private int LowestNeighCap(Room room)
+        {
+            int lowestCap = _maxRoomCap;
+            foreach (Room neigh in room.Neighbors)
+            {
+                int cap = neigh.Capacity;
+                if (cap < lowestCap)
+                    lowestCap = cap;
+            }
+
+            return lowestCap;
+        }
+        
+        //Fills the dungeon with monsters
+        private void seedMonsters(int lowestCap, int numberOfMonster)
+        {
+            //Fill the exit neighbors with monsters.
+            int i = 0;
+            int remaining = numberOfMonster;
+            foreach (Room neigh in exitRoom.Neighbors)
+            {
+                
+            }
+            
+            //Fill the other rooms
+            foreach (Room r in rooms.Where(x => !x.Neighbors.Contains(exitRoom)))
+            {
+                int cap = r.Capacity >= lowestCap ? lowestCap - 1 : r.Capacity;
+                for (int j = 0; j < cap; j++)
+                {
+                }
+            }
         }
     }
 
