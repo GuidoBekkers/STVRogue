@@ -101,11 +101,10 @@ namespace NUnitTests
 
             // TODO: implement actual player constructor
             // Create the player
-            Player player = new Player("playerId", "playerName");
+            Player player = new Player("playerId", "playerName", playerMaxHp, 1);
 
             // Set the players' attributes
             player.Hp = playerStartHp;
-            player.HpMax = playerMaxHp;
 
             // Add the potion to the players' bag
             player.Bag.Add(hPotion);
@@ -140,11 +139,10 @@ namespace NUnitTests
 
             // TODO: implement actual player constructor
             // Create the player
-            Player player = new Player("playerId", "playerName");
+            Player player = new Player("playerId", "playerName", 2, 1);
 
             // Set the players' attributes which allow for healing
             player.Hp = 1;
-            player.HpMax = 2;
 
             // Pre-Condition
             // Check if the correct exception is thrown when the potion is not in the player's bag
@@ -166,7 +164,7 @@ namespace NUnitTests
 
             // TODO: implement actual player constructor
             // Create the player
-            Player player = new Player("playerId", "playerName");
+            Player player = new Player("playerId", "playerName", 1, 1);
 
             // Add the potion to the players' bag
             player.Bag.Add(rPotion);
@@ -197,7 +195,7 @@ namespace NUnitTests
 
             // TODO: implement actual player constructor
             // Create the player
-            Player player = new Player("playerId", "playerName");
+            Player player = new Player("playerId", "playerName", 1, 1);
 
             // Pre-Condition
             // Check if the correct exception is thrown when the potion is not in the player's bag
