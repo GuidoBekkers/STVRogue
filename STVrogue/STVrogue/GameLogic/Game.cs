@@ -41,7 +41,7 @@ namespace STVrogue.GameLogic
         Dungeon dungeon;
         DifficultyMode difficultyMode;
         bool gameover = false;
-
+        
         /// <summary>
         /// Ignore this variable. It is added for some debug purpose.
         /// </summary>
@@ -50,9 +50,12 @@ namespace STVrogue.GameLogic
         /* To count the number of passed turns. */
         int turnNumber = 0;
 
+        int healUsed; // Keeps track of the last turn a heal potion was used
+        int rageUsed; // Keeps track of the last turn a rage potion was used
+        
         public Game()
         {
-            player = new Player("0", "Bagginssess");
+           // player = new Player("0", "Bagginssess");
         }
         
         /// <summary>
@@ -73,6 +76,18 @@ namespace STVrogue.GameLogic
         {
             get => turnNumber;
             set => turnNumber = value;
+        }
+
+        public int HealUsed
+        {
+            get => healUsed;
+            set => healUsed = value;
+        }
+        
+        public int RageUsed
+        {
+            get => rageUsed;
+            set => rageUsed = value;
         }
 
         public bool Gameover => gameover;
@@ -115,7 +130,49 @@ namespace STVrogue.GameLogic
         /// </summary>
         public bool Flee(Creature c)
         {
-            throw new NotImplementedException();
+            List<Room> possibleRooms = c.Location.ReachableRooms();
+            bool canFlee = true;
+            Random random = new Random();
+            
+            // Conditions for a monster
+            if (c is Monster)
+            {
+                foreach (Room r in possibleRooms)
+                {
+                    // A monster can't flee to a room if it would exceed max capacity
+                    if (r.Capacity <= r.Monsters.Count) possibleRooms.Remove(r);
+                }
+            }
+            // Conditions for Player
+            else if (c is Player)
+            {
+                // In normal mode and elite mode: if player is enraged, player cannot flee
+                if ((DifficultyMode == DifficultyMode.NORMALmode || DifficultyMode == DifficultyMode.ELITEmode) && (c as Player).Enraged) canFlee = false;
+                
+                // In Elite mode: if player.eliteFlee is false, player cannot flee
+                if (DifficultyMode == DifficultyMode.ELITEmode && !(c as Player).EliteFlee) canFlee = false;
+                
+                // If heal potion is used at turn t, player can only flee at turn t+2 or later
+                if (TurnNumber <= HealUsed + 1) canFlee = false;
+                
+                foreach (Room r in possibleRooms)
+                {
+                    // Player cannot flee to exit room
+                    if (r.RoomType == RoomType.EXITroom) possibleRooms.Remove(r);
+                    // Player can always flee when next to start room
+                    else if (r.RoomType == RoomType.STARTroom) canFlee = true;
+                }
+            }
+            // if there is less then 1 possible room creature cannot flee
+            if (possibleRooms.Count < 1) canFlee = false;
+            
+            // If all conditions are met the creature flees to a random room in possibleRooms
+            if (canFlee)
+            {
+                c.Move(possibleRooms[random.Next(possibleRooms.Count)]);
+                return true;
+            }
+            else return false;
         }
 
         /// <summary>

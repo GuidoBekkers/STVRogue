@@ -143,6 +143,10 @@ namespace STVrogue.GameLogic
         /// The effect last for 5 turns including the turn when the potion is used.
         /// </summary>
         bool enraged = false;
+        
+        // Only relevant for elite mode
+        // False if player enters room neighboring the exit room enraged or TODO uses rage potion in a room neighboring the exit room. 
+        bool eliteFlee = true;
 
         // Constructor for player
         public Player(string id, string name, int hp, int ar) : base(id, name, hp, ar)
@@ -168,6 +172,13 @@ namespace STVrogue.GameLogic
             get => enraged;
             set => enraged = value;
         }
+
+        public bool EliteFlee
+        {
+            get => eliteFlee;
+            set => eliteFlee = value;
+        }
+
         #endregion
 
         /// <summary>
@@ -186,6 +197,16 @@ namespace STVrogue.GameLogic
             if (!Location.Neighbors.Contains(r))
                 throw new ArgumentException();
             Location = r;
+            // Only relevant for elite mode
+            // If connecting room is exitroom and player is enraged, player cannot flee
+            EliteFlee = true;
+            if (Enraged)
+            {
+                foreach (Room room in r.Neighbors)
+                {
+                    if (room.RoomType == RoomType.EXITroom) EliteFlee = false;
+                }
+            }
         }
         
         // Player attacks a creature
