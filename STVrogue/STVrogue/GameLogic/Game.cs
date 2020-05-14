@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using STVrogue.GameControl;
 
 namespace STVrogue.GameLogic
@@ -17,6 +18,33 @@ namespace STVrogue.GameLogic
         public int initialNumberOfHealingPots;
         public int initialNumberOfRagePots;
         public DifficultyMode difficultyMode;
+        public int playerBaseHp = 10;
+        public int playerBaseAr = 1;
+
+        public int GetDifficultyMultiplier(DifficultyMode difficulty)
+        {
+            int returnVal = 0;
+            switch (difficulty)
+            {
+                case DifficultyMode.NEWBIEmode:
+                {
+                    returnVal =  3;
+                    break;
+                }
+                case DifficultyMode.NORMALmode:
+                {
+                    returnVal = 2;
+                    break;
+                }
+                case DifficultyMode.ELITEmode:
+                {
+                    returnVal = 1;
+                    break;
+                }
+            }
+
+            return returnVal;
+        }
     }
     
     [Serializable()]
@@ -55,7 +83,7 @@ namespace STVrogue.GameLogic
         
         public Game()
         {
-           // player = new Player("0", "Bagginssess");
+            //player = new Player("0", "Bagginssess");
         }
         
         /// <summary>
@@ -65,7 +93,25 @@ namespace STVrogue.GameLogic
         /// </summary>
         public Game(GameConfiguration conf)
         {
-            throw new NotImplementedException();
+            // Set the difficulty mode
+            difficultyMode = conf.difficultyMode;
+            
+            // Get the difficulty HP and AR multiplier
+            int difMult = conf.GetDifficultyMultiplier(difficultyMode);
+            
+            // Initialize the player
+            player = new Player("playerId", "player", (conf.playerBaseHp * difMult), (conf.playerBaseAr * difMult));
+            
+            // Initialize the dungeon
+            dungeon = new Dungeon(conf.dungeonShape, conf.numberOfRooms, conf.maxRoomCapacity);
+            
+            // Seed the monsters and items
+            if (!dungeon.SeedMonstersAndItems(conf.initialNumberOfMonsters, conf.initialNumberOfHealingPots,
+                conf.initialNumberOfRagePots))
+            {
+                // Throw and argument exception if this seeding fails
+                throw new ArgumentException("Could not seed the dungeon with the given parameters");
+            }
         }
 
         public Player Player => player;
@@ -101,7 +147,14 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Move(Creature c, Room destination)
         {
-            throw new NotImplementedException();
+            if (c.Location.Neighbors.Contains(destination))
+            {
+                c.Move(destination);
+            }
+            else
+            {
+                throw new ArgumentException($"Destination ({destination.Id}) was not a neighbour to creature's location ({c.Location.Id})");
+            }
         }
 
         /// <summary>
@@ -110,7 +163,18 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Attack(Creature attacker, Creature defender)
         {
-            
+            if (!attacker.Alive)
+            {
+                throw new ArgumentException($"Attacker: {attacker.Id} is not alive");
+            }
+            else if (attacker.Location != defender.Location)
+            {
+                throw new ArgumentException($"Attacker's ({attacker.Id}) location ({attacker.Location.Id}) does not match defender's ({defender.Id}) location ({defender.Location.Id})");
+            }
+            else
+            {
+                attacker.Attack(defender);
+            }
         }
 
         /// <summary>
@@ -185,18 +249,28 @@ namespace STVrogue.GameLogic
         public void Update(Command playerAction)
         {
             Console.WriteLine("** Turn " + TurnNumber + ": "  + Player.Name + " " + playerAction);
-            if (playerAction.Name == CommandType.ATTACK)
+            
+            // Handle the given action
+            switch (playerAction.Name)
             {
-                Console.WriteLine("      Clang! Wooosh. WHACK!");
+                case (CommandType.ATTACK):
+                {
+                    Console.WriteLine("      Clang! Wooosh. WHACK!");
+                    break;
+                }
+                case (CommandType.FLEE):
+                {
+                    Console.WriteLine("      We knew you are a coward.");
+                    break;
+                }
+                case (CommandType.DoNOTHING):
+                {
+                    Console.WriteLine("      Lazy. Start working!");
+                    break;
+                }
             }
-            if (playerAction.Name == CommandType.FLEE)
-            {
-                Console.WriteLine("      We knew you are a coward.");
-            }
-            if (playerAction.Name == CommandType.DoNOTHING)
-            {
-                Console.WriteLine("      Lazy. Start working!");
-            }
+            
+            // Update the turn number
             turnNumber++;
         }
         
