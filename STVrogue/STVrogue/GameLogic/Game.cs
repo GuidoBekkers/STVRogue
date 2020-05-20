@@ -112,6 +112,9 @@ namespace STVrogue.GameLogic
                 // Throw and argument exception if this seeding fails
                 throw new ArgumentException("Could not seed the dungeon with the given parameters");
             }
+            
+            // Place the player in the starting room of the dungeon
+            player.Location = dungeon.StartRoom;
         }
 
         public Player Player => player;
@@ -270,7 +273,7 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Update(Command playerAction)
         {
-            Console.WriteLine("** Turn " + turnNumber + ": "  + Player.Name + " " + playerAction);
+            Console.WriteLine($"** Turn {turnNumber.ToString()}: {player.Name} {playerAction}");
             
             // Handle the given action
             switch (playerAction.Name)
