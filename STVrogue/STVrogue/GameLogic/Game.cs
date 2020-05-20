@@ -64,7 +64,6 @@ namespace STVrogue.GameLogic
     /// </summary>
     public class Game
     {
-
         Player player;
         Dungeon dungeon;
         DifficultyMode difficultyMode;
@@ -83,7 +82,7 @@ namespace STVrogue.GameLogic
         
         public Game()
         {
-            //player = new Player("0", "Bagginssess");
+            
         }
         
         /// <summary>
@@ -203,7 +202,7 @@ namespace STVrogue.GameLogic
                 if (difficultyMode == DifficultyMode.ELITEmode)
                 {
                     // Check if the player's location neighbours the exit room
-                    if (player.Location.ReachableRooms().Contains(dungeon.ExitRoom))
+                    if (player.Location.Neighbors.Contains(dungeon.ExitRoom))
                     {
                         player.EliteFlee = false;
                     }
