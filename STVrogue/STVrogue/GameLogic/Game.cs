@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using STVrogue.GameControl;
 
 namespace STVrogue.GameLogic
@@ -218,7 +219,7 @@ namespace STVrogue.GameLogic
         /// </summary>
         public bool Flee(Creature c)
         {
-            List<Room> possibleRooms = c.Location.ReachableRooms();
+            List<Room> possibleRooms = c.Location.Neighbors.ToList();
             bool canFlee = true;
             Random random = new Random();
             
