@@ -145,7 +145,7 @@ namespace STVrogue.GameLogic
         bool enraged = false;
         
         // Only relevant for elite mode
-        // False if player enters room neighboring the exit room enraged or TODO uses rage potion in a room neighboring the exit room. 
+        // False if player enters room neighboring the exit room enraged or uses rage potion in a room neighboring the exit room. 
         bool eliteFlee = true;
 
         // Constructor for player
@@ -182,13 +182,21 @@ namespace STVrogue.GameLogic
         #endregion
 
         /// <summary>
-        /// Use the given item. We also pass the current turn-number at which
-        /// this action happens.
+        /// Use the given item.
         /// </summary>
-        public void Use(long turnNr, Item i)
+        public void Use(Item i)
         {
-            throw new NotImplementedException();
-            // TODO
+            // Check if the item is in the player's bag
+            if (!bag.Contains(i))
+            {
+                throw new ArgumentException($"The used item {i.Id} was not present in the player's bag");
+            }
+            
+            // Use the item
+            i.Use(this);
+            
+            // Remove the item from the bag
+            bag.Remove(i);
         }
 
         // Player moves, only to neighboring rooms

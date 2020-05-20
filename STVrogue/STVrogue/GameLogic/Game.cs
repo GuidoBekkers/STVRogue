@@ -183,7 +183,29 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void UseItem(Item i)
         {
-            throw new NotImplementedException();
+            // Use the item
+            player.Use(i);
+            
+            if (i is HealingPotion)
+            {
+                // Store the turn in which the item was used
+                healUsed = turnNumber;
+            }
+            else if (i is RagePotion)
+            {
+                // Store the turn in which the item was used
+                rageUsed = turnNumber;
+                
+                // Check the difficulty 
+                if (difficultyMode == DifficultyMode.ELITEmode)
+                {
+                    // Check if the player's location neighbours the exit room
+                    if (player.Location.ReachableRooms().Contains(dungeon.ExitRoom))
+                    {
+                        player.EliteFlee = false;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -248,7 +270,7 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Update(Command playerAction)
         {
-            Console.WriteLine("** Turn " + TurnNumber + ": "  + Player.Name + " " + playerAction);
+            Console.WriteLine("** Turn " + turnNumber + ": "  + Player.Name + " " + playerAction);
             
             // Handle the given action
             switch (playerAction.Name)
