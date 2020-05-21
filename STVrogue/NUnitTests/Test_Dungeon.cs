@@ -17,9 +17,9 @@ namespace NUnitTests
         /// <param name = "cap">the given maximum capacity of a room</param>
         
         //Linear shape
-        [TestCase(DungeonShapeType.LINEARshape, 1, 2)] //not enough rooms 
-        [TestCase(DungeonShapeType.LINEARshape, 2, 4)] //exactly enough rooms
-        [TestCase(DungeonShapeType.LINEARshape, 3, 6)] //just enough rooms
+        [TestCase(DungeonShapeType.LINEARshape, 2, 2)] //not enough rooms 
+        [TestCase(DungeonShapeType.LINEARshape, 3, 4)] //exactly enough rooms
+        [TestCase(DungeonShapeType.LINEARshape, 4, 6)] //just enough rooms
         [TestCase(DungeonShapeType.LINEARshape, 20, 15)] //many rooms
         
         //Tree shape
@@ -45,8 +45,7 @@ namespace NUnitTests
             Exception exc = null;
             
             //Pre-Condition
-            if (cap < 1 || rooms < 2 || 
-                (rooms < 3 && (shape == DungeonShapeType.TREEshape || shape == DungeonShapeType.RANDOMshape)))
+            if (rooms < 3)
             {
                 //Check if constructor throws an exception when pre-condition is not met
                 Assert.Throws<ArgumentException>(() => new Dungeon(shape, rooms, cap));

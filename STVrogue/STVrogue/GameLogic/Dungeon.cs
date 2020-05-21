@@ -36,8 +36,7 @@ namespace STVrogue.GameLogic
         public Dungeon(DungeonShapeType shape, int numberOfRooms, int maxRoomCap)
         {
             //precondition
-            if (maxRoomCap < 1 || numberOfRooms < 2 || 
-                numberOfRooms < 3 && (shape == DungeonShapeType.TREEshape || shape == DungeonShapeType.RANDOMshape))
+            if (numberOfRooms < 3)
             {
                 throw new ArgumentException();
             }
@@ -160,7 +159,7 @@ namespace STVrogue.GameLogic
             //Count the max monsters we can spawn near the exit
             int maxExitMonsters = MaxNeighMonsters(exitRoom);
             
-            //Check the lowest capacity room of exit neighbors.
+            //Check the lowest capacity room of exit neighbors
             int lowestCap = LowestNeighCap(exitRoom);
             //Calculate the max monsters we can spawn not near the exit
             int maxNonExitMonsters = 0;
@@ -176,10 +175,11 @@ namespace STVrogue.GameLogic
                 return false;
             
             //Seed the monsters
-            seedMonsters(lowestCap, numberOfMonster);
+            SeedMonsters(lowestCap, numberOfMonster, 0, true);
             
-            
-            
+            //Seed the items
+            SeedItems();
+
             return true;
         }
         
@@ -210,24 +210,134 @@ namespace STVrogue.GameLogic
         }
         
         //Fills the dungeon with monsters
-        private void seedMonsters(int lowestCap, int numberOfMonster)
+        private void SeedMonsters(int lowestCap, int numberOfMonsters, int id, bool firstRecur = false)
         {
+            if (numberOfMonsters <= 0)
+            {
+                return;
+            }
+
+            int counter = 0; //used for unique IDs
+            int seedAmount; //the amount of monsters we seed in a room
+            int cap; //the max amount of monsters we can seed in a room
+            int remainingMonsters = numberOfMonsters; //used to keep track of the monsters that need to be seeded
+
             //Fill the exit neighbors with monsters.
-            int i = 0;
-            int remaining = numberOfMonster;
             foreach (Room neigh in exitRoom.Neighbors)
             {
-                
-            }
-            
-            //Fill the other rooms
-            foreach (Room r in rooms.Where(x => !x.Neighbors.Contains(exitRoom)))
-            {
-                int cap = r.Capacity >= lowestCap ? lowestCap - 1 : r.Capacity;
-                for (int j = 0; j < cap; j++)
+                if (remainingMonsters <= 0)
+                    return;
+
+                cap = neigh.Capacity - neigh.Monsters.Count; //the max amount of monsters we can seed in this room
+                if (cap > remainingMonsters)
+                    seedAmount = remainingMonsters;
+                else
+                    seedAmount = firstRecur ? random.Next(lowestCap, cap + 1) : random.Next(cap + 1);
+
+                for (int i = 0; i < seedAmount; i++)
                 {
+                    neigh.Monsters.Add(CreateMonster(id + counter));
+                    counter++;
+                    remainingMonsters--;
                 }
             }
+
+            //Fill the other rooms
+            foreach (Room r in rooms.Where(r => !r.Neighbors.Contains(exitRoom)))
+            {
+                if (remainingMonsters <= 0)
+                    return;
+                
+                int maxCap = r.Capacity >= lowestCap ? lowestCap - 1 : r.Capacity;
+                cap = maxCap - r.Monsters.Count;
+                if (cap > remainingMonsters)
+                    seedAmount = remainingMonsters;
+                else
+                    seedAmount = random.Next(cap + 1);
+                for (int j = 0; j < seedAmount; j++)
+                {
+                    r.Monsters.Add(CreateMonster(id + counter));
+                    counter++;
+                    remainingMonsters--;
+                }
+            }
+            
+            SeedMonsters(lowestCap, remainingMonsters, id + counter);
+        }
+
+        //Returns a monster
+        private Monster CreateMonster(int id)
+        {
+            int hp = random.Next(50, 101); //TODO: tweak HP 
+            int ar = random.Next(1, 11); //TODO: tweak AR  
+            return new Monster("M" + id, "goblin", hp, ar); //ALLE MONSTERS HETEN NU GOBLIN
+        }
+
+        public void SeedItems()
+        {
+            int id = 0; //used for unique IDs
+         
+            Room[] rndmRooms = rooms.OrderBy(x => random.Next()).ToArray();
+            
+            //make sure there is at least one healing and rage potion in startRoom.Neighbors
+            for (int i = 0; i < rndmRooms.Length; i++)
+            {
+                Room r = rndmRooms[i];
+                if (r.Neighbors.Contains(startRoom))
+                {
+                    r.Items.Add(new HealingPotion("H" + id, random.Next(1, 101)));
+                    id++;
+                    r.Items.Add(new RagePotion("H" + id));
+                    id++;
+                    id = AddPotions(r, id);
+                    break;
+                }
+            }
+
+            int emptyRooms = rooms.Count / 2 - 2; //The amount of rooms without potions besides exit and start
+            if (emptyRooms < 0)
+                emptyRooms = 0;
+            
+            for (int i = 0; i < rndmRooms.Length; i++)
+            {
+                Room r = rndmRooms[i];
+                if (r == startRoom || r == exitRoom || r.Items.Count != 0)
+                {
+                    continue;
+                }
+                if (emptyRooms > 0)
+                {
+                    emptyRooms--;
+                    continue;
+                }
+
+                AddPotions(r, id);
+
+            }
+            
+
+        }
+
+        //Adds random amount of potions to a room, returns id for unique ids
+        public int AddPotions(Room room, int id)
+        {
+            int counter = id; //used for unique IDs;
+            int healPotions = random.Next(3); //random amount of healing potions
+            int ragePotions = random.Next(3); //random amount of rage potions 
+            
+            for (int i = 0; i < healPotions; i++)
+            {
+                room.Items.Add(new HealingPotion("H" + counter, random.Next(1, 101)));
+                counter++;
+            }
+
+            for (int i = 0; i < ragePotions; i++)
+            {
+                room.Items.Add(new RagePotion("H" + counter));
+                counter++;
+            }
+
+            return counter;
         }
     }
 

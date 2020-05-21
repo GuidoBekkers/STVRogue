@@ -51,8 +51,8 @@ namespace STVrogue.GameLogic
         int turnNumber = 0;
 
         public Game()
-        {
-            player = new Player("0", "Bagginssess");
+        { 
+            //player = new Player("0", "Bagginssess");
         }
         
         /// <summary>
