@@ -21,6 +21,7 @@ namespace STVrogue.GameLogic
         public int initialNumberOfHealingPots;
         public int initialNumberOfRagePots;
         public DifficultyMode difficultyMode;
+        public string playerName;
         public int playerBaseHp = 10;
         public int playerBaseAr = 1;
 
@@ -85,10 +86,10 @@ namespace STVrogue.GameLogic
         int healUsed; // Keeps track of the last turn a heal potion was used
         int rageUsed; // Keeps track of the last turn a rage potion was used
 
-        public Game()
-        {
+        //public Game()
+        //{
 
-        }
+        //}
 
         /// <summary>
         /// Try to create an instance of Game satisfying the specified configuration.
@@ -104,7 +105,8 @@ namespace STVrogue.GameLogic
             var difMult = conf.GetDifficultyMultiplier(difficultyMode);
 
             // Initialize the player
-            player = new Player("playerId", "player", (conf.playerBaseHp * difMult), (conf.playerBaseAr * difMult));
+            player = new Player("playerId", conf.playerName, (conf.playerBaseHp * difMult),
+                (conf.playerBaseAr * difMult));
 
             // Initialize the dungeon
             dungeon = new Dungeon(conf.dungeonShape, conf.numberOfRooms, conf.maxRoomCapacity);
@@ -174,10 +176,12 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Attack(Creature attacker, Creature defender)
         {
+            // Check if the attacker is alive
             if (!attacker.Alive)
             {
                 throw new ArgumentException($"Attacker: {attacker.Id} is not alive");
             }
+            // Check if the attacker and defender are in the same room
             else if (attacker.Location != defender.Location)
             {
                 throw new ArgumentException(
@@ -185,7 +189,21 @@ namespace STVrogue.GameLogic
             }
             else
             {
+                // Execute the attack
                 attacker.Attack(defender);
+
+                // Check if the defender died
+                if (!defender.Alive)
+                {
+                    if (defender is Monster)
+                    {
+                        livingMonsters.Remove(defender as Monster);
+                    }
+                    else
+                    {
+                        gameover = true;
+                    }
+                }
             }
         }
 

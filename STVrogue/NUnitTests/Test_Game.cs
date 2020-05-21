@@ -83,6 +83,28 @@ namespace NUnitTests
             // Check if the correct exception is thrown
             Assert.Throws<ArgumentException>(() => g = new Game(gameConfiguration));
         }
+        
+        [Test]
+        public void Test_Game_Constructor_InvalidSeed()
+        {
+            // Create the game variable
+            Game g;
+            
+            // Initialize the invalid GameConfiguration
+            GameConfiguration gameConfiguration= new GameConfiguration
+            {
+                numberOfRooms = 3,
+                maxRoomCapacity = 5,
+                dungeonShape = DungeonShapeType.LINEARshape,
+                initialNumberOfMonsters = 10,
+                initialNumberOfHealingPots = 10,
+                initialNumberOfRagePots = 10,
+                difficultyMode = DifficultyMode.NORMALmode
+            };
+
+            // Check if the correct exception is thrown
+            Assert.Throws<ArgumentException>(() => g = new Game(gameConfiguration));
+        }
 
         [Test]
         public void Test_Game_GetSetFunctions()
@@ -661,7 +683,7 @@ namespace NUnitTests
         public void Test_Game_Update()
         {
             // TODO: write Game.Update test
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }
