@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using NUnit.Framework;
 using STVrogue.GameLogic;
 using STVrogue.Utils;
@@ -45,7 +47,7 @@ namespace NUnitTests
             Exception exc = null;
             
             //Pre-Condition
-            if (rooms < 3)
+            if (rooms < 3 || cap < 1)
             {
                 //Check if constructor throws an exception when pre-condition is not met
                 Assert.Throws<ArgumentException>(() => new Dungeon(shape, rooms, cap));
@@ -74,8 +76,6 @@ namespace NUnitTests
                         Assert.IsTrue(HelperPredicates.IsLinear(dungeon));
                         break;
                     case DungeonShapeType.TREEshape:
-                        // Assert.IsTrue(HelperPredicates.HasUniqueStartAndExit(dungeon));
-                        // Assert.IsTrue(HelperPredicates.AllReachableFromStart(dungeon));
                         Assert.IsTrue(HelperPredicates.IsTree(dungeon));
                         break;
                     case DungeonShapeType.RANDOMshape:
@@ -86,15 +86,133 @@ namespace NUnitTests
                         break;
                 }
             }
-            
-           
-            
         }
 
-        public void Test_Dungeon_SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion,
-            int numberOfRagePotion)
+        //NUnit Theory testing for the SeedMonstersAndItems method
+        [DatapointSource]
+        public int[] int_values = new int[] {0, 1, 3, 5, 10};
+
+        [Theory]
+        // Theory-1 checks if the method returns false if the preconditions are not met for: numberOfMonsters,
+        //numberOfHealingPotions and numberOfRagePotions.
+        public void SeedMonstersAndItems_Theory1(int numberOfMonster, int numberOfHealingPotions, int numberOfRagePotions,
+            int numberOfRooms, int maximumCapacity)
         {
+            //Make sure that the dungeon has always valid inputs
+            Assume.That(numberOfRooms > 2 && maximumCapacity > 0);
+            Dungeon dungeon = new Dungeon(DungeonShapeType.LINEARshape, numberOfRooms, maximumCapacity);
+            int maxMonsterSeeds = MaxSeeds(maximumCapacity, dungeon);
             
+            //Cases when pre-conditions are not met
+            Assume.That(numberOfMonster > maxMonsterSeeds || numberOfHealingPotions < 1 
+                                                          || numberOfRagePotions < 1 || numberOfMonster < 1);
+            //Check if the function returns false in all cases
+            Assert.IsFalse(dungeon.SeedMonstersAndItems(numberOfMonster, numberOfHealingPotions, numberOfRagePotions));
+        }
+        
+        [Theory]
+        //Theory-2 checks if the post-conditions are met, when the pre-conditions are met
+        public void SeedMonstersAndItems_Theory2(int numberOfMonster, int numberOfHealingPotions, int numberOfRagePotions,
+            int numberOfRooms, int maximumCapacity)
+        {
+            //Make sure that the dungeon has always valid inputs
+            Assume.That(numberOfRooms > 2 && maximumCapacity > 0);
+            Dungeon dungeon = new Dungeon(DungeonShapeType.LINEARshape, numberOfRooms, maximumCapacity);
+            int maxMonsterSeeds = MaxSeeds(maximumCapacity, dungeon);
+
+            //Cases when the pre-conditions are met
+            Assume.That(numberOfMonster <= maxMonsterSeeds && numberOfHealingPotions >= 1 
+                                                           && numberOfRagePotions >= 1 && numberOfMonster > 0);
+            //Check is the function returns true
+            Assert.IsTrue(dungeon.SeedMonstersAndItems(numberOfMonster, numberOfHealingPotions, numberOfRagePotions));
+            
+            //Check if every seeded monster has HP > 0 and AR > 0
+            foreach (Monster m in dungeon.Monsters)
+            {
+                Assert.IsTrue(m.Hp > 0 && m.AttackRating > 0);
+            }
+            
+            //lowest amount of monsters in exit.Neighbors:
+            int lowestMonstersAmount = LowestMonstersAmount(maximumCapacity, dungeon.ExitRoom.Neighbors);
+            int emptyRooms = 0; //amount of rooms without items
+
+            foreach (Room r in dungeon.Rooms)
+            {
+                //Check if every room not neighbor of exit room has less monsters than
+                //lowest amount of monsters in exitRoom.Neighbors
+                if (!r.Neighbors.Contains(dungeon.ExitRoom) && r != dungeon.StartRoom)
+                    Assert.IsTrue(r.Monsters.Count < lowestMonstersAmount);
+                
+                //Check if number of monsters in every room is less than its maximum capacity
+                Assert.IsTrue(r.Capacity >= r.Monsters.Count);
+                
+                if (r.Items.Count == 0)
+                {
+                    emptyRooms++;
+                }
+            }
+            
+            //Check if at least N/2 rooms have no item at all
+            Assert.IsTrue(emptyRooms >= dungeon.Rooms.Count / 2);
+            
+            bool hpItem = false; //is there a hp item?
+            bool rpItem = false; //is there an ar item?
+            //Check if there is at least one healing and one rage potion in startRoom.Neigbors
+            foreach (Room r in dungeon.StartRoom.Neighbors)
+            {
+                foreach (Item i in r.Items)
+                {
+                    if (i is HealingPotion)
+                        hpItem = true;
+                    if (i is RagePotion)
+                        rpItem = true;
+
+                    if (hpItem && rpItem)
+                        break;
+                }
+                if (hpItem && rpItem)
+                    break;
+            }
+            
+            Assert.IsTrue(hpItem);
+            Assert.IsTrue(rpItem);
+        }
+        
+        //Returns the maximum monsters that can be seeded
+        private int MaxSeeds(int maxCap, Dungeon dungeon)
+        {
+            int lowestCap = maxCap;
+            int res = 0;
+            foreach (Room r in dungeon.ExitRoom.Neighbors)
+            {
+                res += r.Capacity;
+                if (r.Capacity < lowestCap)
+                {
+                    lowestCap = r.Capacity;
+                }
+            }
+
+            int nonExitRooms = dungeon.Rooms.Count - dungeon.ExitRoom.Neighbors.Count;
+            //This is a check for random dungeon shape:
+            nonExitRooms -= dungeon.ExitRoom.Neighbors.Contains(dungeon.StartRoom) ? 1 : 2; 
+
+            res += nonExitRooms * (lowestCap - 1);
+            return res;
+        }
+
+        //Returns the lowest amount of monsters in a hash set of rooms
+        private int LowestMonstersAmount(int maxCap, HashSet<Room> rooms)
+        {
+            int lowestMonstersAmount = maxCap; 
+            foreach (Room r in rooms)
+            {
+                if (r.Monsters.Count < lowestMonstersAmount)
+                {
+                    lowestMonstersAmount = r.Monsters.Count;
+                }
+            }
+            
+            return lowestMonstersAmount;
         }
     }
 }

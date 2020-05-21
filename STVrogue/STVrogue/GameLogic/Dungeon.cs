@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using STVrogue.Utils;
+using static STVrogue.Utils.RandomFactory;
 
 
 namespace STVrogue.GameLogic
@@ -15,12 +16,11 @@ namespace STVrogue.GameLogic
     public class Dungeon
     {
         HashSet<Room> rooms = new HashSet<Room>();
-        private HashSet<Monster> monsters = new HashSet<Monster>();
+        HashSet<Monster> monsters = new HashSet<Monster>();
         private readonly int _maxRoomCap;
         private int _numberOfRooms;
         Room startRoom;
         Room exitRoom;
-        private readonly Random random;
 
         protected Dungeon() { }
         
@@ -36,12 +36,11 @@ namespace STVrogue.GameLogic
         public Dungeon(DungeonShapeType shape, int numberOfRooms, int maxRoomCap)
         {
             //precondition
-            if (numberOfRooms < 3)
+            if (numberOfRooms < 3 || maxRoomCap < 1)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("invalid number of rooms or invalid maximum capacity");
             }
             
-            random = new Random(5);
             _maxRoomCap = maxRoomCap;
             _numberOfRooms = numberOfRooms;
             
@@ -58,7 +57,7 @@ namespace STVrogue.GameLogic
                     Room[] roomsArray = rooms.ToArray();
                     for (int i = 0; i < _numberOfRooms / 3; i++)
                     {
-                        roomsArray[random.Next(0, _numberOfRooms / 2)].Connect(roomsArray[random.Next(_numberOfRooms / 2 + 1, _numberOfRooms)]);
+                        roomsArray[GetRandom().Next(0, _numberOfRooms / 2)].Connect(roomsArray[GetRandom().Next(_numberOfRooms / 2 + 1, _numberOfRooms)]);
                     }
                     rooms = roomsArray.ToHashSet();
                     break;
@@ -116,7 +115,7 @@ namespace STVrogue.GameLogic
 
         private int RoomCap()
         {
-            return random.Next(1, _maxRoomCap + 1);
+            return GetRandom().Next(1, _maxRoomCap + 1);
         }
         
         
@@ -125,6 +124,11 @@ namespace STVrogue.GameLogic
         { 
             get => rooms;
             set => rooms = value;
+        }
+
+        public HashSet<Monster> Monsters
+        {
+            get => monsters;
         }
 
         public Room StartRoom
@@ -156,9 +160,10 @@ namespace STVrogue.GameLogic
         /// </summary>
         public bool SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion, int numberOfRagePotion)
         {
-            //There must be at least 1 healing and rage potion
-            if (numberOfHealingPotion < 1 || numberOfRagePotion < 1)
+            //There must be at least 1 healing, 1 rage potion and 1 monster
+            if (numberOfHealingPotion < 1 || numberOfRagePotion < 1 || numberOfMonster < 1)
                 return false;
+            
             
             //Count the max monsters we can spawn near the exit
             int maxExitMonsters = MaxNeighMonsters(exitRoom);
@@ -236,7 +241,7 @@ namespace STVrogue.GameLogic
                 if (cap > remainingMonsters)
                     seedAmount = remainingMonsters;
                 else
-                    seedAmount = firstRecur ? random.Next(lowestCap, cap + 1) : random.Next(cap + 1);
+                    seedAmount = firstRecur ? GetRandom().Next(lowestCap, cap + 1) : GetRandom().Next(cap + 1);
 
                 for (int i = 0; i < seedAmount; i++)
                 {
@@ -257,7 +262,7 @@ namespace STVrogue.GameLogic
                 if (cap > remainingMonsters)
                     seedAmount = remainingMonsters;
                 else
-                    seedAmount = random.Next(cap + 1);
+                    seedAmount = GetRandom().Next(cap + 1);
                 for (int j = 0; j < seedAmount; j++)
                 {
                     r.Monsters.Add(CreateMonster());
@@ -272,16 +277,16 @@ namespace STVrogue.GameLogic
         //Returns a monster
         private Monster CreateMonster()
         {
-            int hp = random.Next(50, 101); //TODO: tweak HP 
-            int ar = random.Next(1, 11); //TODO: tweak AR  
+            int hp = GetRandom().Next(50, 101); //TODO: tweak HP 
+            int ar = GetRandom().Next(1, 11); //TODO: tweak AR  
             Monster m = new Monster(IdFactory.GetCreatureId(), "goblin", hp, ar); //ALLE MONSTERS HETEN NU GOBLIN
             monsters.Add(m);
             return m;
         }
-
+        
         public void SeedItems(int numberOfHealingPotion, int numberOfRagePotion)
         {
-            Room[] rndmRooms = rooms.OrderBy(x => random.Next()).ToArray();
+            Room[] rndmRooms = rooms.OrderBy(x => GetRandom().Next()).ToArray();
             int remainingHealingPotions = numberOfHealingPotion;
             int remainingRagePotions = numberOfRagePotion;
             
@@ -291,7 +296,7 @@ namespace STVrogue.GameLogic
                 Room r = rndmRooms[i];
                 if (r.Neighbors.Contains(startRoom))
                 {
-                    r.Items.Add(new HealingPotion(IdFactory.GetItemId(), random.Next(1, 101)));
+                    r.Items.Add(new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101)));
                     r.Items.Add(new RagePotion(IdFactory.GetItemId()));
                     remainingHealingPotions--;
                     remainingRagePotions--;
@@ -356,7 +361,7 @@ namespace STVrogue.GameLogic
         {
             for (int i = 0; i < amount; i++)
             {
-                room.Items.Add(new HealingPotion(IdFactory.GetItemId(), random.Next(1, 101)));
+                room.Items.Add(new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101)));
             }
         }
 
