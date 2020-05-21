@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Transactions;
+using STVrogue.Utils;
+
 
 namespace STVrogue.GameLogic
 {
@@ -16,6 +15,7 @@ namespace STVrogue.GameLogic
     public class Dungeon
     {
         HashSet<Room> rooms = new HashSet<Room>();
+        private HashSet<Monster> monsters = new HashSet<Monster>();
         private readonly int _maxRoomCap;
         private int _numberOfRooms;
         Room startRoom;
@@ -73,7 +73,7 @@ namespace STVrogue.GameLogic
             Room prevRoom = startRoom;
             for (int i = 0; i < _numberOfRooms - 2; i++)
             {
-                Room currRoom = new Room("R" + i, RoomType.ORDINARYroom, RoomCap());
+                Room currRoom = new Room(IdFactory.GetRoomId(), RoomType.ORDINARYroom, RoomCap());
                 rooms.Add(currRoom);
                 currRoom.Connect(prevRoom);
                 prevRoom = currRoom;
@@ -91,12 +91,12 @@ namespace STVrogue.GameLogic
             }
             else if (i == _numberOfRooms - 1)
             {
-                room = new Room("ES", RoomType.EXITroom, 0);
+                room = new Room("RE", RoomType.EXITroom, 0);
                 ExitRoom = room;
             }
             else
             {
-                room = new Room("R" + i,  RoomType.ORDINARYroom, RoomCap());
+                room = new Room(IdFactory.GetRoomId(),  RoomType.ORDINARYroom, RoomCap());
             }
             rooms.Add(room);
             
@@ -156,6 +156,10 @@ namespace STVrogue.GameLogic
         /// </summary>
         public bool SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion, int numberOfRagePotion)
         {
+            //There must be at least 1 healing and rage potion
+            if (numberOfHealingPotion < 1 || numberOfRagePotion < 1)
+                return false;
+            
             //Count the max monsters we can spawn near the exit
             int maxExitMonsters = MaxNeighMonsters(exitRoom);
             
@@ -175,10 +179,10 @@ namespace STVrogue.GameLogic
                 return false;
             
             //Seed the monsters
-            SeedMonsters(lowestCap, numberOfMonster, 0, true);
+            SeedMonsters(lowestCap, numberOfMonster, true);
             
             //Seed the items
-            SeedItems();
+            SeedItems(numberOfHealingPotion, numberOfRagePotion);
 
             return true;
         }
@@ -187,7 +191,7 @@ namespace STVrogue.GameLogic
         private int MaxNeighMonsters(Room room)
         {
             int maxExitMonsters = 0;
-            foreach (Room neigh in exitRoom.Neighbors)
+            foreach (Room neigh in room.Neighbors)
             {
                 maxExitMonsters += neigh.Capacity;
             }
@@ -210,7 +214,7 @@ namespace STVrogue.GameLogic
         }
         
         //Fills the dungeon with monsters
-        private void SeedMonsters(int lowestCap, int numberOfMonsters, int id, bool firstRecur = false)
+        private void SeedMonsters(int lowestCap, int numberOfMonsters, bool firstRecur = false)
         {
             if (numberOfMonsters <= 0)
             {
@@ -236,7 +240,7 @@ namespace STVrogue.GameLogic
 
                 for (int i = 0; i < seedAmount; i++)
                 {
-                    neigh.Monsters.Add(CreateMonster(id + counter));
+                    neigh.Monsters.Add(CreateMonster());
                     counter++;
                     remainingMonsters--;
                 }
@@ -256,28 +260,30 @@ namespace STVrogue.GameLogic
                     seedAmount = random.Next(cap + 1);
                 for (int j = 0; j < seedAmount; j++)
                 {
-                    r.Monsters.Add(CreateMonster(id + counter));
+                    r.Monsters.Add(CreateMonster());
                     counter++;
                     remainingMonsters--;
                 }
             }
             
-            SeedMonsters(lowestCap, remainingMonsters, id + counter);
+            SeedMonsters(lowestCap, remainingMonsters);
         }
 
         //Returns a monster
-        private Monster CreateMonster(int id)
+        private Monster CreateMonster()
         {
             int hp = random.Next(50, 101); //TODO: tweak HP 
             int ar = random.Next(1, 11); //TODO: tweak AR  
-            return new Monster("M" + id, "goblin", hp, ar); //ALLE MONSTERS HETEN NU GOBLIN
+            Monster m = new Monster(IdFactory.GetCreatureId(), "goblin", hp, ar); //ALLE MONSTERS HETEN NU GOBLIN
+            monsters.Add(m);
+            return m;
         }
 
-        public void SeedItems()
+        public void SeedItems(int numberOfHealingPotion, int numberOfRagePotion)
         {
-            int id = 0; //used for unique IDs
-         
             Room[] rndmRooms = rooms.OrderBy(x => random.Next()).ToArray();
+            int remainingHealingPotions = numberOfHealingPotion;
+            int remainingRagePotions = numberOfRagePotion;
             
             //make sure there is at least one healing and rage potion in startRoom.Neighbors
             for (int i = 0; i < rndmRooms.Length; i++)
@@ -285,23 +291,24 @@ namespace STVrogue.GameLogic
                 Room r = rndmRooms[i];
                 if (r.Neighbors.Contains(startRoom))
                 {
-                    r.Items.Add(new HealingPotion("H" + id, random.Next(1, 101)));
-                    id++;
-                    r.Items.Add(new RagePotion("H" + id));
-                    id++;
-                    id = AddPotions(r, id);
+                    r.Items.Add(new HealingPotion(IdFactory.GetItemId(), random.Next(1, 101)));
+                    r.Items.Add(new RagePotion(IdFactory.GetItemId()));
+                    remainingHealingPotions--;
+                    remainingRagePotions--;
                     break;
                 }
             }
 
             int emptyRooms = rooms.Count / 2 - 2; //The amount of rooms without potions besides exit and start
-            if (emptyRooms < 0)
-                emptyRooms = 0;
-            
+            int seedRooms = rooms.Count - emptyRooms - 2;
+
             for (int i = 0; i < rndmRooms.Length; i++)
             {
+                if (remainingHealingPotions <= 0 && remainingRagePotions <= 0)
+                    break;
+                
                 Room r = rndmRooms[i];
-                if (r == startRoom || r == exitRoom || r.Items.Count != 0)
+                if (r == startRoom || r == exitRoom)
                 {
                     continue;
                 }
@@ -311,33 +318,54 @@ namespace STVrogue.GameLogic
                     continue;
                 }
 
-                AddPotions(r, id);
-
+                if (remainingHealingPotions > 0)
+                {
+                    if (seedRooms >= numberOfHealingPotion)
+                    {
+                        AddHealingPotions(r, 1);
+                        remainingHealingPotions--;
+                    }
+                    else
+                    {
+                        int seedAmount = numberOfHealingPotion / seedRooms + numberOfHealingPotion % seedRooms;
+                        AddHealingPotions(r, seedAmount);
+                        remainingHealingPotions -= seedAmount;
+                    }
+                }
+                
+                if (remainingRagePotions > 0)
+                {
+                    if (seedRooms >= numberOfRagePotion)
+                    {
+                        AddRagePotions(r, 1);
+                        remainingRagePotions--;
+                    }
+                    else
+                    {
+                        int seedAmount = numberOfRagePotion / seedRooms + numberOfRagePotion % seedRooms;
+                        AddRagePotions(r, seedAmount);
+                        remainingRagePotions -= seedAmount;
+                    }
+                }
+                seedRooms--;
             }
-            
-
         }
 
         //Adds random amount of potions to a room, returns id for unique ids
-        public int AddPotions(Room room, int id)
+        public void AddHealingPotions(Room room, int amount)
         {
-            int counter = id; //used for unique IDs;
-            int healPotions = random.Next(3); //random amount of healing potions
-            int ragePotions = random.Next(3); //random amount of rage potions 
-            
-            for (int i = 0; i < healPotions; i++)
+            for (int i = 0; i < amount; i++)
             {
-                room.Items.Add(new HealingPotion("H" + counter, random.Next(1, 101)));
-                counter++;
+                room.Items.Add(new HealingPotion(IdFactory.GetItemId(), random.Next(1, 101)));
             }
+        }
 
-            for (int i = 0; i < ragePotions; i++)
+        public void AddRagePotions(Room room, int amount)
+        {
+            for (int i = 0; i < amount; i++)
             {
-                room.Items.Add(new RagePotion("H" + counter));
-                counter++;
+                room.Items.Add(new RagePotion(IdFactory.GetItemId()));
             }
-
-            return counter;
         }
     }
 

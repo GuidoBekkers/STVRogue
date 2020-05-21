@@ -90,5 +90,11 @@ namespace NUnitTests
            
             
         }
+
+        public void Test_Dungeon_SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion,
+            int numberOfRagePotion)
+        {
+            
+        }
     }
 }
