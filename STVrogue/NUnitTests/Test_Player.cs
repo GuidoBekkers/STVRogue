@@ -72,6 +72,59 @@ namespace NUnitTests
             Assert.IsTrue(player.Kp == 1);
         }
         
-        // TODO: player test use
+        [Test]
+        public void Test_PlayerUse()
+        {
+            // Instance the player object
+            Player p = new Player("pId", "Player", 2, 1);
+            
+            // Instance a rage potion
+            RagePotion ragePotion = new RagePotion("rPotionId");
+            
+            // Instance a healing potion
+            HealingPotion healingPotion = new HealingPotion("hPotionId", 1);
+            
+            // Add the items to the player's bag
+            p.Bag.Add(ragePotion);
+            p.Bag.Add(healingPotion);
+            
+            // Test the rage potion use
+            p.Use(ragePotion);
+            
+            // Check if the player became enraged
+            Assert.IsTrue(p.Enraged);
+            
+            // Set the player's health to 1
+            p.Hp = 1;
+            
+            // Test the healing potion use
+            p.Use(healingPotion);
+            
+            // Check if the player was healed and that the max health was not exceeded
+            Assert.IsTrue(p.Hp == 2 && p.Hp <= p.HpMax);
+
+        }
+
+        [Test]
+        public void Test_PlayerUse_NotInBag()
+        {
+            // Instance the player object
+            Player p = new Player("pId", "Player", 2, 1);
+            p.Hp = 1;
+            
+            // Instance a rage potion
+            RagePotion ragePotion = new RagePotion("rPotionId");
+            
+            // Instance a healing potion
+            HealingPotion healingPotion = new HealingPotion("hPotionId", 1);
+
+            // Check that the correct exception is thrown because the item is not in the player's bag
+            Assert.Throws<ArgumentException>(() => p.Use(ragePotion));
+            Assert.Throws<ArgumentException>(() => p.Use(healingPotion));
+            
+            // Check that the player's stats have remained the same
+            Assert.IsTrue(!p.Enraged);
+            Assert.IsTrue(p.Hp == 1);
+        }
     }
 }
