@@ -332,6 +332,12 @@ namespace STVrogue.GameLogic
             {
                 player.Enraged = false;
             }
+            
+            // Check if the player won
+            if (player.Location.Id == dungeon.ExitRoom.Id)
+            {
+                gameover = true;
+            }
 
             // Update the turn number
             turnNumber++;
@@ -355,13 +361,13 @@ namespace STVrogue.GameLogic
                 // Handle the player moving to the given location
                 case (CommandType.MOVE):
                 {
-                    HandlePlayerTurnMove(playerAction.Args[1]);
+                    HandlePlayerTurnMove(playerAction.Args[0]);
                     break;
                 }
                 // Handle the player attacking the given enemy
                 case (CommandType.ATTACK):
                 {
-                    HandlePlayerTurnAttack(playerAction.Args[1]);
+                    HandlePlayerTurnAttack(playerAction.Args[0]);
                     break;
                 }
                 // Handle the player picking up all the items in the room
@@ -374,12 +380,13 @@ namespace STVrogue.GameLogic
                     }
                     // Remove all the items from the room
                     player.Location.Items.Clear();
+                    Console.WriteLine("You picked up all items from the ground");
                     break;
                 }
                 // Handle the player using the given item
                 case (CommandType.USE):
                 {
-                    HandlePlayerTurnUse(playerAction.Args[1]);
+                    HandlePlayerTurnUse(playerAction.Args[0]);
                     break;
                 }
                 // Handle the player fleeing
@@ -463,13 +470,15 @@ namespace STVrogue.GameLogic
         {
             // Create a bool denoting if the item was found
             var found = false;
+
+            Item itemToUse = null;
             // Find the item with the correct ID
             foreach (var item in player.Bag)
             {
                 // When found, use that item
                 if (item.Id == targetId)
                 {
-                    UseItem(item);
+                    itemToUse = item;
                     found = true;
                 }
             }
@@ -478,6 +487,8 @@ namespace STVrogue.GameLogic
             {
                 throw new ArgumentException($"The given item ({targetId}) was not in the player's bag");
             }
+            // Use the item
+            UseItem(itemToUse);
         }
 
         /// <summary>
