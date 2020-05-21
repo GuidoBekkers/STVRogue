@@ -83,8 +83,8 @@ namespace STVrogue.GameLogic
         int rageUsed; // Keeps track of the last turn a rage potion was used
         
         public Game()
-        {
-            
+        { 
+            //player = new Player("0", "Bagginssess");
         }
         
         /// <summary>
