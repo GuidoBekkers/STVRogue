@@ -95,8 +95,6 @@ namespace STVrogue.GameLogic
         /// </summary>
         public virtual void Move(Room r)
         {
-            if (!Location.Neighbors.Contains(r))
-                throw new ArgumentException();
             if (r.Monsters.Count >= r.Capacity)
                 throw new ArgumentException();
             r.Monsters.Add(this);
@@ -193,6 +191,9 @@ namespace STVrogue.GameLogic
             
             // Use the item
             i.Use(this);
+            
+            // Check if it was an needless use of a healing potion, thus not removing it from your bag
+            if (i is HealingPotion && Hp == HpMax) return;
             
             // Remove the item from the bag
             bag.Remove(i);

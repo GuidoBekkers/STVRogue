@@ -34,22 +34,7 @@ namespace NUnitTests
             CollectionAssert.DoesNotContain(room1.Monsters, creature);
             CollectionAssert.Contains(room2.Monsters, creature);
         }
-        
-        // Test creature move to non neighboring room
-        [Test]
-        public void Test_CreatureMove2()
-        {
-            // Instantiate 2 unconnected rooms with a creature in 1
-            Room room1 = new Room("1",RoomType.ORDINARYroom, 5);
-            Room room2 = new Room("2",RoomType.ORDINARYroom, 5);
-            Creature creature = new Creature("3", "test_creature");
-            creature.Location = room1;
-            room1.Monsters.Add(creature);
-            
-            // Check if exception in thrown when rooms are not connected
-            Assert.Throws<ArgumentException>(() => creature.Move(room2));
-        }
-        
+
         // Test creature move to neighboring room with max capacity
         [Test]
         public void Test_CreatureMove3()
