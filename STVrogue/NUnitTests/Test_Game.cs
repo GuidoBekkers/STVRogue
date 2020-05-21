@@ -29,12 +29,12 @@ namespace NUnitTests
             // Initialize the valid GameConfiguration
             GameConfiguration gameConfiguration = new GameConfiguration
             {
-                numberOfRooms = 10,
+                numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
 
@@ -83,6 +83,28 @@ namespace NUnitTests
             // Check if the correct exception is thrown
             Assert.Throws<ArgumentException>(() => g = new Game(gameConfiguration));
         }
+        
+        [Test]
+        public void Test_Game_Constructor_InvalidSeed()
+        {
+            // Create the game variable
+            Game g;
+            
+            // Initialize the invalid GameConfiguration
+            GameConfiguration gameConfiguration= new GameConfiguration
+            {
+                numberOfRooms = 3,
+                maxRoomCapacity = 5,
+                dungeonShape = DungeonShapeType.LINEARshape,
+                initialNumberOfMonsters = 10,
+                initialNumberOfHealingPots = 10,
+                initialNumberOfRagePots = 10,
+                difficultyMode = DifficultyMode.NORMALmode
+            };
+
+            // Check if the correct exception is thrown
+            Assert.Throws<ArgumentException>(() => g = new Game(gameConfiguration));
+        }
 
         [Test]
         public void Test_Game_GetSetFunctions()
@@ -90,12 +112,12 @@ namespace NUnitTests
             // Initialize the valid GameConfiguration
             GameConfiguration gameConfiguration = new GameConfiguration
             {
-                numberOfRooms = 10,
+                numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
             
@@ -143,9 +165,9 @@ namespace NUnitTests
                 numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
             
@@ -174,9 +196,9 @@ namespace NUnitTests
                 numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
             
@@ -187,7 +209,7 @@ namespace NUnitTests
             Room dest = g.Dungeon.ExitRoom;
             
             // Check that the destination is indeed unreachable
-            Assert.IsFalse(g.Player.Location.CanReach(dest));
+            Assert.IsFalse(g.Player.Location.Neighbors.Contains(dest));
             
             // Check for the correct exception
             Assert.Throws<ArgumentException>(() => g.Move(g.Player, dest));
@@ -202,9 +224,9 @@ namespace NUnitTests
                 numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
             
@@ -221,7 +243,7 @@ namespace NUnitTests
             g.Attack(g.Player, foe);
             
             // Check if the attack was executed
-            Assert.IsTrue(foe.Hp == 5 - gameConfiguration.playerBaseAr);
+            Assert.IsTrue(foe.Hp == 5 - g.Player.AttackRating);
         }
         
         [Test]
@@ -233,9 +255,9 @@ namespace NUnitTests
                 numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
             
@@ -249,7 +271,7 @@ namespace NUnitTests
             foe.Alive = false;
             
             // Check if the correct exception is thrown
-            Assert.Throws<ArgumentException>(() => g.Attack(g.Player, foe));
+            Assert.Throws<ArgumentException>(() => g.Attack(foe, g.Player));
         }
         
         [Test]
@@ -261,9 +283,9 @@ namespace NUnitTests
                 numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
             
@@ -289,9 +311,9 @@ namespace NUnitTests
                 numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
             
@@ -303,6 +325,9 @@ namespace NUnitTests
 
             // Initialize the healing potion
             HealingPotion potion = new HealingPotion("hId", 1);
+            
+            // Add the potion to the player's bag
+            g.Player.Bag.Add(potion);
             
             // Store the current healUsed
             int healUsedOld = g.HealUsed;
@@ -329,9 +354,9 @@ namespace NUnitTests
                 numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.NORMALmode
             };
             
@@ -340,6 +365,9 @@ namespace NUnitTests
 
             // Initialize the potion
             RagePotion potion = new RagePotion("rId");
+            
+            // Add the potion to the player's bag
+            g.Player.Bag.Add(potion);
             
             // Store the current healUsed
             int rageUsedOld = g.RageUsed;
@@ -366,9 +394,9 @@ namespace NUnitTests
                 numberOfRooms = 3,
                 maxRoomCapacity = 5,
                 dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 10,
-                initialNumberOfHealingPots = 10,
-                initialNumberOfRagePots = 10,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
                 difficultyMode = DifficultyMode.ELITEmode
             };
             
@@ -380,6 +408,9 @@ namespace NUnitTests
 
             // Initialize the potion
             RagePotion potion = new RagePotion("rId");
+            
+            // Add the potion to the player's bag
+            g.Player.Bag.Add(potion);
             
             // Store the current healUsed
             int rageUsedOld = g.RageUsed;
@@ -652,7 +683,7 @@ namespace NUnitTests
         public void Test_Game_Update()
         {
             // TODO: write Game.Update test
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace STVrogue.GameLogic
             // Check if the player is already at max HP
             if (player.Hp == player.HpMax)
             {
-                // TODO: write to the console that the player is already at max HP
+                Console.WriteLine("When you start drinking the potion, you realise you are already more then healthy, so you decide to put the potion back in your bag");
                 return;
             }
             
@@ -44,7 +44,7 @@ namespace STVrogue.GameLogic
             // Heal the player
             player.Hp += this.HealValue;
                 
-            // TODO: write to the console that this potion was used
+            Console.WriteLine($"You drank a healing potion and recovered {(player.Hp - prevHp).ToString()} HP!");
         }
     }
 
@@ -61,7 +61,7 @@ namespace STVrogue.GameLogic
             // Enrage the player
             player.Enraged = true;
                 
-            // TODO: write to the console that this potion was used
+            Console.WriteLine("You drank a rage potion and feel enraged for 5 turns!");
         }
     }
 }
