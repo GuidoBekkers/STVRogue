@@ -73,7 +73,7 @@ namespace STVrogue.GameLogic
         Dungeon dungeon;
         DifficultyMode difficultyMode;
         bool gameover = false;
-        private HashSet<Monster> livingMonsters;
+        public HashSet<Monster> livingMonsters;
 
         /// <summary>
         /// Ignore this variable. It is added for some debug purpose.
