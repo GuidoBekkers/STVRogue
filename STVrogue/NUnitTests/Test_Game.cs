@@ -245,6 +245,73 @@ namespace NUnitTests
             // Check if the attack was executed
             Assert.IsTrue(foe.Hp == 5 - g.Player.AttackRating);
         }
+        [Test]
+        public void Test_Game_Attack_DeadMonster()
+        {
+            // Initialize the valid GameConfiguration
+            GameConfiguration gameConfiguration = new GameConfiguration
+            {
+                numberOfRooms = 3,
+                maxRoomCapacity = 5,
+                dungeonShape = DungeonShapeType.LINEARshape,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
+                difficultyMode = DifficultyMode.NORMALmode
+            };
+            
+            // Initialize the game
+            Game g = new Game(gameConfiguration);
+
+            // Initialize the foe
+            Monster foe = new Monster("mId", "mName", 1, 1);
+            
+            // Set their location to be equal to the player's location
+            foe.Location = g.Player.Location;
+            
+            // Execute the attack
+            g.Attack(g.Player, foe);
+            
+            // Check if the foe died
+            Assert.IsFalse(foe.Alive);
+            
+            // Check if the foe was removed from the livingMonster set
+            Assert.IsFalse(g.livingMonsters.Contains(foe));
+        }
+        
+        [Test]
+        public void Test_Game_Attack_DeadPlayer()
+        {
+            // Initialize the valid GameConfiguration
+            GameConfiguration gameConfiguration = new GameConfiguration
+            {
+                numberOfRooms = 3,
+                maxRoomCapacity = 5,
+                dungeonShape = DungeonShapeType.LINEARshape,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
+                difficultyMode = DifficultyMode.NORMALmode
+            };
+            
+            // Initialize the game
+            Game g = new Game(gameConfiguration);
+
+            // Initialize the foe
+            Monster foe = new Monster("mId", "mName", 5, 100);
+            
+            // Set their location to be equal to the player's location
+            foe.Location = g.Player.Location;
+            
+            // Execute the attack
+            g.Attack(foe, g.Player);
+            
+            // Check if the player died
+            Assert.IsFalse(g.Player.Alive);
+            
+            // Check if the gameover boolean is triggered
+            Assert.IsTrue(g.Gameover);
+        }
         
         [Test]
         public void Test_Game_Attack_NotAlive()
