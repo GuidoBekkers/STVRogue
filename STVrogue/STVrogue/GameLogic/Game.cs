@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using STVrogue.GameControl;
+using static STVrogue.Utils.RandomFactory;
 
 namespace STVrogue.GameLogic
 {
@@ -82,8 +83,8 @@ namespace STVrogue.GameLogic
         int rageUsed; // Keeps track of the last turn a rage potion was used
         
         public Game()
-        {
-            
+        { 
+            //player = new Player("0", "Bagginssess");
         }
         
         /// <summary>
@@ -221,7 +222,6 @@ namespace STVrogue.GameLogic
         {
             List<Room> possibleRooms = c.Location.Neighbors.ToList();
             bool canFlee = true;
-            Random random = new Random();
             
             // Conditions for a monster
             if (c is Monster)
@@ -262,7 +262,7 @@ namespace STVrogue.GameLogic
             // If all conditions are met the creature flees to a random room in possibleRooms
             if (canFlee)
             {
-                c.Move(possibleRooms[random.Next(possibleRooms.Count)]);
+                c.Move(possibleRooms[GetRandom().Next(possibleRooms.Count)]);
                 return true;
             }
             else return false;

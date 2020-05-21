@@ -129,7 +129,6 @@ namespace STVrogue.GameLogic
         public Monster(string id, string name, int hp, int ar) : base(id, name, hp, ar)
         {
         }
-        
     }
 
     public class Player : Creature
