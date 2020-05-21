@@ -226,15 +226,17 @@ namespace STVrogue.GameLogic
             // Conditions for a monster
             if (c is Monster)
             {
-                foreach (Room r in possibleRooms)
-                {
-                    // A monster can't flee to a room if it would exceed max capacity
-                    if (r.Capacity <= r.Monsters.Count) possibleRooms.Remove(r);
-                }
+                if(c.Location != player.Location) return false;
+                
+                // A monster can't flee to a room if it would exceed max capacity
+                possibleRooms.RemoveAll(r =>r.Capacity <= r.Monsters.Count);
+
             }
             // Conditions for Player
             else if (c is Player)
             {
+                if(c.Location.Monsters.Count < 1) throw new ArgumentException($"Player: {c.Id} is not in combat");
+                
                 // In normal mode and elite mode: if player is enraged, player cannot flee
                 if ((DifficultyMode == DifficultyMode.NORMALmode || DifficultyMode == DifficultyMode.ELITEmode) && (c as Player).Enraged) canFlee = false;
                 
@@ -243,14 +245,16 @@ namespace STVrogue.GameLogic
                 
                 // If heal potion is used at turn t, player can only flee at turn t+2 or later
                 if (TurnNumber <= HealUsed + 1) canFlee = false;
+
+                // Player cannot flee to exit room
+                possibleRooms.RemoveAll(r => r.RoomType == RoomType.EXITroom);
                 
                 foreach (Room r in possibleRooms)
                 {
-                    // Player cannot flee to exit room
-                    if (r.RoomType == RoomType.EXITroom) possibleRooms.Remove(r);
                     // Player can always flee when next to start room
-                    else if (r.RoomType == RoomType.STARTroom) canFlee = true;
+                    if (r.RoomType == RoomType.STARTroom) canFlee = true;
                 }
+                
             }
             // if there is less then 1 possible room creature cannot flee
             if (possibleRooms.Count < 1) canFlee = false;
