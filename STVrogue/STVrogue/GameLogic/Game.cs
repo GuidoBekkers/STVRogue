@@ -70,6 +70,7 @@ namespace STVrogue.GameLogic
         Dungeon dungeon;
         DifficultyMode difficultyMode;
         bool gameover = false;
+        private HashSet<Monster> livingMonsters;
         
         /// <summary>
         /// Ignore this variable. It is added for some debug purpose.
@@ -113,6 +114,9 @@ namespace STVrogue.GameLogic
                 // Throw and argument exception if this seeding fails
                 throw new ArgumentException("Could not seed the dungeon with the given parameters");
             }
+            
+            // Get the list of all monsters created in the dungeon and store it
+            livingMonsters = dungeon.monsters;
             
             // Place the player in the starting room of the dungeon
             player.Location = dungeon.StartRoom;
@@ -279,24 +283,59 @@ namespace STVrogue.GameLogic
         {
             Console.WriteLine($"** Turn {turnNumber.ToString()}: {player.Name} {playerAction}");
             
-            // Handle the given action
+            // Handle the given player action
             switch (playerAction.Name)
             {
-                case (CommandType.ATTACK):
-                {
-                    Console.WriteLine("      Clang! Wooosh. WHACK!");
-                    break;
-                }
-                case (CommandType.FLEE):
-                {
-                    Console.WriteLine("      We knew you are a coward.");
-                    break;
-                }
+                // Handle the player doing nothing
                 case (CommandType.DoNOTHING):
                 {
+                    // TODO: handle the player doing nothing
                     Console.WriteLine("      Lazy. Start working!");
                     break;
                 }
+                // Handle the player moving to the given location
+                case (CommandType.MOVE):
+                {
+                    // TODO: handle the player moving to the given location
+                    break;
+                }
+                // Handle the player attacking the given enemy
+                case (CommandType.ATTACK):
+                {
+                    // TODO: handle the player attacking the given enemy
+                    Console.WriteLine("      Clang! Wooosh. WHACK!");
+                    break;
+                }
+                // Handle the player picking up all the items in the room
+                case (CommandType.PICKUP):
+                {
+                    // TODO: handle the player picking up all items in his location
+                    break;
+                }
+                // Handle the player using the given item
+                case (CommandType.USE):
+                {
+                    // TODO: handle the player using the given item
+                    break;
+                }
+                // Handle the player fleeing
+                case (CommandType.FLEE):
+                {
+                    // TODO: handle the player fleeing
+                    Console.WriteLine("      We knew you are a coward.");
+                    break;
+                }
+            }
+            
+            // Handle the monsters' turns
+            foreach (Monster m in livingMonsters)
+            {
+                int actionMax = 2;
+                if (m.Location == player.Location)
+                {
+                    actionMax += 2;
+                }
+                int action = 
             }
             
             // Update the turn number
