@@ -24,13 +24,16 @@ namespace STVrogue
         
         // A string builder for efficient writing to the console
         private static StringBuilder sb = new StringBuilder();
+        
+        // The Game variable
+        private static Game game;
 
         static void Main(string[] args)
         {
             PrettyPrintLogo();
             InitGame();
             InitGameConfig();
-            Game game = new Game(_gameConfiguration);
+            game = new Game(_gameConfiguration);
             bool gameover = false;
             while (!gameover || !game.Gameover)
             {
@@ -63,6 +66,11 @@ namespace STVrogue
             }
 
             Console.WriteLine("** YOU WIN! Score:" + game.Player.Kp + ". Go ahead and brag it out.");
+        }
+
+        private static void CheckPossibleActions()
+        {
+            
         }
 
         /// <summary>
@@ -107,73 +115,77 @@ namespace STVrogue
             // Get the name of the player, handling null inputs
             void GetName()
             {
-                var s = Console.ReadLine();
-                if (!string.IsNullOrEmpty(s))
+                while (true)
                 {
-                    _gameConfiguration.playerName = s;
-                }
-                else
-                {
-                    Console.WriteLine("\"It would be unwise to ignore me, what is your name?\"");
-                    GetName();
+                    var s = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        _gameConfiguration.playerName = s;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\"It would be unwise to ignore me, what is your name?\"");
+                        continue;
+                    }
+                    break;
                 }
             }
 
             // Get the chosen difficulty setting, handling null and false inputs
             void GetDif()
             {
-                var s = Console.ReadLine();
-                if (!string.IsNullOrEmpty(s))
+                while (true)
                 {
-                    var i = int.Parse(s);
-                    if (i == 1 || i == 2 | i == 3)
+                    var s = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(s))
                     {
-                        switch (i)
+                        var i = int.Parse(s);
+                        if (i == 1 || i == 2 | i == 3)
                         {
-                            case 1: // easy mode
+                            switch (i)
                             {
-                                sb.Append(
-                                        "You feel a wave of excitement and fear rush over you as you enter the clean and well lit entrance.")
-                                    .Append("\n");
-                                sb.Append("Your adventure begins...").Append("\n").Append("\n").Append("\n");
-                                _gameConfiguration.difficultyMode = DifficultyMode.NEWBIEmode;
-                                break;
+                                case 1: // easy mode
+                                {
+                                    sb.Append("You feel a wave of excitement and fear rush over you as you enter the clean and well lit entrance.")
+                                        .Append("\n");
+                                    sb.Append("Your adventure begins...").Append("\n").Append("\n").Append("\n");
+                                    _gameConfiguration.difficultyMode = DifficultyMode.NEWBIEmode;
+                                    break;
+                                }
+                                case 2: // normal mode
+                                {
+                                    sb.Append("You grab a torch off the wall as you approach the middle entrance and venture onwards into the cave.")
+                                        .Append("\n");
+                                    sb.Append("Your adventure begins...").Append("\n").Append("\n").Append("\n");
+                                    _gameConfiguration.difficultyMode = DifficultyMode.NORMALmode;
+                                    break;
+                                }
+                                case 3: // hard mode
+                                {
+                                    sb.Append("You wisely grab a torch from the well lit entrance before using your sword to hack away at the thick and thorny vines shielding this entrance.")
+                                        .Append("\n");
+                                    sb.Append("You venture on, clenching your sword in one hand and your torch in the other, hoping it's flickering flames will never fade.")
+                                        .Append("\n");
+                                    sb.Append("Your adventure begins...").Append("\n").Append("\n").Append("\n");
+                                    _gameConfiguration.difficultyMode = DifficultyMode.ELITEmode;
+                                    break;
+                                }
                             }
-                            case 2: // normal mode
-                            {
-                                sb.Append(
-                                        "You grab a torch off the wall as you approach the middle entrance and venture onwards into the cave.")
-                                    .Append("\n");
-                                sb.Append("Your adventure begins...").Append("\n").Append("\n").Append("\n");
-                                _gameConfiguration.difficultyMode = DifficultyMode.NORMALmode;
-                                break;
-                            }
-                            case 3: // hard mode
-                            {
-                                sb.Append(
-                                        "You wisely grab a torch from the well lit entrance before using your sword to hack away at the thick and thorny vines shielding this entrance.")
-                                    .Append("\n");
-                                sb.Append(
-                                        "You venture on, clenching your sword in one hand and your torch in the other, hoping it's flickering flames will never fade.")
-                                    .Append("\n");
-                                sb.Append("Your adventure begins...").Append("\n").Append("\n").Append("\n");
-                                _gameConfiguration.difficultyMode = DifficultyMode.ELITEmode;
-                                break;
-                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("There are only three entrances, which one do you choose? (1, 2, or 3)");
+                            continue;
                         }
                     }
                     else
                     {
-                        Console.WriteLine("There are only three entrances, which one do you choose? (1, 2, or 3)");
-                        GetDif();
+                        Console.WriteLine("Standing around will get you nowhere, which entrance do you choose? (1, 2, or 3)");
+                        continue;
                     }
+
+                    break;
                 }
-                else
-                {
-                    Console.WriteLine("Standing around will get you nowhere, which entrance do you choose? (1, 2, or 3)");
-                    GetDif();
-                }
-                
             }
         }
 
