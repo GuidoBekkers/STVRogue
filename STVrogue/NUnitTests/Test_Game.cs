@@ -1,13 +1,25 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using STVrogue.GameControl;
 using STVrogue.GameLogic;
+using STVrogue.Utils;
 
 namespace NUnitTests
 {
     [TestFixture]
     public class Test_Game
     {
+        GameConfiguration gC = new GameConfiguration
+        {
+            numberOfRooms = 5,
+            maxRoomCapacity = 5,
+            dungeonShape = DungeonShapeType.LINEARshape,
+            initialNumberOfMonsters = 4,
+            initialNumberOfHealingPots = 1,
+            initialNumberOfRagePots = 1,
+            difficultyMode = DifficultyMode.NORMALmode
+        };
         [Test]
         public void Test_GameConfiguration()
         {
@@ -592,19 +604,8 @@ namespace NUnitTests
         [Test]
         public void Test_Game_Flee_Player_ToExitRoom()
         {
-            // Initialize gameConfiguration
-            GameConfiguration gameConfiguration = new GameConfiguration
-            {
-                numberOfRooms = 5,
-                maxRoomCapacity = 5,
-                dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 1,
-                initialNumberOfHealingPots = 1,
-                initialNumberOfRagePots = 1,
-                difficultyMode = DifficultyMode.NORMALmode
-            };
             // Initialize the game
-            Game g = new Game(gameConfiguration);
+            Game g = new Game(gC);
                 
             // Initialize a room with a monster and a player connecting to an exit room
             Room room1 = new Room("1",RoomType.ORDINARYroom, 5);
@@ -624,20 +625,8 @@ namespace NUnitTests
         [Test]
         public void Test_Game_Flee_Monster()
         {
-            // Initialize correct gameConfiguration
-            GameConfiguration gameConfiguration = new GameConfiguration
-            {
-                numberOfRooms = 5,
-                maxRoomCapacity = 5,
-                dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 1,
-                initialNumberOfHealingPots = 1,
-                initialNumberOfRagePots = 1,
-                difficultyMode = DifficultyMode.NORMALmode
-            };
-            
             // Initialize the game
-            Game g = new Game(gameConfiguration);
+            Game g = new Game(gC);
             
             // Initialize a room with a monster and a player connecting to a room not at max capacity
             Room room1 = new Room("1",RoomType.ORDINARYroom, 5);
@@ -657,20 +646,8 @@ namespace NUnitTests
         [Test]
         public void Test_Game_Flee_Monster_MaxCapacity()
         {
-            // Initialize correct gameConfiguration
-            GameConfiguration gameConfiguration = new GameConfiguration
-            {
-                numberOfRooms = 5,
-                maxRoomCapacity = 5,
-                dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 1,
-                initialNumberOfHealingPots = 1,
-                initialNumberOfRagePots = 1,
-                difficultyMode = DifficultyMode.NORMALmode
-            };
-            
             // Initialize the game
-            Game g = new Game(gameConfiguration);
+            Game g = new Game(gC);
             
             // Initialize a room with a monster and a player connecting to a room 
             Room room1 = new Room("1",RoomType.ORDINARYroom, 2);
@@ -696,20 +673,8 @@ namespace NUnitTests
         [Test]
         public void Test_Game_Flee_PlayerFleeingNotInCombat()
         {
-            // Initialize correct gameConfiguration
-            GameConfiguration gameConfiguration = new GameConfiguration
-            {
-                numberOfRooms = 5,
-                maxRoomCapacity = 5,
-                dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 1,
-                initialNumberOfHealingPots = 1,
-                initialNumberOfRagePots = 1,
-                difficultyMode = DifficultyMode.NORMALmode
-            };
-            
             // Initialize the game
-            Game g = new Game(gameConfiguration);
+            Game g = new Game(gC);
             
             // Move the player to a room adjacent to the start room, which has 0 monsters in it
             g.Player.Location = g.Dungeon.StartRoom.Neighbors.First();
@@ -722,20 +687,8 @@ namespace NUnitTests
         [Test]
         public void Test_Game_Flee_MonsterFleeingNotInCombat()
         {
-            // Initialize correct gameConfiguration
-            GameConfiguration gameConfiguration = new GameConfiguration
-            {
-                numberOfRooms = 5,
-                maxRoomCapacity = 5,
-                dungeonShape = DungeonShapeType.LINEARshape,
-                initialNumberOfMonsters = 1,
-                initialNumberOfHealingPots = 1,
-                initialNumberOfRagePots = 1,
-                difficultyMode = DifficultyMode.NORMALmode
-            };
-            
             // Initialize the game
-            Game g = new Game(gameConfiguration);
+            Game g = new Game(gC);
             
             // Initialize a monster in a different room then the start room, in which is player
             Monster m = new Monster("1", "TestMonster", 10, 10);
@@ -746,11 +699,98 @@ namespace NUnitTests
             Assert.IsFalse(g.Flee(m));
         }
 
+        // Test Game.Update, test moving player and test player enrage correctly wears out
         [Test]
         public void Test_Game_Update()
         {
-            // TODO: write Game.Update test
-            //throw new NotImplementedException();
+            // Initialize the game
+            Game g = new Game(gC);
+
+            // Set turn to 10 and rage used to 5
+            g.TurnNumber = 10;
+            g.RageUsed = 5;
+            g.Player.Enraged = true;
+            
+            // Update the game, move the player to a room next to the start room
+            g.Update(new Command(CommandType.MOVE, new string[]{g.Dungeon.StartRoom.Neighbors.First().Id}));
+
+            // Check if player is no longer enraged
+            Assert.IsFalse(g.Player.Enraged);
+            
+            // Check if player location updated
+            Assert.IsFalse(g.Player.Location == g.Dungeon.StartRoom);
+        }
+        
+        // Test if trying to move to a wrong roomid throws an exception
+        [Test]
+        public void Test_Game_HandlePlayerTurnMoveException()
+        {
+            // Initialize the game
+            Game g = new Game(gC);
+            
+            // Check that exception is thrown when trying to move to invalid id
+            Assert.Throws<ArgumentException>(() => g.Update(new Command(CommandType.MOVE, new string[]{"r9999"})));
+        }
+        
+        // Test Game HandlePlayerTurnAttack() 
+        [Test]
+        public void Test_Game_HandlePlayerTurnAttack()
+        {
+            // Initialize the game
+            Game g = new Game(gC);
+            
+            // Initialize a monster and add to the startroom
+            Monster m = new Monster("0", "TestMonster", 10, 10);
+            m.Location = g.Dungeon.StartRoom;
+            g.Dungeon.StartRoom.Monsters.Add(m);
+            
+            // Update the game, with the player attacking the monster
+            g.Update(new Command(CommandType.ATTACK, new string[]{"0"}));
+            
+            // Check if monster hp decreased
+            Assert.IsFalse(m.Hp == 10);
+        }
+        
+        // Test if trying to attack a wrong creature id throws an exception
+        [Test]
+        public void Test_Game_HandlePlayerTurnAttackException()
+        {
+            // Initialize the game
+            Game g = new Game(gC);
+            
+            // Check that exception is thrown when trying to Attack invalid id
+            Assert.Throws<ArgumentException>(() => g.Update(new Command(CommandType.ATTACK, new string[]{"m9999"})));
+        }
+        
+        // Test Game HandlePlayerTurnUse
+        [Test]
+        public void Test_Game_HandlePlayerTurnUse()
+        {
+            // Initialize the game
+            Game g = new Game(gC);
+            
+            // Add HealPotion to player bag
+            g.Player.Bag.Add(new HealingPotion("h99", 5));
+
+            // Set player hp to 1
+            g.Player.Hp = 1;
+            
+            // Update the game, with the player attacking the monster
+            g.Update(new Command(CommandType.USE, new string[]{"h99"}));
+            
+            // Check if player hp correctly updated
+            Assert.IsTrue(g.Player.Hp == 1 + 5);
+        }
+        
+        // Test Game HandlePlayerTurnUse on wrong id
+        [Test]
+        public void Test_Game_HandlePlayerTurnUseException()
+        {
+            // Initialize the game
+            Game g = new Game(gC);
+            
+            // Check that exception is thrown when trying to Use invalid id
+            Assert.Throws<ArgumentException>(() => g.Update(new Command(CommandType.ATTACK, new string[]{"i9999"})));
         }
     }
 }
