@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using STVrogue.GameControl;
 
 namespace STVrogue.GameLogic
@@ -17,6 +19,33 @@ namespace STVrogue.GameLogic
         public int initialNumberOfHealingPots;
         public int initialNumberOfRagePots;
         public DifficultyMode difficultyMode;
+        public int playerBaseHp = 10;
+        public int playerBaseAr = 1;
+
+        public int GetDifficultyMultiplier(DifficultyMode difficulty)
+        {
+            int returnVal = 0;
+            switch (difficulty)
+            {
+                case DifficultyMode.NEWBIEmode:
+                {
+                    returnVal =  3;
+                    break;
+                }
+                case DifficultyMode.NORMALmode:
+                {
+                    returnVal = 2;
+                    break;
+                }
+                case DifficultyMode.ELITEmode:
+                {
+                    returnVal = 1;
+                    break;
+                }
+            }
+
+            return returnVal;
+        }
     }
     
     [Serializable()]
@@ -36,12 +65,11 @@ namespace STVrogue.GameLogic
     /// </summary>
     public class Game
     {
-
         Player player;
         Dungeon dungeon;
         DifficultyMode difficultyMode;
         bool gameover = false;
-
+        
         /// <summary>
         /// Ignore this variable. It is added for some debug purpose.
         /// </summary>
@@ -50,6 +78,9 @@ namespace STVrogue.GameLogic
         /* To count the number of passed turns. */
         int turnNumber = 0;
 
+        int healUsed; // Keeps track of the last turn a heal potion was used
+        int rageUsed; // Keeps track of the last turn a rage potion was used
+        
         public Game()
         { 
             //player = new Player("0", "Bagginssess");
@@ -62,7 +93,28 @@ namespace STVrogue.GameLogic
         /// </summary>
         public Game(GameConfiguration conf)
         {
-            throw new NotImplementedException();
+            // Set the difficulty mode
+            difficultyMode = conf.difficultyMode;
+            
+            // Get the difficulty HP and AR multiplier
+            int difMult = conf.GetDifficultyMultiplier(difficultyMode);
+            
+            // Initialize the player
+            player = new Player("playerId", "player", (conf.playerBaseHp * difMult), (conf.playerBaseAr * difMult));
+            
+            // Initialize the dungeon
+            dungeon = new Dungeon(conf.dungeonShape, conf.numberOfRooms, conf.maxRoomCapacity);
+            
+            // Seed the monsters and items
+            if (!dungeon.SeedMonstersAndItems(conf.initialNumberOfMonsters, conf.initialNumberOfHealingPots,
+                conf.initialNumberOfRagePots))
+            {
+                // Throw and argument exception if this seeding fails
+                throw new ArgumentException("Could not seed the dungeon with the given parameters");
+            }
+            
+            // Place the player in the starting room of the dungeon
+            player.Location = dungeon.StartRoom;
         }
 
         public Player Player => player;
@@ -73,6 +125,18 @@ namespace STVrogue.GameLogic
         {
             get => turnNumber;
             set => turnNumber = value;
+        }
+
+        public int HealUsed
+        {
+            get => healUsed;
+            set => healUsed = value;
+        }
+        
+        public int RageUsed
+        {
+            get => rageUsed;
+            set => rageUsed = value;
         }
 
         public bool Gameover => gameover;
@@ -86,7 +150,14 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Move(Creature c, Room destination)
         {
-            throw new NotImplementedException();
+            if (c.Location.Neighbors.Contains(destination))
+            {
+                c.Move(destination);
+            }
+            else
+            {
+                throw new ArgumentException($"Destination ({destination.Id}) was not a neighbour to creature's location ({c.Location.Id})");
+            }
         }
 
         /// <summary>
@@ -95,7 +166,18 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Attack(Creature attacker, Creature defender)
         {
-            
+            if (!attacker.Alive)
+            {
+                throw new ArgumentException($"Attacker: {attacker.Id} is not alive");
+            }
+            else if (attacker.Location != defender.Location)
+            {
+                throw new ArgumentException($"Attacker's ({attacker.Id}) location ({attacker.Location.Id}) does not match defender's ({defender.Id}) location ({defender.Location.Id})");
+            }
+            else
+            {
+                attacker.Attack(defender);
+            }
         }
 
         /// <summary>
@@ -104,7 +186,29 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void UseItem(Item i)
         {
-            throw new NotImplementedException();
+            // Use the item
+            player.Use(i);
+            
+            if (i is HealingPotion)
+            {
+                // Store the turn in which the item was used
+                healUsed = turnNumber;
+            }
+            else if (i is RagePotion)
+            {
+                // Store the turn in which the item was used
+                rageUsed = turnNumber;
+                
+                // Check the difficulty 
+                if (difficultyMode == DifficultyMode.ELITEmode)
+                {
+                    // Check if the player's location neighbours the exit room
+                    if (player.Location.Neighbors.Contains(dungeon.ExitRoom))
+                    {
+                        player.EliteFlee = false;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -115,7 +219,49 @@ namespace STVrogue.GameLogic
         /// </summary>
         public bool Flee(Creature c)
         {
-            throw new NotImplementedException();
+            List<Room> possibleRooms = c.Location.Neighbors.ToList();
+            bool canFlee = true;
+            Random random = new Random();
+            
+            // Conditions for a monster
+            if (c is Monster)
+            {
+                foreach (Room r in possibleRooms)
+                {
+                    // A monster can't flee to a room if it would exceed max capacity
+                    if (r.Capacity <= r.Monsters.Count) possibleRooms.Remove(r);
+                }
+            }
+            // Conditions for Player
+            else if (c is Player)
+            {
+                // In normal mode and elite mode: if player is enraged, player cannot flee
+                if ((DifficultyMode == DifficultyMode.NORMALmode || DifficultyMode == DifficultyMode.ELITEmode) && (c as Player).Enraged) canFlee = false;
+                
+                // In Elite mode: if player.eliteFlee is false, player cannot flee
+                if (DifficultyMode == DifficultyMode.ELITEmode && !(c as Player).EliteFlee) canFlee = false;
+                
+                // If heal potion is used at turn t, player can only flee at turn t+2 or later
+                if (TurnNumber <= HealUsed + 1) canFlee = false;
+                
+                foreach (Room r in possibleRooms)
+                {
+                    // Player cannot flee to exit room
+                    if (r.RoomType == RoomType.EXITroom) possibleRooms.Remove(r);
+                    // Player can always flee when next to start room
+                    else if (r.RoomType == RoomType.STARTroom) canFlee = true;
+                }
+            }
+            // if there is less then 1 possible room creature cannot flee
+            if (possibleRooms.Count < 1) canFlee = false;
+            
+            // If all conditions are met the creature flees to a random room in possibleRooms
+            if (canFlee)
+            {
+                c.Move(possibleRooms[random.Next(possibleRooms.Count)]);
+                return true;
+            }
+            else return false;
         }
 
         /// <summary>
@@ -127,19 +273,29 @@ namespace STVrogue.GameLogic
         /// </summary>
         public void Update(Command playerAction)
         {
-            Console.WriteLine("** Turn " + TurnNumber + ": "  + Player.Name + " " + playerAction);
-            if (playerAction.Name == CommandType.ATTACK)
+            Console.WriteLine($"** Turn {turnNumber.ToString()}: {player.Name} {playerAction}");
+            
+            // Handle the given action
+            switch (playerAction.Name)
             {
-                Console.WriteLine("      Clang! Wooosh. WHACK!");
+                case (CommandType.ATTACK):
+                {
+                    Console.WriteLine("      Clang! Wooosh. WHACK!");
+                    break;
+                }
+                case (CommandType.FLEE):
+                {
+                    Console.WriteLine("      We knew you are a coward.");
+                    break;
+                }
+                case (CommandType.DoNOTHING):
+                {
+                    Console.WriteLine("      Lazy. Start working!");
+                    break;
+                }
             }
-            if (playerAction.Name == CommandType.FLEE)
-            {
-                Console.WriteLine("      We knew you are a coward.");
-            }
-            if (playerAction.Name == CommandType.DoNOTHING)
-            {
-                Console.WriteLine("      Lazy. Start working!");
-            }
+            
+            // Update the turn number
             turnNumber++;
         }
         

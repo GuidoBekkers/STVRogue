@@ -101,11 +101,10 @@ namespace NUnitTests
 
             // TODO: implement actual player constructor
             // Create the player
-            Player player = new Player("playerId", "playerName");
+            Player player = new Player("playerId", "playerName", playerMaxHp, 1);
 
             // Set the players' attributes
             player.Hp = playerStartHp;
-            player.HpMax = playerMaxHp;
 
             // Add the potion to the players' bag
             player.Bag.Add(hPotion);
@@ -122,37 +121,10 @@ namespace NUnitTests
 
             // Post-Conditions
             // Check that the player's hp has not exceeded it's max hp
-            // TODO: uncomment when hp capping has been implemented
-            //Assert.IsTrue(player.Hp <= player.HpMax);
+            Assert.IsTrue(player.Hp <= player.HpMax);
 
             // Check that the player has been healed the appropriate amount, or got capped at the max hp
             Assert.IsTrue(player.Hp == playerStartHp + hPotion.HealValue || player.Hp == player.HpMax);
-        }
-
-        [Test]
-        public void Test_HealingPotion_Use_NotInBag()
-        {
-            // Create an exception variable, for debugging
-            Exception exc = null;
-
-            // Create the healing potion with valid hardcoded healValue
-            HealingPotion hPotion = new HealingPotion("potionId", 1);
-
-            // TODO: implement actual player constructor
-            // Create the player
-            Player player = new Player("playerId", "playerName");
-
-            // Set the players' attributes which allow for healing
-            player.Hp = 1;
-            player.HpMax = 2;
-
-            // Pre-Condition
-            // Check if the correct exception is thrown when the potion is not in the player's bag
-            Assert.Throws<Exception>(() => hPotion.Use(player));
-
-            // Post-Condition
-            // Check if the player's health remained the same
-            Assert.IsTrue(player.Hp == 1);
         }
 
         [Test]
@@ -164,9 +136,8 @@ namespace NUnitTests
             // Create the rage potion
             RagePotion rPotion = new RagePotion("potionId");
 
-            // TODO: implement actual player constructor
             // Create the player
-            Player player = new Player("playerId", "playerName");
+            Player player = new Player("playerId", "playerName", 1, 1);
 
             // Add the potion to the players' bag
             player.Bag.Add(rPotion);
@@ -184,28 +155,6 @@ namespace NUnitTests
             // Post-Conditions
             // Check if the player became enraged
             Assert.IsTrue(player.Enraged);
-        }
-
-        [Test]
-        public void Test_RagePotion_Use_NotInBag()
-        {
-            // Create an exception variable, for debugging
-            Exception exc = null;
-
-            // Create the rage potion
-            RagePotion rPotion = new RagePotion("potionId");
-
-            // TODO: implement actual player constructor
-            // Create the player
-            Player player = new Player("playerId", "playerName");
-
-            // Pre-Condition
-            // Check if the correct exception is thrown when the potion is not in the player's bag
-            Assert.Throws<Exception>(() => rPotion.Use(player));
-
-            // Post-Condition
-            // Check if the player's health remained the same
-            Assert.IsFalse(player.Enraged);
         }
     }
 }

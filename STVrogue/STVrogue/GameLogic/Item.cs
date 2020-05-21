@@ -31,16 +31,10 @@ namespace STVrogue.GameLogic
         /// <param name="player">The player object</param>
         public override void Use(Player player)
         {
-            // Check if the player actually has this item in their bag
-            if (!player.Bag.Contains(this))
-            {
-                throw new Exception($"The used item {this.Id} was not present in the bag");
-            }
-
             // Check if the player is already at max HP
             if (player.Hp == player.HpMax)
             {
-                // TODO: write tot the console that the player is already at max HP
+                // TODO: write to the console that the player is already at max HP
                 return;
             }
             
@@ -49,9 +43,6 @@ namespace STVrogue.GameLogic
                 
             // Heal the player
             player.Hp += this.HealValue;
-                
-            // Remove this item from the player's bag
-            player.Bag.Remove(this);
                 
             // TODO: write to the console that this potion was used
         }
@@ -67,17 +58,8 @@ namespace STVrogue.GameLogic
         /// <param name="player">The player object</param>
         public override void Use(Player player)
         {
-            // Check if the player actually has this item in their bag
-            if (!player.Bag.Contains(this)) 
-            {
-                throw new Exception($"The used item {this.Id} was not present in the bag");
-            }
-            
             // Enrage the player
             player.Enraged = true;
-                
-            // Remove this item from the player's bag
-            player.Bag.Remove(this);
                 
             // TODO: write to the console that this potion was used
         }
