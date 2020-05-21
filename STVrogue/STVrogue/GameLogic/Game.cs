@@ -226,6 +226,8 @@ namespace STVrogue.GameLogic
             // Conditions for a monster
             if (c is Monster)
             {
+                if(c.Location != player.Location) return false;
+                
                 foreach (Room r in possibleRooms)
                 {
                     // A monster can't flee to a room if it would exceed max capacity
@@ -235,6 +237,8 @@ namespace STVrogue.GameLogic
             // Conditions for Player
             else if (c is Player)
             {
+                if(c.Location.Monsters.Count < 1) throw new ArgumentException($"Player: {c.Id} is not in combat");
+                
                 // In normal mode and elite mode: if player is enraged, player cannot flee
                 if ((DifficultyMode == DifficultyMode.NORMALmode || DifficultyMode == DifficultyMode.ELITEmode) && (c as Player).Enraged) canFlee = false;
                 
