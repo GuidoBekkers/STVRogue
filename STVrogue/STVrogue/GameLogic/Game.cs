@@ -112,18 +112,29 @@ namespace STVrogue.GameLogic
             dungeon = new Dungeon(conf.dungeonShape, conf.numberOfRooms, conf.maxRoomCapacity);
 
             // Seed the monsters and items
-            if (!dungeon.SeedMonstersAndItems(conf.initialNumberOfMonsters, conf.initialNumberOfHealingPots,
-                conf.initialNumberOfRagePots))
-            {
-                // Throw and argument exception if this seeding fails
-                throw new ArgumentException("Could not seed the dungeon with the given parameters");
-            }
+            TrySeed();
 
             // Get the list of all monsters created in the dungeon and store it
             livingMonsters = new HashSet<Monster>();//dungeon.monsters;
 
             // Place the player in the starting room of the dungeon
             player.Location = dungeon.StartRoom;
+
+            // Try seeding the monsters and items a couple of times, throw an exception is still not successful
+            void TrySeed()
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    // Try seeding the monsters and items 10 times
+                    if (dungeon.SeedMonstersAndItems(conf.initialNumberOfMonsters, conf.initialNumberOfHealingPots,
+                        conf.initialNumberOfRagePots))
+                    {
+                        return;
+                    }
+                }
+                // Throw and argument exception if this seeding fails
+                throw new ArgumentException("Could not seed the dungeon with the given parameters");
+            }
         }
 
         public Player Player => player;
@@ -314,6 +325,12 @@ namespace STVrogue.GameLogic
             foreach (var m in livingMonsters)
             {
                 HandleMonsterTurn(m);
+            }
+            
+            // Check if the player should calm down
+            if (turnNumber - rageUsed >= 5)
+            {
+                player.Enraged = false;
             }
 
             // Update the turn number
