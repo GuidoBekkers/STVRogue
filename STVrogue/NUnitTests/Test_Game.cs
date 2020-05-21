@@ -594,9 +594,60 @@ namespace NUnitTests
             Assert.IsFalse(m1.Location == room2);
         }
 
-        // Test player and monster not in combat fleeing
+        // Test game flee, player not in combat trying to flee
+        [Test]
+        public void Test_Game_Flee_PlayerFleeingNotInCombat()
+        {
+            // Initialize correct gameConfiguration
+            GameConfiguration gameConfiguration = new GameConfiguration
+            {
+                numberOfRooms = 5,
+                maxRoomCapacity = 5,
+                dungeonShape = DungeonShapeType.LINEARshape,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
+                difficultyMode = DifficultyMode.NORMALmode
+            };
+            
+            // Initialize the game
+            Game g = new Game(gameConfiguration);
+            
+            // Move the player to a room adjacent to the start room, which has 0 monsters in it
+            g.Player.Location = g.Dungeon.StartRoom.Neighbors.First();
+            
+            // Check if trying to flee gives exception
+            Assert.Throws<ArgumentException>(() => g.Flee(g.Player));
+        }
         
-        
+        // Test game flee, monster not in combat trying to flee
+        [Test]
+        public void Test_Game_Flee_MonsterFleeingNotInCombat()
+        {
+            // Initialize correct gameConfiguration
+            GameConfiguration gameConfiguration = new GameConfiguration
+            {
+                numberOfRooms = 5,
+                maxRoomCapacity = 5,
+                dungeonShape = DungeonShapeType.LINEARshape,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
+                difficultyMode = DifficultyMode.NORMALmode
+            };
+            
+            // Initialize the game
+            Game g = new Game(gameConfiguration);
+            
+            // Initialize a monster in a different room then the start room, in which is player
+            Monster m = new Monster("1", "TestMonster", 10, 10);
+            m.Location = g.Dungeon.StartRoom.Neighbors.First();
+            g.Dungeon.StartRoom.Neighbors.First().Monsters.Add(m);
+            
+            // Check if it is impossible for the monster to flee
+            Assert.IsFalse(g.Flee(m));
+        }
+
         [Test]
         public void Test_Game_Update()
         {
