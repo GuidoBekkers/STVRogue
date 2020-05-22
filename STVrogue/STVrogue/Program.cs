@@ -11,7 +11,17 @@ namespace STVrogue
     {
         static void Main(string[] args)
         {
-            Game game = new Game() ;
+            GameConfiguration gameConfiguration = new GameConfiguration
+            {
+                numberOfRooms = 3,
+                maxRoomCapacity = 5,
+                dungeonShape = DungeonShapeType.LINEARshape,
+                initialNumberOfMonsters = 1,
+                initialNumberOfHealingPots = 1,
+                initialNumberOfRagePots = 1,
+                difficultyMode = DifficultyMode.NORMALmode
+            };
+            Game game = new Game(gameConfiguration);
             Console.WriteLine(" _______ _________            _______  _______  _______           _______ ");
             Console.WriteLine("(  ____ \\\\__   __/|\\     /|  (  ____ )(  ___  )(  ____ \\|\\     /|(  ____ \\") ;
             Console.WriteLine("| (    \\/   ) (   | )   ( |  | (    )|| (   ) || (    \\/| )   ( || (    \\/");
