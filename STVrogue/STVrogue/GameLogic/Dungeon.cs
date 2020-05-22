@@ -234,7 +234,7 @@ namespace STVrogue.GameLogic
             int exitRoomNeigh = exitRoom.Neighbors.Count;
 
             //Fill the exit neighbors with monsters.
-            foreach (Room r in exitRoom.Neighbors)
+            foreach (Room r in exitRoom.Neighbors.Where(r => r != startRoom))
             {
                 cap = r.Capacity - r.Monsters.Count; //the max amount of monsters we can seed in this room
                 if (firstRecur)
@@ -247,12 +247,12 @@ namespace STVrogue.GameLogic
                 }
                 else
                 {
-                    if (cap >= remainingMonsters)
-                        seedAmount = remainingMonsters;
-                    else if(cap > 0)
-                        seedAmount = GetRandom().Next(1, cap + 1);
-                    else
+                    if(remainingMonsters == 0 || cap == 0)
                         seedAmount = 0;
+                    else if (cap >= remainingMonsters)
+                        seedAmount = GetRandom().Next(1, remainingMonsters);
+                    else 
+                        seedAmount = GetRandom().Next(1, cap + 1);
                 }
 
                 for (int i = 0; i < seedAmount; i++)
@@ -267,16 +267,19 @@ namespace STVrogue.GameLogic
             currentCap = LowestMonstersAmount(_maxRoomCap, exitRoom.Neighbors);
 
             //Fill the other rooms
-            foreach (Room r in rooms.Where(r => !r.Neighbors.Contains(exitRoom)))
+            foreach (Room r in rooms.Where(r => !r.Neighbors.Contains(exitRoom) && r != startRoom))
             {
+                if (r.Capacity == r.Monsters.Count)
+                    continue;
                 int maxCap = r.Capacity >= currentCap ? currentCap - 1 : r.Capacity;
                 cap = maxCap - r.Monsters.Count;
-                if (cap >= remainingMonsters)
-                    seedAmount = remainingMonsters;
-                else if (cap > 0)
-                    seedAmount = GetRandom().Next(1, cap + 1);
-                else
+                if (cap == 0 || remainingMonsters == 0)
                     seedAmount = 0;
+                else if (cap >= remainingMonsters)
+                    seedAmount = remainingMonsters;
+                else 
+                    seedAmount = GetRandom().Next(1, cap + 1);
+                
                 for (int j = 0; j < seedAmount; j++)
                 {
                     r.Monsters.Add(CreateMonster(r));
@@ -291,7 +294,7 @@ namespace STVrogue.GameLogic
         private int LowestMonstersAmount(int maxCap, HashSet<Room> rooms)
         {
             int lowestMonstersAmount = maxCap; 
-            foreach (Room r in rooms)
+            foreach (Room r in rooms.Where(r => r != startRoom))
             {
                 if (r.Monsters.Count < lowestMonstersAmount)
                 {

@@ -149,7 +149,7 @@ namespace NUnitTests
             }
             
             //lowest amount of monsters in exit.Neighbors:
-            int lowestMonstersAmount = LowestMonstersAmount(cap, dungeon.ExitRoom.Neighbors);
+            int lowestMonstersAmount = LowestMonstersAmount(cap, dungeon);
             int emptyRooms = 0; //amount of rooms without items
             int monsterCount = 0; 
             int hpCount = 0; 
@@ -161,7 +161,11 @@ namespace NUnitTests
                 //lowest amount of monsters in exitRoom.Neighbors
                 if (!r.Neighbors.Contains(dungeon.ExitRoom) && r != dungeon.StartRoom)
                     Assert.IsTrue(r.Monsters.Count < lowestMonstersAmount);
-                
+
+                if (r.Capacity < r.Monsters.Count)
+                {
+                    int x = 0;
+                }
                 //Check if number of monsters in every room is less than its maximum capacity
                 Assert.IsTrue(r.Capacity >= r.Monsters.Count);
                 
@@ -232,11 +236,11 @@ namespace NUnitTests
             return res;
         }
 
-        //Returns the lowest amount of monsters in a hash set of rooms
-        private int LowestMonstersAmount(int maxCap, HashSet<Room> rooms)
+        //Returns the lowest amount of monsters in the neighbors of dungeon
+        private int LowestMonstersAmount(int maxCap, Dungeon dungeon)
         {
             int lowestMonstersAmount = maxCap; 
-            foreach (Room r in rooms)
+            foreach (Room r in dungeon.ExitRoom.Neighbors.Where(r => r != dungeon.StartRoom))
             {
                 if (r.Monsters.Count < lowestMonstersAmount)
                 {
@@ -249,11 +253,19 @@ namespace NUnitTests
         
         [Test]
         //Getters and setters tests
-        public void Test_RoomType_Setter()
+        public void Test_RoomType()
         {
             Room r = new Room("test", RoomType.ORDINARYroom, 3);
             r.RoomType = RoomType.STARTroom;
             Assert.IsTrue(r.RoomType == RoomType.STARTroom);
+        }
+        
+        [Test]
+        public void Test_Room()
+        {
+            Dungeon dungeon = new Dungeon(DungeonShapeType.LINEARshape, 5, 3);
+            dungeon.Rooms = new HashSet<Room>();
+            Assert.IsTrue(dungeon.Rooms.Count == 0);
         }
         
     }
