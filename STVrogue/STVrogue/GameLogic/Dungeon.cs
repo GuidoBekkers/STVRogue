@@ -22,7 +22,7 @@ namespace STVrogue.GameLogic
         Room startRoom;
         Room exitRoom;
 
-        protected Dungeon() { }
+        protected Dungeon(){}
         
         /// <summary>
         /// Create a dungeon with the indicated number of rooms and the indicated shape.
@@ -161,10 +161,14 @@ namespace STVrogue.GameLogic
         public bool SeedMonstersAndItems(int numberOfMonster, int numberOfHealingPotion, int numberOfRagePotion)
         {
             //There must be at least 1 healing, 1 rage potion and 1 monster
-            if (numberOfHealingPotion < 1 || numberOfRagePotion < 1 || numberOfMonster < 1)
+            if (numberOfHealingPotion < 1 || numberOfRagePotion < 1)
                 return false;
             
-            
+            //If there are less monsters then exit room neighbors, there won't be strict more monsters in the exitroom
+            //neighbors than the non exitroom neighbors
+            if (numberOfMonster < exitRoom.Neighbors.Count)
+                return false;
+
             //Count the max monsters we can spawn near the exit
             int maxExitMonsters = MaxNeighMonsters(exitRoom);
             
@@ -178,13 +182,13 @@ namespace STVrogue.GameLogic
                 int cap = room.Capacity;
                 maxNonExitMonsters += cap >= lowestCap ? lowestCap - 1 : cap;
             }
-            
+
             //Check if there is enough capacity to seed the monsters 
             if (numberOfMonster - maxExitMonsters > maxNonExitMonsters)
                 return false;
             
             //Seed the monsters
-            SeedMonsters(lowestCap, numberOfMonster, true);
+            SeedMonsters(0, numberOfMonster, true);
             
             //Seed the items
             SeedItems(numberOfHealingPotion, numberOfRagePotion);
@@ -219,67 +223,92 @@ namespace STVrogue.GameLogic
         }
         
         //Fills the dungeon with monsters
-        private void SeedMonsters(int lowestCap, int numberOfMonsters, bool firstRecur = false)
+        private void SeedMonsters(int currentCap, int remainingMonsters, bool firstRecur = false)
         {
-            if (numberOfMonsters <= 0)
-            {
-                return;
-            }
-
-            int counter = 0; //used for unique IDs
-            int seedAmount; //the amount of monsters we seed in a room
+            //base case
+            if (remainingMonsters <= 0)
+                return; 
+            
+            int seedAmount = 0; //the amount of monsters we seed in a room
             int cap; //the max amount of monsters we can seed in a room
-            int remainingMonsters = numberOfMonsters; //used to keep track of the monsters that need to be seeded
+            int exitRoomNeigh = exitRoom.Neighbors.Count;
 
             //Fill the exit neighbors with monsters.
-            foreach (Room neigh in exitRoom.Neighbors)
+            foreach (Room r in exitRoom.Neighbors)
             {
-                if (remainingMonsters <= 0)
-                    return;
-
-                cap = neigh.Capacity - neigh.Monsters.Count; //the max amount of monsters we can seed in this room
-                if (cap > remainingMonsters)
-                    seedAmount = remainingMonsters;
+                cap = r.Capacity - r.Monsters.Count; //the max amount of monsters we can seed in this room
+                if (firstRecur)
+                {
+                    int maxSeed = remainingMonsters - exitRoomNeigh >=
+                                  r.Capacity
+                        ? r.Capacity
+                        : remainingMonsters - exitRoomNeigh + 1;
+                    seedAmount = GetRandom().Next(1, maxSeed + 1);
+                }
                 else
-                    seedAmount = firstRecur ? GetRandom().Next(lowestCap, cap + 1) : GetRandom().Next(cap + 1);
+                {
+                    if (cap >= remainingMonsters)
+                        seedAmount = remainingMonsters;
+                    else if(cap > 0)
+                        seedAmount = GetRandom().Next(1, cap + 1);
+                    else
+                        seedAmount = 0;
+                }
 
                 for (int i = 0; i < seedAmount; i++)
                 {
-                    neigh.Monsters.Add(CreateMonster());
-                    counter++;
+                    r.Monsters.Add(CreateMonster(r));
                     remainingMonsters--;
                 }
+                
+                exitRoomNeigh--;
             }
+
+            currentCap = LowestMonstersAmount(_maxRoomCap, exitRoom.Neighbors);
 
             //Fill the other rooms
             foreach (Room r in rooms.Where(r => !r.Neighbors.Contains(exitRoom)))
             {
-                if (remainingMonsters <= 0)
-                    return;
-                
-                int maxCap = r.Capacity >= lowestCap ? lowestCap - 1 : r.Capacity;
+                int maxCap = r.Capacity >= currentCap ? currentCap - 1 : r.Capacity;
                 cap = maxCap - r.Monsters.Count;
-                if (cap > remainingMonsters)
+                if (cap >= remainingMonsters)
                     seedAmount = remainingMonsters;
+                else if (cap > 0)
+                    seedAmount = GetRandom().Next(1, cap + 1);
                 else
-                    seedAmount = GetRandom().Next(cap + 1);
+                    seedAmount = 0;
                 for (int j = 0; j < seedAmount; j++)
                 {
-                    r.Monsters.Add(CreateMonster());
-                    counter++;
+                    r.Monsters.Add(CreateMonster(r));
                     remainingMonsters--;
                 }
             }
             
-            SeedMonsters(lowestCap, remainingMonsters);
+            SeedMonsters(currentCap, remainingMonsters);
+        }
+        
+        //Returns the lowest amount of monsters in a hash set of rooms
+        private int LowestMonstersAmount(int maxCap, HashSet<Room> rooms)
+        {
+            int lowestMonstersAmount = maxCap; 
+            foreach (Room r in rooms)
+            {
+                if (r.Monsters.Count < lowestMonstersAmount)
+                {
+                    lowestMonstersAmount = r.Monsters.Count;
+                }
+            }
+            
+            return lowestMonstersAmount;
         }
 
         //Returns a monster
-        private Monster CreateMonster()
+        private Monster CreateMonster(Room r)
         {
             int hp = GetRandom().Next(50, 101); //TODO: tweak HP 
             int ar = GetRandom().Next(1, 11); //TODO: tweak AR  
             Monster m = new Monster(IdFactory.GetCreatureId(), "goblin", hp, ar); //ALLE MONSTERS HETEN NU GOBLIN
+            m.Location = r;
             monsters.Add(m);
             return m;
         }
@@ -293,11 +322,10 @@ namespace STVrogue.GameLogic
             //make sure there is at least one healing and rage potion in startRoom.Neighbors
             for (int i = 0; i < rndmRooms.Length; i++)
             {
-                Room r = rndmRooms[i];
-                if (r.Neighbors.Contains(startRoom))
+                if (rndmRooms[i].Neighbors.Contains(startRoom) && rndmRooms[i] != ExitRoom)
                 {
-                    r.Items.Add(new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101)));
-                    r.Items.Add(new RagePotion(IdFactory.GetItemId()));
+                    rndmRooms[i].Items.Add(new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101)));
+                    rndmRooms[i].Items.Add(new RagePotion(IdFactory.GetItemId()));
                     remainingHealingPotions--;
                     remainingRagePotions--;
                     break;
@@ -305,19 +333,18 @@ namespace STVrogue.GameLogic
             }
 
             int emptyRooms = rooms.Count / 2 - 2; //The amount of rooms without potions besides exit and start
-            int seedRooms = rooms.Count - emptyRooms - 2;
+            int seedRooms = rooms.Count - (emptyRooms + 2);
 
-            for (int i = 0; i < rndmRooms.Length; i++)
+            foreach (Room r in rndmRooms)
             {
-                if (remainingHealingPotions <= 0 && remainingRagePotions <= 0)
+                if (remainingHealingPotions == 0 && remainingRagePotions == 0)
                     break;
                 
-                Room r = rndmRooms[i];
                 if (r == startRoom || r == exitRoom)
                 {
                     continue;
                 }
-                if (emptyRooms > 0)
+                if (emptyRooms > 0 && r.Items.Count == 0)
                 {
                     emptyRooms--;
                     continue;
@@ -332,7 +359,7 @@ namespace STVrogue.GameLogic
                     }
                     else
                     {
-                        int seedAmount = numberOfHealingPotion / seedRooms + numberOfHealingPotion % seedRooms;
+                        int seedAmount = remainingHealingPotions / seedRooms;
                         AddHealingPotions(r, seedAmount);
                         remainingHealingPotions -= seedAmount;
                     }
@@ -347,13 +374,15 @@ namespace STVrogue.GameLogic
                     }
                     else
                     {
-                        int seedAmount = numberOfRagePotion / seedRooms + numberOfRagePotion % seedRooms;
+                        int seedAmount = remainingRagePotions / seedRooms;
                         AddRagePotions(r, seedAmount);
                         remainingRagePotions -= seedAmount;
                     }
                 }
                 seedRooms--;
             }
+
+            rooms = rndmRooms.ToHashSet();
         }
 
         //Adds random amount of potions to a room, returns id for unique ids
@@ -398,11 +427,6 @@ namespace STVrogue.GameLogic
     public class Room : GameEntity
     {
         /// <summary>
-        /// The number of monsters in this room cannot exceed this capacity.
-        /// </summary>
-        int capacity;
-        
-        /// <summary>
         /// The type of this node: either start-node, exit-node, or common-node.
         /// </summary>
         RoomType roomType ;
@@ -419,11 +443,16 @@ namespace STVrogue.GameLogic
         public Room(string uniqueId, RoomType roomTy, int capacity) : base(uniqueId)
         {
             this.roomType = roomTy;
-            this.capacity = capacity;
+            this.Capacity = capacity;
         }
 
         #region getters and setters
-        public int Capacity => capacity;
+
+        /// <summary>
+        /// The number of monsters in this room cannot exceed this capacity.
+        /// </summary>
+        public int Capacity { get; }
+
         public HashSet<Room> Neighbors => neighbors;
         public HashSet<Creature> Monsters => monsters;
 
