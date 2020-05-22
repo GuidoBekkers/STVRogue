@@ -88,43 +88,59 @@ namespace NUnitTests
             }
         }
 
-        //NUnit Theory testing for the SeedMonstersAndItems method
+        /// <summary>
+        /// Test the SeedMonstersAndItems methods with NUnit Theory. The Datapoint Source values
+        /// are chosen because of the following reasons:
+        /// -- 0 for invalid input for monsters, healPotions, ragePotions
+        /// -- 1 for minimum valid input for monsters, healPotions, ragePotions and cap
+        /// -- 5 and 10 for higher amount
+        /// For the shape of the dungeon, RandomShape is chosen because in this case, the exitRoom can have
+        /// more then one neighbor
+        /// </summary>
+        /// <param name = "monsters">the given number of monsters to seed</param>
+        /// <param name = "healPotions">the given number heal potions to seed</param>
+        /// <param name = "ragePotions">the given number of rage potions to seed</param>
+        /// <param name = "rooms">the given number of rooms to generate</param>
+        /// <param name = "cap">the given maximum capacity of a room</param>
+        /// <param name = "shape">the given shape of the dungeon</param>
+        
         [DatapointSource]
-        public int[] int_values = new int[] {0, 1, 3, 5, 10};
+        public int[] int_values = new int[] {0, 1, 5, 10};
 
         [Theory]
         // Theory-1 checks if the method returns false if the preconditions are not met for: numberOfMonsters,
         //numberOfHealingPotions and numberOfRagePotions.
-        public void SeedMonstersAndItems_Theory1(int numberOfMonster, int numberOfHealingPotions, int numberOfRagePotions,
-            int numberOfRooms, int maximumCapacity)
+        public void SeedMonstersAndItems_Theory1(int monsters, int healPotions, int ragePotions,
+            int rooms, int cap)
         {
             //Make sure that the dungeon has always valid inputs
-            Assume.That(numberOfRooms > 2 && maximumCapacity > 0);
-            Dungeon dungeon = new Dungeon(DungeonShapeType.LINEARshape, numberOfRooms, maximumCapacity);
-            int maxMonsterSeeds = MaxSeeds(maximumCapacity, dungeon);
+            Assume.That(rooms > 2 && cap > 0);
+            Dungeon dungeon = new Dungeon(DungeonShapeType.RANDOMshape, rooms, cap);
+            int maxMonsterSeeds = MaxSeeds(cap, dungeon);
             
             //Cases when pre-conditions are not met
-            Assume.That(numberOfMonster > maxMonsterSeeds || numberOfHealingPotions < 1 
-                                                          || numberOfRagePotions < 1 || numberOfMonster < 1);
+            Assume.That(monsters > maxMonsterSeeds || healPotions < 1 || ragePotions < 1 || monsters < 1 ||
+                        monsters < dungeon.ExitRoom.Neighbors.Count);
             //Check if the function returns false in all cases
-            Assert.IsFalse(dungeon.SeedMonstersAndItems(numberOfMonster, numberOfHealingPotions, numberOfRagePotions));
+            Assert.IsFalse(dungeon.SeedMonstersAndItems(monsters, healPotions, ragePotions));
         }
         
         [Theory]
         //Theory-2 checks if the post-conditions are met, when the pre-conditions are met
-        public void SeedMonstersAndItems_Theory2(int numberOfMonster, int numberOfHealingPotions, int numberOfRagePotions,
-            int numberOfRooms, int maximumCapacity)
+        public void SeedMonstersAndItems_Theory2(int monsters, int healPotions, int ragePotions,
+            int rooms, int cap)
         {
             //Make sure that the dungeon has always valid inputs
-            Assume.That(numberOfRooms > 2 && maximumCapacity > 0);
-            Dungeon dungeon = new Dungeon(DungeonShapeType.LINEARshape, numberOfRooms, maximumCapacity);
-            int maxMonsterSeeds = MaxSeeds(maximumCapacity, dungeon);
+            Assume.That(rooms > 2 && cap > 0);
+            Dungeon dungeon = new Dungeon(DungeonShapeType.RANDOMshape, rooms, cap);
+            int maxMonsterSeeds = MaxSeeds(cap, dungeon);
 
             //Cases when the pre-conditions are met
-            Assume.That(numberOfMonster <= maxMonsterSeeds && numberOfHealingPotions >= 1 
-                                                           && numberOfRagePotions >= 1 && numberOfMonster > 0);
-            //Check is the function returns true
-            Assert.IsTrue(dungeon.SeedMonstersAndItems(numberOfMonster, numberOfHealingPotions, numberOfRagePotions));
+            Assume.That(monsters <= maxMonsterSeeds && healPotions >= 1 
+                                                           && ragePotions >= 1 && monsters >= 1
+                                                           && monsters >= dungeon.ExitRoom.Neighbors.Count);
+            //Check if the function returns true
+            Assert.IsTrue(dungeon.SeedMonstersAndItems(monsters, healPotions, ragePotions));
             
             //Check if every seeded monster has HP > 0 and AR > 0
             foreach (Monster m in dungeon.Monsters)
@@ -133,8 +149,11 @@ namespace NUnitTests
             }
             
             //lowest amount of monsters in exit.Neighbors:
-            int lowestMonstersAmount = LowestMonstersAmount(maximumCapacity, dungeon.ExitRoom.Neighbors);
+            int lowestMonstersAmount = LowestMonstersAmount(cap, dungeon.ExitRoom.Neighbors);
             int emptyRooms = 0; //amount of rooms without items
+            int monsterCount = 0; 
+            int hpCount = 0; 
+            int rpCount = 0;
 
             foreach (Room r in dungeon.Rooms)
             {
@@ -150,14 +169,28 @@ namespace NUnitTests
                 {
                     emptyRooms++;
                 }
+
+                monsterCount += r.Monsters.Count;
+
+                foreach (Item potion in r.Items)
+                {
+                    if (potion is HealingPotion)
+                        hpCount++;
+                    else if (potion is RagePotion)
+                        rpCount++;
+                }
             }
             
             //Check if at least N/2 rooms have no item at all
             Assert.IsTrue(emptyRooms >= dungeon.Rooms.Count / 2);
+            //Check amount of monsters
+            Assert.IsTrue(monsterCount == monsters);
+            //Check amount of hp and rp potions
+            Assert.IsTrue(hpCount == healPotions && rpCount == ragePotions);
             
             bool hpItem = false; //is there a hp item?
             bool rpItem = false; //is there an ar item?
-            //Check if there is at least one healing and one rage potion in startRoom.Neigbors
+            //Check if there is at least one healing and one rage potion in startRoom.Neighbors
             foreach (Room r in dungeon.StartRoom.Neighbors)
             {
                 foreach (Item i in r.Items)
@@ -174,11 +207,10 @@ namespace NUnitTests
                     break;
             }
             
-            Assert.IsTrue(hpItem);
-            Assert.IsTrue(rpItem);
+            Assert.IsTrue(hpItem && rpItem);
         }
-        
-        //Returns the maximum monsters that can be seeded
+
+        //Returns the maximum monsters that can be seeded in a dungeon
         private int MaxSeeds(int maxCap, Dungeon dungeon)
         {
             int lowestCap = maxCap;
@@ -192,11 +224,11 @@ namespace NUnitTests
                 }
             }
 
-            int nonExitRooms = dungeon.Rooms.Count - dungeon.ExitRoom.Neighbors.Count;
-            //This is a check for random dungeon shape:
-            nonExitRooms -= dungeon.ExitRoom.Neighbors.Contains(dungeon.StartRoom) ? 1 : 2; 
-
-            res += nonExitRooms * (lowestCap - 1);
+            foreach (Room r in dungeon.Rooms
+                .Where(x => !x.Neighbors.Contains(dungeon.ExitRoom)))
+            {
+                res += r.Capacity >= lowestCap ? lowestCap - 1 : r.Capacity;
+            }
             return res;
         }
 
@@ -214,5 +246,15 @@ namespace NUnitTests
             
             return lowestMonstersAmount;
         }
+        
+        [Test]
+        //Getters and setters tests
+        public void Test_RoomType_Setter()
+        {
+            Room r = new Room("test", RoomType.ORDINARYroom, 3);
+            r.RoomType = RoomType.STARTroom;
+            Assert.IsTrue(r.RoomType == RoomType.STARTroom);
+        }
+        
     }
 }
