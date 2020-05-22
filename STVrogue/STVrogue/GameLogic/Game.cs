@@ -23,7 +23,7 @@ namespace STVrogue.GameLogic
         public DifficultyMode difficultyMode;
         public string playerName;
         public int playerBaseHp = 10;
-        public int playerBaseAr = 1;
+        public int playerBaseAr = 10;
 
         public int GetDifficultyMultiplier(DifficultyMode difficulty)
         {
@@ -209,6 +209,7 @@ namespace STVrogue.GameLogic
                     if (defender is Monster)
                     {
                         livingMonsters.Remove(defender as Monster);
+                        defender.Location.Monsters.Remove(defender);
                     }
                     else
                     {
@@ -438,8 +439,6 @@ namespace STVrogue.GameLogic
         /// <param name="targetId">The id of the monster the player wants to attack</param>
         private void HandlePlayerTurnAttack(string targetId)
         {
-            // Create a bool denoting if the target was found
-            var found = false;
             // Find the monster with the correct ID
             foreach (var m in player.Location.Monsters)
             {
@@ -448,18 +447,21 @@ namespace STVrogue.GameLogic
                 {
                     // Store the monster's old HP
                     int prevHp = m.Hp;
-                            
+
                     // Attack the monster
                     Attack(player, m);
-                    found = true;
-                    Console.WriteLine($"You attacked monster {targetId}, dealing {(prevHp - m.Hp).ToString()} damage");
+                    Console.Write($"You attacked monster {targetId}, dealing {(prevHp - m.Hp).ToString()} damage");
+                    if (m.Alive)
+                        Console.WriteLine();
+                    else
+                        Console.WriteLine(", which was enough to kill it!");
+                    return;
                 }
             }
+
             // if the target was not found, throw an exception
-            if (!found)
-            {
-                throw new ArgumentException($"The given monster ({targetId}) was not in the same location as the player ({player.Location.Id})");
-            }
+            throw new ArgumentException(
+                $"The given monster ({targetId}) was not in the same location as the player ({player.Location.Id})");
         }
 
         /// <summary>
