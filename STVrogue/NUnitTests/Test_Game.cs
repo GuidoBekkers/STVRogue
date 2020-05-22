@@ -10,16 +10,7 @@ namespace NUnitTests
     [TestFixture]
     public class Test_Game
     {
-        GameConfiguration gC = new GameConfiguration
-        {
-            numberOfRooms = 5,
-            maxRoomCapacity = 5,
-            dungeonShape = DungeonShapeType.LINEARshape,
-            initialNumberOfMonsters = 4,
-            initialNumberOfHealingPots = 1,
-            initialNumberOfRagePots = 1,
-            difficultyMode = DifficultyMode.NORMALmode
-        };
+        
         [Test]
         public void Test_GameConfiguration()
         {
@@ -599,7 +590,18 @@ namespace NUnitTests
             Assert.IsTrue(g.Flee(g.Player));
             Assert.IsFalse(m.Location == g.Player.Location);
         }
-
+        // Initialize a game configuration
+        GameConfiguration gC = new GameConfiguration
+        {
+            numberOfRooms = 5,
+            maxRoomCapacity = 5,
+            dungeonShape = DungeonShapeType.LINEARshape,
+            initialNumberOfMonsters = 4,
+            initialNumberOfHealingPots = 1,
+            initialNumberOfRagePots = 1,
+            difficultyMode = DifficultyMode.NORMALmode
+        };
+        
         // Test game flee player trying to flee to exit room
         [Test]
         public void Test_Game_Flee_Player_ToExitRoom()
@@ -676,9 +678,6 @@ namespace NUnitTests
             // Initialize the game
             Game g = new Game(gC);
             
-            // Move the player to a room adjacent to the start room, which has 0 monsters in it
-            g.Player.Location = g.Dungeon.StartRoom.Neighbors.First();
-            
             // Check if trying to flee gives exception
             Assert.Throws<ArgumentException>(() => g.Flee(g.Player));
         }
@@ -719,6 +718,23 @@ namespace NUnitTests
             
             // Check if player location updated
             Assert.IsFalse(g.Player.Location == g.Dungeon.StartRoom);
+        }
+        
+        // Test game update recognizing when game is won
+        [Test]
+        public void Test_Game_Update_End()
+        {
+            // Initialize the game
+            Game g = new Game(gC);
+            
+            //Move player to exit room
+            g.Player.Location = g.Dungeon.ExitRoom;
+            
+            // Update the game
+            g.Update(new Command(CommandType.DoNOTHING, ""));
+            
+            // Check if game is over
+            Assert.True(g.Gameover);
         }
         
         // Test if trying to move to a wrong roomid throws an exception
@@ -790,7 +806,38 @@ namespace NUnitTests
             Game g = new Game(gC);
             
             // Check that exception is thrown when trying to Use invalid id
-            Assert.Throws<ArgumentException>(() => g.Update(new Command(CommandType.ATTACK, new string[]{"i9999"})));
+            Assert.Throws<ArgumentException>(() => g.Update(new Command(CommandType.USE, new string[]{"i9999"})));
+        }
+        
+        // Test fleeing not working when there are no monsters and working when there is a monster
+        [Test]
+        public void Test_Game_HandlePlayerTurn_Flee()
+        {
+            // Initialize the game
+            Game g = new Game(gC);
+
+            // Initialize a monster and add to the start-room
+            Monster m = new Monster("0", "TestMonster", 10, 10);
+            m.Location = g.Dungeon.StartRoom;
+            g.Dungeon.StartRoom.Monsters.Add(m);
+            
+            // Enrage player, so he cant flee
+            g.Player.Enraged = true;
+
+            // Update the game, with the player attempting to flee
+            g.Update(new Command(CommandType.FLEE, ""));
+            
+            // Check if player didnt move, since there is no monster in the start room
+            Assert.True(g.Player.Location == g.Dungeon.StartRoom);
+            
+            // Set player enrage to false
+            g.Player.Enraged = false;
+            
+            // Update the game, with the player attempting to flee
+            g.Update(new Command(CommandType.FLEE, ""));
+            
+            // Check if player didnt move, since there is no monster in the start room
+            Assert.False(g.Player.Location == g.Dungeon.StartRoom);
         }
     }
 }

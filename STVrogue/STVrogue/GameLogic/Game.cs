@@ -115,7 +115,7 @@ namespace STVrogue.GameLogic
             TrySeed();
 
             // Get the list of all monsters created in the dungeon and store it
-            livingMonsters = new HashSet<Monster>();//dungeon.monsters;
+            livingMonsters = dungeon.Monsters;
 
             // Place the player in the starting room of the dungeon
             player.Location = dungeon.StartRoom;
@@ -282,7 +282,7 @@ namespace STVrogue.GameLogic
                 if (DifficultyMode == DifficultyMode.ELITEmode && !(c as Player).EliteFlee) canFlee = false;
 
                 // If heal potion is used at turn t, player can only flee at turn t+2 or later
-                if (TurnNumber <= HealUsed + 1) canFlee = false;
+                if (TurnNumber <= HealUsed + 1 && HealUsed != 0) canFlee = false;
 
                 // Player cannot flee to exit room
                 possibleRooms.RemoveAll(r => r.RoomType == RoomType.EXITroom);
