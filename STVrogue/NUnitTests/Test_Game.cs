@@ -813,6 +813,11 @@ namespace NUnitTests
             // Initialize the game
             Game g = new Game(gC);
             
+            // Initialize a monster and add to the startroom
+            Monster m = new Monster("0", "TestMonster", 10, 10);
+            m.Location = g.Dungeon.StartRoom;
+            g.Dungeon.StartRoom.Monsters.Add(m);
+            
             // Check that exception is thrown when trying to Attack invalid id
             Assert.Throws<ArgumentException>(() => g.Update(new Command(CommandType.ATTACK, new string[]{"m9999"})));
         }
