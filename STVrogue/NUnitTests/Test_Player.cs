@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using NUnit.Framework;
 using STVrogue.GameLogic;
@@ -95,6 +96,7 @@ namespace NUnitTests
             Assert.IsTrue(player.Kp == 1);
         }
         
+        // Test using an item
         [Test]
         public void Test_PlayerUse()
         {
@@ -128,6 +130,7 @@ namespace NUnitTests
 
         }
 
+        // Test using an item which is not in the player's bag
         [Test]
         public void Test_PlayerUse_NotInBag()
         {
@@ -148,6 +151,21 @@ namespace NUnitTests
             // Check that the player's stats have remained the same
             Assert.IsTrue(!p.Enraged);
             Assert.IsTrue(p.Hp == 1);
+        }
+
+        // Test the setter of the player's bag
+        [Test]
+        public void Test_PlayerBag_Set()
+        {
+            // Instance the player and an item
+            Player p = new Player("pId", "Player", 2, 1);
+            HealingPotion potion = new HealingPotion("pId", 1);
+            // Add the item to the player's bag
+            p.Bag.Add(potion);
+            // Set the bag to a new empty list
+            p.Bag = new List<Item>();
+            // Check if the bag is empty, and thus successfully set
+            Assert.IsFalse(p.Bag.Contains(potion));
         }
     }
 }

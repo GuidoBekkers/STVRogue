@@ -4,8 +4,11 @@ namespace STVrogue.GameLogic
     public class Item : GameEntity
     {
         public Item(String id) : base(id){ }
-        
-        public virtual void Use(Player player){ }
+
+        public virtual void Use(Player player)
+        {
+            Console.WriteLine("You throw the empty bottle on the ground.");
+        }
     }
 
     public class HealingPotion : Item
@@ -45,6 +48,7 @@ namespace STVrogue.GameLogic
             player.Hp += this.HealValue;
                 
             Console.WriteLine($"You drank a healing potion and recovered {(player.Hp - prevHp).ToString()} HP!");
+            base.Use(player);
         }
     }
 
@@ -62,6 +66,7 @@ namespace STVrogue.GameLogic
             player.Enraged = true;
                 
             Console.WriteLine("You drank a rage potion and feel enraged for 5 turns!");
+            base.Use(player);
         }
     }
 }

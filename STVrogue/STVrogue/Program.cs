@@ -46,7 +46,7 @@ namespace STVrogue
             PrettyPrintLogo();
             InitGame();
             InitGameConfig();
-            game = new Game(_gameConfiguration);
+            game = CreateGame();
             bool gameover = false;
             while (!gameover && !game.Gameover)
             {
@@ -518,14 +518,41 @@ namespace STVrogue
         }
 
         /// <summary>
+        /// Try creating a game, retrying with different values if it fails
+        /// </summary>
+        /// <returns></returns>
+        private static Game CreateGame()
+        {
+            Game g;
+            try
+            {
+                g = new Game(_gameConfiguration);
+            }
+            catch (Exception e)
+            {
+                if (e.InnerException is ArgumentException)
+                {
+                    InitGameConfig();
+                    return CreateGame();
+                }
+                else
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
+            return g;
+        }
+
+        /// <summary>
         /// Initialized the game configuration
         /// </summary>
         private static void InitGameConfig()
         {
-            _gameConfiguration.numberOfRooms = 3; //GetRandom().Next(5, 15);
-            _gameConfiguration.maxRoomCapacity = 10;
-            _gameConfiguration.dungeonShape = DungeonShapeType.LINEARshape;//GetRandomDungeonShape();
-            _gameConfiguration.initialNumberOfMonsters = 1; //GetRandom().Next(15, 30);
+            _gameConfiguration.numberOfRooms = GetRandom().Next(5, 20);
+            _gameConfiguration.maxRoomCapacity = GetRandom().Next(10, 15);
+            _gameConfiguration.dungeonShape = GetRandomDungeonShape();
+            _gameConfiguration.initialNumberOfMonsters = GetRandom().Next(15, 30);
             _gameConfiguration.initialNumberOfHealingPots = GetRandom().Next(1, 10);
             _gameConfiguration.initialNumberOfRagePots = GetRandom().Next(1, 10);
         }
