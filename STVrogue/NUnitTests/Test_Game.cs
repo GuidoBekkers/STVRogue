@@ -243,7 +243,7 @@ namespace NUnitTests
             g.Attack(g.Player, foe);
             
             // Check if the attack was executed
-            Assert.IsTrue(foe.Hp == 5 - g.Player.AttackRating);
+            Assert.IsTrue(foe.Hp < 5);
         }
         [Test]
         public void Test_Game_Attack_DeadMonster()
