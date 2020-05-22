@@ -767,12 +767,32 @@ namespace NUnitTests
             Assert.Throws<ArgumentException>(() => g.Update(new Command(CommandType.MOVE, new string[]{"r9999"})));
         }
         
-        // Test Game HandlePlayerTurnAttack() 
+        // Test Game HandlePlayerTurnAttack(), killing the enemy 
         [Test]
-        public void Test_Game_HandlePlayerTurnAttack()
+        public void Test_Game_HandlePlayerTurnAttack_Kill()
         {
             // Initialize the game
             Game g = new Game(gC);
+            
+            // Initialize a monster and add to the startroom
+            Monster m = new Monster("0", "TestMonster", 10, 10);
+            m.Location = g.Dungeon.StartRoom;
+            g.Dungeon.StartRoom.Monsters.Add(m);
+            
+            // Update the game, with the player attacking the monster
+            g.Update(new Command(CommandType.ATTACK, new string[]{"0"}));
+            
+            // Check if monster hp decreased
+            Assert.IsFalse(m.Hp == 10);
+        }
+        
+        // Test Game HandlePlayerTurnAttack(), not killing the enemy 
+        [Test]
+        public void Test_Game_HandlePlayerTurnAttack_Alive()
+        {
+            // Initialize the game
+            Game g = new Game(gC);
+            g.Player.AttackRating = 1;
             
             // Initialize a monster and add to the startroom
             Monster m = new Monster("0", "TestMonster", 10, 10);
