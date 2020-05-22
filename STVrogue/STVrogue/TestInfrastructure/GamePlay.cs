@@ -62,6 +62,7 @@ namespace STVrogue.TestInfrastructure
 
     }
 
+    /*
     /// <summary>
     /// A dummy GamePlay; for testing the specification classes.
     /// </summary>
@@ -80,4 +81,5 @@ namespace STVrogue.TestInfrastructure
         public override Game GetState() { return state; }
         public override void ReplayCurrentTurn() { turn++; state.z_ = execution[turn]; }
     }
+    */
 }

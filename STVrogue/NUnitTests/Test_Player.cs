@@ -54,6 +54,29 @@ namespace NUnitTests
             Assert.Throws<ArgumentException>(() => player.Move(room2));
         }
         
+        // Test player moving while enraged, into a room connected to an exit room, correctly updating eliteFlee
+        [Test]
+        public void Test_PlayerMove3()
+        {
+            // Instantiate 3 connecting rooms, one being an exit room
+            Room room1 = new Room("1",RoomType.ORDINARYroom, 5);
+            Room room2 = new Room("2",RoomType.ORDINARYroom, 5);
+            Room room3 = new Room("3",RoomType.EXITroom, 5);
+            room1.Connect(room2);
+            room2.Connect(room3);
+            
+            // Instantiate a player
+            Player player = new Player("4", "TestPlayer", 10, 10);
+            player.Location = room1;
+            player.Enraged = true;
+            
+            // Move player to a room connected to the exit room
+            player.Move(room2);
+            
+            // Check if eliteFlee gets updated to false
+            Assert.IsFalse(player.EliteFlee);
+        }
+        
         // Test player attack killing foe and increasing kill points
         [Test]
         public void Test_PlayerAttack()
