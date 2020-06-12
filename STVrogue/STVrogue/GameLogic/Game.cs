@@ -9,6 +9,19 @@ using static STVrogue.Utils.RandomFactory;
 namespace STVrogue.GameLogic
 {
     /// <summary>
+    /// Enumerator representing all possible action types
+    /// </summary>
+    public enum ActionType
+    {
+        Move,
+        Pickup,
+        Use,
+        Attack,
+        Flee,
+        DoNothing
+    }
+    
+    /// <summary>
     /// Representing the configuration of a level.
     /// </summary>
     [Serializable()]
@@ -357,18 +370,29 @@ namespace STVrogue.GameLogic
                 case (CommandType.DoNOTHING):
                 {
                     Console.WriteLine("You chose to do nothing.");
+                    
+                    // Store this action as the previous action
+                    player.PrevAction = ActionType.DoNothing;
                     break;
                 }
                 // Handle the player moving to the given location
                 case (CommandType.MOVE):
                 {
+                    // Handle the player moving to the given room
                     HandlePlayerTurnMove(playerAction.Args[0]);
+                    
+                    // Store this action as the previous action
+                    player.PrevAction = ActionType.Move;
                     break;
                 }
                 // Handle the player attacking the given enemy
                 case (CommandType.ATTACK):
                 {
+                    // Handle the player attacking the given monster
                     HandlePlayerTurnAttack(playerAction.Args[0]);
+                    
+                    // Store this action as the previous action
+                    player.PrevAction = ActionType.Attack;
                     break;
                 }
                 // Handle the player picking up all the items in the room
@@ -381,13 +405,20 @@ namespace STVrogue.GameLogic
                     }
                     // Remove all the items from the room
                     player.Location.Items.Clear();
+                    
+                    // Store this action as the previous action
+                    player.PrevAction = ActionType.Pickup;
                     Console.WriteLine("You picked up all items from the ground");
                     break;
                 }
                 // Handle the player using the given item
                 case (CommandType.USE):
                 {
+                    // Handle the player using an item
                     HandlePlayerTurnUse(playerAction.Args[0]);
+                    
+                    // Store this action as the previous action
+                    player.PrevAction = ActionType.Use;
                     break;
                 }
                 // Handle the player fleeing
@@ -402,6 +433,9 @@ namespace STVrogue.GameLogic
                     {
                         Console.WriteLine("Your attempt to flee from combat was not successful");
                     }
+                    
+                    // Store this action as the previous action
+                    player.PrevAction = ActionType.Flee;
                     break;
                 }
             }
@@ -537,6 +571,9 @@ namespace STVrogue.GameLogic
                     {
                         // move to a random room
                         Move(m, destinations[GetRandom().Next(0, destinations.Count)]);
+                        
+                        // Store this action as the previous action
+                        m.PrevAction = ActionType.Move;
                     }
 
                     // Else do nothing
@@ -544,6 +581,8 @@ namespace STVrogue.GameLogic
                 }
                 case 1: // do nothing
                 {
+                    // Store this action as the previous action
+                    m.PrevAction = ActionType.DoNothing;
                     break;
                 }
                 case 2: // attack
@@ -554,6 +593,9 @@ namespace STVrogue.GameLogic
                     // Handle the monster attacking the player
                     Attack(m, player);
                     
+                    // Store this action as the previous action
+                    m.PrevAction = ActionType.Attack;
+                    
                     Console.WriteLine($"Monster {m.Id} attacked you and dealt {(prevHp - player.Hp).ToString()} damage");
                     break;
                 }
@@ -561,6 +603,9 @@ namespace STVrogue.GameLogic
                 {
                     // Handle the monster fleeing, it doesn't matter if the flee was successful because the monster does nothing if he can't flee.
                     Flee(m);
+                    
+                    // Store this action as the previous action
+                    m.PrevAction = ActionType.Flee;
                     
                     Console.WriteLine($"Monster {m.Id} fled from the fight");
                     break;
