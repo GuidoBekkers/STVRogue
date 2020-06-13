@@ -12,6 +12,8 @@ namespace STVrogue.GameLogic
         bool alive ;
         Room location;
         int attackRating ;
+        private ActionType prevAction;
+        
         
         public Creature(string id, String name) : base(id)
         {
@@ -83,6 +85,13 @@ namespace STVrogue.GameLogic
             get => attackRating;
             set => attackRating = value;
         }
+
+        public ActionType PrevAction
+        {
+            get => prevAction;
+            set => prevAction = value;
+        }
+
         #endregion
         
         /// <summary>
