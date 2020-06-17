@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Text;
 using STVrogue.GameControl;
 using STVrogue.GameLogic;
+using STVrogue.TestInfrastructure;
+using STVrogue.Utils;
 using static STVrogue.Utils.RandomFactory;
 
 namespace STVrogue
@@ -47,6 +50,8 @@ namespace STVrogue
             InitGame();
             InitGameConfig();
             game = CreateGame();
+            SaveHelper.RecordConfig(_gameConfiguration); // Record the game configuration
+            RandomFactory.Reset(); // Reset the random generator, for easier saving/loading
             bool gameover = false;
             while (!gameover && !game.Gameover)
             {
@@ -120,7 +125,14 @@ namespace STVrogue
                     case ' ': // Do nothing
                         game.Update(new Command(CommandType.DoNOTHING, ""));
                         break;
+                    case 's': // Save
+                        SaveHelper.SaveToFile("save.txt");
+                        break;
+                    case 'l': // Load
+                        LoadGame("save.txt");
+                        break;
                     case 'q': // Quit
+                        SaveHelper.Quit();
                         gameover = true;
                         break;
                 }
@@ -297,6 +309,10 @@ namespace STVrogue
                     if (_possibleActions.CanQuit) return c;
                     ReadValidInput();
                     break;
+                case 's':
+                    return c;
+                case 'l':
+                    return c;
                 default:
                     ReadValidInput();
                     break;
@@ -370,7 +386,25 @@ namespace STVrogue
                 sb.Append("| Quit(q)           ");
                 i++;
             }
-
+            
+            if (i == 4 && enterPossible)
+            {
+                sb.Append("\n");
+                enterPossible = false;
+            }
+            
+            sb.Append("| Save(s)           ");
+            i++;
+            
+            if (i == 4 && enterPossible)
+            {
+                sb.Append("\n");
+                enterPossible = false;
+            }
+            
+            sb.Append("| Load(l)           ");
+            
+            
             sb.Append("|\n");
             Console.WriteLine(sb.ToString());
             sb.Clear();
@@ -572,6 +606,22 @@ namespace STVrogue
             Console.WriteLine("/\\____) |   | |     \\   /    | ) \\ \\__| (___) || (___) || (___) || (____/\\");
             Console.WriteLine("\\_______)   )_(      \\_/     |/   \\__/(_______)(_______)(_______)(_______/");
             Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Loads the game from the given save file
+        /// </summary>
+        /// <param name="saveFile">the path to the save file</param>
+        private static void LoadGame(string saveFile)
+        {
+            // Reset the random generator
+            RandomFactory.Reset();
+            
+            // Create the GamePlay simulator
+            GamePlay sim = new GamePlay(saveFile);
+
+            // Replace this instance of Game with the simulated one
+            game = sim.GetLoadedGame();
         }
     }
 }
