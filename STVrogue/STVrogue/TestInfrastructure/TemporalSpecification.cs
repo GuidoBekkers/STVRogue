@@ -9,8 +9,11 @@ namespace STVrogue.TestInfrastructure
     /// <summary>
     /// Representing three types of judgement of a specification.
     /// </summary>
-    public enum Judgement {
-        Valid, Inconclusive, Invalid
+    public enum Judgement
+    {
+        Valid,
+        Inconclusive,
+        Invalid
     }
 
     /// <summary>
@@ -23,7 +26,6 @@ namespace STVrogue.TestInfrastructure
      */
     public abstract class TemporalSpecification
     {
-
         /// <summary>
         /// Check if this specification holds on the given gameplay. It returns a Judgement
         /// with the following meaning:
@@ -61,6 +63,7 @@ namespace STVrogue.TestInfrastructure
                 if (verdict == Judgement.Invalid) return Judgement.Invalid;
                 if (verdict == Judgement.Valid) countRelevantlyValid++;
             }
+
             if (countRelevantlyValid >= threshold) return Judgement.Valid;
             return Judgement.Inconclusive;
         }
@@ -80,8 +83,11 @@ namespace STVrogue.TestInfrastructure
     {
         Predicate<Game> p;
 
-        public Always(Predicate<Game> p) { this.p = p; }
-       
+        public Always(Predicate<Game> p)
+        {
+            this.p = p;
+        }
+
         public override Judgement Evaluate(GamePlay sigma)
         {
             sigma.Reset();
@@ -93,6 +99,7 @@ namespace STVrogue.TestInfrastructure
                 Log("violation of Always at turn " + sigma.Turn);
                 return Judgement.Invalid;
             }
+
             while (!sigma.AtTheEnd())
             {
                 // replay the current turn (and get the next turn)
@@ -107,9 +114,110 @@ namespace STVrogue.TestInfrastructure
                 }
 
             }
+
             // if we reach this point than p holds on every state in the gameplay:
             return Judgement.Valid;
         }
     }
-    
+
+    /// Representing the conjunction of two temporal properties
+    public class Conjunction : TemporalSpecification
+    {
+        private TemporalSpecification a;
+        private TemporalSpecification b;
+
+        public Conjunction(TemporalSpecification a, TemporalSpecification b)
+        {
+            this.a = a;
+            this.b = b;
+        }
+
+        public override Judgement Evaluate(GamePlay sigma)
+        {
+            Judgement A = a.Evaluate(sigma);
+            Judgement B = b.Evaluate(sigma);
+
+            if (A == Judgement.Valid && B == Judgement.Valid)
+                return Judgement.Valid;
+
+            if (A == Judgement.Invalid || B == Judgement.Invalid)
+                return Judgement.Invalid;
+
+            return Judgement.Inconclusive;
+        }
+    }
+
+    // Representing the negation of a temporal property
+    public class Negation : TemporalSpecification
+    {
+        private TemporalSpecification tp;
+
+        public Negation(TemporalSpecification tp)
+        {
+            this.tp = tp;
+        }
+
+        public override Judgement Evaluate(GamePlay sigma)
+        {
+            Judgement TP = tp.Evaluate(sigma);
+
+            if (TP == Judgement.Invalid)
+                return Judgement.Valid;
+
+            if (TP == Judgement.Valid)
+                return Judgement.Invalid;
+
+            return Judgement.Inconclusive;
+        }
+    }
+
+    // Representing the 'eventually' property
+    public class Future : TemporalSpecification
+    {
+        Predicate<Game> p;
+
+        public Future(Predicate<Game> p)
+        {
+            this.p = p;
+        }
+
+        public override Judgement Evaluate(GamePlay sigma)
+        {
+            return new Negation(new Always(g => !p(g))).Evaluate(sigma);
+        }
+    }
+
+    // Representing the 'eventually' property
+    public class Conditional : TemporalSpecification
+    {
+        private TemporalSpecification assuming;
+        private TemporalSpecification b;
+
+        public Conditional(TemporalSpecification assuming, TemporalSpecification b)
+        {
+            this.assuming = assuming;
+            this.b = b;
+        }
+
+        public override Judgement Evaluate(GamePlay gameplay)
+        {
+            Judgement A = assuming.Evaluate(gameplay);
+            Judgement B = b.Evaluate(gameplay);
+
+            if (A == Judgement.Valid && B == Judgement.Valid)
+                return Judgement.Valid;
+
+            if (A == Judgement.Valid && B == Judgement.Invalid)
+                return Judgement.Invalid;
+
+            return Judgement.Inconclusive;
+        }
+    }
+
+    // public class Change : TemporalSpecification
+    // {
+    //     
+    // }
 }
+    
+    
