@@ -48,9 +48,9 @@ namespace STVrogue
         {
             PrettyPrintLogo();
             InitGame();
-            InitGameConfig();
+            _gameConfiguration = RandomGameConfig(_gameConfiguration);
             RandomFactory.Reset(); // Reset the random generator, for easier saving/loading
-            game = CreateGame();
+            game = CreateGame(_gameConfiguration);
             SaveHelper.RecordConfig(_gameConfiguration); // Record the game configuration
             bool gameover = false;
             while (!gameover && !game.Gameover)
@@ -555,19 +555,18 @@ namespace STVrogue
         /// Try creating a game, retrying with different values if it fails
         /// </summary>
         /// <returns></returns>
-        private static Game CreateGame()
+        public static Game CreateGame(GameConfiguration gc)
         {
             Game g;
             try
             {
-                g = new Game(_gameConfiguration);
+                g = new Game(gc);
             }
             catch (Exception e)
             {
                 if (e.InnerException is ArgumentException)
                 {
-                    InitGameConfig();
-                    return CreateGame();
+                    return CreateGame(RandomGameConfig(gc));
                 }
                 else
                 {
@@ -581,14 +580,16 @@ namespace STVrogue
         /// <summary>
         /// Initialized the game configuration
         /// </summary>
-        private static void InitGameConfig()
+        public static GameConfiguration RandomGameConfig(GameConfiguration gc)
         {
-            _gameConfiguration.numberOfRooms = GetRandom().Next(5, 20);
-            _gameConfiguration.maxRoomCapacity = GetRandom().Next(10, 15);
-            _gameConfiguration.dungeonShape = GetRandomDungeonShape();
-            _gameConfiguration.initialNumberOfMonsters = GetRandom().Next(15, 30);
-            _gameConfiguration.initialNumberOfHealingPots = GetRandom().Next(1, 10);
-            _gameConfiguration.initialNumberOfRagePots = GetRandom().Next(1, 10);
+            gc.numberOfRooms = GetRandom().Next(5, 20);
+            gc.maxRoomCapacity = GetRandom().Next(10, 15);
+            gc.dungeonShape = GetRandomDungeonShape();
+            gc.initialNumberOfMonsters = GetRandom().Next(15, 30);
+            gc.initialNumberOfHealingPots = GetRandom().Next(1, 10);
+            gc.initialNumberOfRagePots = GetRandom().Next(1, 10);
+
+            return gc;
         }
 
         /// <summary>
@@ -616,6 +617,9 @@ namespace STVrogue
         {
             // Reset the random generator
             RandomFactory.Reset();
+            
+            // Reset the id factory
+            IdFactory.ResetIdFactory();
             
             // Create the GamePlay simulator
             GamePlay sim = new GamePlay(saveFile);

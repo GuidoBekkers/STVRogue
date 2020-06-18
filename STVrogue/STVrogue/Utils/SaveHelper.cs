@@ -4,9 +4,11 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using STVrogue.GameControl;
 using STVrogue.GameLogic;
+using static STVrogue.Utils.RandomFactory;
 using CommandType = STVrogue.GameControl.CommandType;
 
 namespace STVrogue.Utils
@@ -25,12 +27,6 @@ namespace STVrogue.Utils
             sb.Clear();
 
             // Append the values of the given GameConfiguration to the StringBuilder
-            sb.Append(gc.numberOfRooms.ToString()).Append(':');
-            sb.Append(gc.maxRoomCapacity.ToString()).Append(':');
-            sb.Append(gc.dungeonShape.ToString()).Append(':');
-            sb.Append(gc.initialNumberOfMonsters).Append(':');
-            sb.Append(gc.initialNumberOfHealingPots).Append(':');
-            sb.Append(gc.initialNumberOfRagePots).Append(':');
             sb.Append(gc.difficultyMode.ToString()).Append(':');
             sb.Append(gc.playerName).Append('\n');
         }
@@ -57,16 +53,13 @@ namespace STVrogue.Utils
             
             // Separate the values
             var values = line.Split(':');
+            
+            // Recalculate the random variables (will be the same due to a reset of the randomizer)
+            gc = Program.RandomGameConfig(gc);
 
             // Parse the GameConfiguration data
-            gc.numberOfRooms = int.Parse(values[0]);
-            gc.maxRoomCapacity = int.Parse(values[1]);
-            Enum.TryParse(values[2], false, out gc.dungeonShape);
-            gc.initialNumberOfMonsters = int.Parse(values[3]);
-            gc.initialNumberOfHealingPots = int.Parse(values[4]);
-            gc.initialNumberOfRagePots = int.Parse(values[5]);
-            Enum.TryParse(values[6], false, out gc.difficultyMode);
-            gc.playerName = values[7];
+            Enum.TryParse(values[0], false, out gc.difficultyMode);
+            gc.playerName = values[1];
             
             // Close the StreamReader
             reader.Close();

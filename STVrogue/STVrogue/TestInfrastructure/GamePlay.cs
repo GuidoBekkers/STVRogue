@@ -40,7 +40,7 @@ namespace STVrogue.TestInfrastructure
         private void LoadSimGame()
         {
             // Instance the game according to the save file
-            simulatedGame = new Game(SaveHelper.LoadConfig(saveFileLocation));
+            simulatedGame = Program.CreateGame(SaveHelper.LoadConfig(saveFileLocation));
             
             // Load the recorded actions
             actions = SaveHelper.LoadActions(saveFileLocation);
