@@ -1,5 +1,7 @@
 ﻿using System;
+using STVrogue.GameControl;
 using STVrogue.GameLogic;
+using STVrogue.Utils;
 
 namespace STVrogue.TestInfrastructure
 {
@@ -12,6 +14,12 @@ namespace STVrogue.TestInfrastructure
         protected int turn = 0;
 
         protected int length;
+
+        protected Command[] actions;
+
+        protected Game simulatedGame;
+
+        private string saveFileLocation;
 
         public GamePlay(){ }
 
@@ -26,20 +34,60 @@ namespace STVrogue.TestInfrastructure
         /// </summary>
         public int Length => length;
 
+        /// <summary>
+        /// Load the data from the save file and initialize the simulatedGame
+        /// </summary>
+        private void LoadSimGame()
+        {
+            // Instance the game according to the save file
+            simulatedGame = Program.CreateGame(SaveHelper.LoadConfig(saveFileLocation));
+            
+            // Load the recorded actions
+            actions = SaveHelper.LoadActions(saveFileLocation);
+        }
 
         /// <summary>
         /// For saving the recorded play represented by this instance of GamePlay into
         /// a file.
         /// </summary>
-        public GamePlay(String Savefile) 
+        public GamePlay(string saveFile)
         {
-            throw new NotImplementedException();
+            // Store the save file location
+            saveFileLocation = saveFile;
+
+            // Load the data from the save file
+            LoadSimGame();
+
+            // Store the length of the game recorded in this save file
+            length = actions.Length;
+        }
+
+        /// <summary>
+        /// Get the fully simulated game
+        /// </summary>
+        public Game GetLoadedGame()
+        {
+            // Execute all saved actions
+            while (!AtTheEnd())
+            {
+                ReplayCurrentTurn();
+            }
+            
+            // Return the fully simulated game
+            return simulatedGame;
         }
 
         /// <summary>
         /// Reset the recorded gameplay to turn 0.
         /// </summary>
-        public virtual void Reset() { throw new NotImplementedException(); }
+        public virtual void Reset()
+        {
+            // Reset the turn number
+            turn = 0;
+            
+            // Reset the game and action list
+            LoadSimGame();
+        }
 
         /// <summary>
         /// True if the gameplay is at the end, hence has no more turn to do.
@@ -51,14 +99,18 @@ namespace STVrogue.TestInfrastructure
         /// </summary>
         public virtual Game GetState()
         {
-            throw new NotImplementedException();
+            return simulatedGame;
         }
 
         /// <summary>
         /// Replay the current turn, thus updating the game state.
         /// This also increases the turn nr, thus shifting the current turn to the next one. 
         /// </summary>
-        public virtual void ReplayCurrentTurn() { throw new NotImplementedException(); }
+        public virtual void ReplayCurrentTurn()
+        {
+            // Execute this turns action and update the turn number
+            simulatedGame.Update(actions[turn++]);
+        }
 
     }
 

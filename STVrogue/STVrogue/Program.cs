@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Text;
 using STVrogue.GameControl;
 using STVrogue.GameLogic;
+using STVrogue.TestInfrastructure;
+using STVrogue.Utils;
 using static STVrogue.Utils.RandomFactory;
 
 namespace STVrogue
@@ -45,8 +48,10 @@ namespace STVrogue
         {
             PrettyPrintLogo();
             InitGame();
-            InitGameConfig();
-            game = CreateGame();
+            _gameConfiguration = RandomGameConfig(_gameConfiguration);
+            RandomFactory.Reset(); // Reset the random generator, for easier saving/loading
+            game = CreateGame(_gameConfiguration);
+            SaveHelper.RecordConfig(_gameConfiguration); // Record the game configuration
             bool gameover = false;
             while (!gameover && !game.Gameover)
             {
@@ -120,7 +125,14 @@ namespace STVrogue
                     case ' ': // Do nothing
                         game.Update(new Command(CommandType.DoNOTHING, ""));
                         break;
+                    case 's': // Save
+                        SaveHelper.SaveToFile("save.txt");
+                        break;
+                    case 'l': // Load
+                        LoadGame("save.txt");
+                        break;
                     case 'q': // Quit
+                        SaveHelper.Quit();
                         gameover = true;
                         break;
                 }
@@ -297,6 +309,10 @@ namespace STVrogue
                     if (_possibleActions.CanQuit) return c;
                     ReadValidInput();
                     break;
+                case 's':
+                    return c;
+                case 'l':
+                    return c;
                 default:
                     ReadValidInput();
                     break;
@@ -370,7 +386,25 @@ namespace STVrogue
                 sb.Append("| Quit(q)           ");
                 i++;
             }
-
+            
+            if (i == 4 && enterPossible)
+            {
+                sb.Append("\n");
+                enterPossible = false;
+            }
+            
+            sb.Append("| Save(s)           ");
+            i++;
+            
+            if (i == 4 && enterPossible)
+            {
+                sb.Append("\n");
+                enterPossible = false;
+            }
+            
+            sb.Append("| Load(l)           ");
+            
+            
             sb.Append("|\n");
             Console.WriteLine(sb.ToString());
             sb.Clear();
@@ -521,19 +555,18 @@ namespace STVrogue
         /// Try creating a game, retrying with different values if it fails
         /// </summary>
         /// <returns></returns>
-        private static Game CreateGame()
+        public static Game CreateGame(GameConfiguration gc)
         {
             Game g;
             try
             {
-                g = new Game(_gameConfiguration);
+                g = new Game(gc);
             }
             catch (Exception e)
             {
                 if (e.InnerException is ArgumentException)
                 {
-                    InitGameConfig();
-                    return CreateGame();
+                    return CreateGame(RandomGameConfig(gc));
                 }
                 else
                 {
@@ -547,14 +580,16 @@ namespace STVrogue
         /// <summary>
         /// Initialized the game configuration
         /// </summary>
-        private static void InitGameConfig()
+        public static GameConfiguration RandomGameConfig(GameConfiguration gc)
         {
-            _gameConfiguration.numberOfRooms = GetRandom().Next(5, 20);
-            _gameConfiguration.maxRoomCapacity = GetRandom().Next(10, 15);
-            _gameConfiguration.dungeonShape = GetRandomDungeonShape();
-            _gameConfiguration.initialNumberOfMonsters = GetRandom().Next(15, 30);
-            _gameConfiguration.initialNumberOfHealingPots = GetRandom().Next(1, 10);
-            _gameConfiguration.initialNumberOfRagePots = GetRandom().Next(1, 10);
+            gc.numberOfRooms = GetRandom().Next(5, 20);
+            gc.maxRoomCapacity = GetRandom().Next(10, 15);
+            gc.dungeonShape = GetRandomDungeonShape();
+            gc.initialNumberOfMonsters = GetRandom().Next(15, 30);
+            gc.initialNumberOfHealingPots = GetRandom().Next(1, 10);
+            gc.initialNumberOfRagePots = GetRandom().Next(1, 10);
+
+            return gc;
         }
 
         /// <summary>
@@ -572,6 +607,25 @@ namespace STVrogue
             Console.WriteLine("/\\____) |   | |     \\   /    | ) \\ \\__| (___) || (___) || (___) || (____/\\");
             Console.WriteLine("\\_______)   )_(      \\_/     |/   \\__/(_______)(_______)(_______)(_______/");
             Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Loads the game from the given save file
+        /// </summary>
+        /// <param name="saveFile">the path to the save file</param>
+        private static void LoadGame(string saveFile)
+        {
+            // Reset the random generator
+            RandomFactory.Reset();
+            
+            // Reset the id factory
+            IdFactory.ResetIdFactory();
+            
+            // Create the GamePlay simulator
+            GamePlay sim = new GamePlay(saveFile);
+
+            // Replace this instance of Game with the simulated one
+            game = sim.GetLoadedGame();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using STVrogue.GameControl;
 
 namespace STVrogue.GameLogic
 {
@@ -12,7 +13,7 @@ namespace STVrogue.GameLogic
         bool alive ;
         Room location;
         int attackRating ;
-        private ActionType prevAction;
+        private CommandType prevAction;
         
         
         public Creature(string id, String name) : base(id)
@@ -86,7 +87,7 @@ namespace STVrogue.GameLogic
             set => attackRating = value;
         }
 
-        public ActionType PrevAction
+        public CommandType PrevAction
         {
             get => prevAction;
             set => prevAction = value;

@@ -38,5 +38,15 @@
         {
             return $"i{_itemIdCounter++}";
         }
+
+        /// <summary>
+        /// Reset the id counters
+        /// </summary>
+        public static void ResetIdFactory()
+        {
+            _creatureIdCounter = 0;
+            _roomIdCounter = 0;
+            _itemIdCounter = 0;
+        }
     }
 }
