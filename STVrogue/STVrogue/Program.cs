@@ -49,9 +49,9 @@ namespace STVrogue
             PrettyPrintLogo();
             InitGame();
             InitGameConfig();
+            RandomFactory.Reset(); // Reset the random generator, for easier saving/loading
             game = CreateGame();
             SaveHelper.RecordConfig(_gameConfiguration); // Record the game configuration
-            RandomFactory.Reset(); // Reset the random generator, for easier saving/loading
             bool gameover = false;
             while (!gameover && !game.Gameover)
             {
