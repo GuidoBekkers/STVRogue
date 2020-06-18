@@ -72,6 +72,16 @@ namespace STVrogue.TestInfrastructure
         {
             return Evaluate(threshold, gameplays.ToArray());
         }
+
+        public TemporalSpecification And(TemporalSpecification ts)
+        {
+            return new Conjunction(this, ts);
+        }
+
+        public TemporalSpecification Assuming(TemporalSpecification ts)
+        {
+            return new Conditional(ts, this);
+        }
     }
 
     /// <summary>
@@ -148,11 +158,11 @@ namespace STVrogue.TestInfrastructure
     }
 
     // Representing the negation of a temporal property
-    public class Negation : TemporalSpecification
+    public class Not : TemporalSpecification
     {
         private TemporalSpecification tp;
 
-        public Negation(TemporalSpecification tp)
+        public Not(TemporalSpecification tp)
         {
             this.tp = tp;
         }
@@ -172,18 +182,18 @@ namespace STVrogue.TestInfrastructure
     }
 
     // Representing the 'eventually' property
-    public class Future : TemporalSpecification
+    public class Eventually : TemporalSpecification
     {
         Predicate<Game> p;
 
-        public Future(Predicate<Game> p)
+        public Eventually(Predicate<Game> p)
         {
             this.p = p;
         }
 
         public override Judgement Evaluate(GamePlay sigma)
         {
-            return new Negation(new Always(g => !p(g))).Evaluate(sigma);
+            return new Not(new Always(g => !p(g))).Evaluate(sigma);
         }
     }
 
@@ -214,10 +224,68 @@ namespace STVrogue.TestInfrastructure
         }
     }
 
-    // public class Change : TemporalSpecification
-    // {
-    //     
-    // }
+    public class AlwaysChange : TemporalSpecification
+    {
+        Predicate<Tuple<Game, Game>> p;
+
+        public AlwaysChange(Predicate<Tuple<Game, Game>> p)
+        {
+            this.p = p;
+        }
+        
+        public override Judgement Evaluate(GamePlay sigma)
+        {
+            if (sigma.Length < 2)
+                return Judgement.Inconclusive;
+            
+            sigma.Reset();
+
+            GamePlay prev = sigma;
+            sigma.ReplayCurrentTurn();
+
+            Boolean ok = p(new Tuple<Game, Game>(prev.GetState(), sigma.GetState()));
+            
+            if (!ok)
+            {
+                // the predicate p is violated!
+                Log("violation of Always at turn " + sigma.Turn);
+                return Judgement.Invalid;
+            }
+            while (!sigma.AtTheEnd())
+            {
+                prev = sigma;
+                // replay the current turn (and get the next turn)
+                sigma.ReplayCurrentTurn();
+                // check if p holds on the state that resulted from replaying the turn
+                ok = p(new Tuple<Game, Game>(prev.GetState(), sigma.GetState()));
+                if (!ok)
+                {
+                    // the predicate p is violated!
+                    Log("violation of Always at turn " + sigma.Turn);
+                    return Judgement.Invalid;
+                }
+            }
+
+            // if we reach this point than p holds on every state in the gameplay:
+            return Judgement.Valid;
+        }
+        
+        // Representing the 'eventually' property
+        public class FutureChange : TemporalSpecification
+        {
+            Predicate<Tuple<Game, Game>> p;
+
+            public FutureChange(Predicate<Tuple<Game, Game>> p)
+            {
+                this.p = p;
+            }
+
+            public override Judgement Evaluate(GamePlay sigma)
+            {
+                return new Not(new AlwaysChange(x => !p(new Tuple<Game, Game>(x.Item1, x.Item2)))).Evaluate(sigma);
+            }
+        }
+    }
 }
     
     
