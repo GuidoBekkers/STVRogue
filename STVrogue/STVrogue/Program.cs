@@ -585,7 +585,7 @@ namespace STVrogue
             gc.numberOfRooms = GetRandom().Next(5, 20);
             gc.maxRoomCapacity = GetRandom().Next(10, 15);
             gc.dungeonShape = GetRandomDungeonShape();
-            gc.initialNumberOfMonsters = GetRandom().Next(15, 30);
+            gc.initialNumberOfMonsters = GetRandom().Next(3, 6);
             gc.initialNumberOfHealingPots = GetRandom().Next(1, 10);
             gc.initialNumberOfRagePots = GetRandom().Next(1, 10);
 

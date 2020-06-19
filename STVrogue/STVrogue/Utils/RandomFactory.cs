@@ -4,7 +4,7 @@ namespace STVrogue.Utils
 {
     public static class RandomFactory
     {
-        private const int Seed = 1234;
+        public static int Seed = 12345;
         private static Random _random = new Random(Seed);
 
         /// <summary>
@@ -15,7 +15,7 @@ namespace STVrogue.Utils
         {
             return ref _random;
         }
-
+        
         /// <summary>
         /// Resets the global random generator
         /// </summary>
