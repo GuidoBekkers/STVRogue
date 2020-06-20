@@ -199,12 +199,12 @@ namespace STVrogue.GameLogic
                 throw new ArgumentException($"The used item {i.Id} was not present in the player's bag");
             }
             
-            // Use the item
-            i.Use(this);
-            
             // Check if it was an needless use of a healing potion, thus not removing it from your bag
             if (i is HealingPotion && Hp == HpMax) return;
             
+            // Use the item
+            i.Use(this);
+
             // Remove the item from the bag
             bag.Remove(i);
         }
