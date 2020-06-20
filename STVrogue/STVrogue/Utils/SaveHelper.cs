@@ -29,7 +29,7 @@ namespace STVrogue.Utils
             // Append the values of the given GameConfiguration to the StringBuilder
             sb.Append(gc.difficultyMode.ToString()).Append(':');
             sb.Append(gc.playerName).Append(':');
-            sb.Append(RandomFactory.Seed.ToString()).Append('\n');
+            sb.Append(gc.seed.ToString()).Append('\n');
         }
 
         /// <summary>
@@ -56,15 +56,11 @@ namespace STVrogue.Utils
             var values = line.Split(':');
             
             // Set random seed to saved seed
-            RandomFactory.Seed =int.Parse(values[2]);
-            RandomFactory.Reset();
+            gc.seed = int.Parse(values[2]);
 
             // Recalculate the random variables (will be the same due to a reset of the randomizer)
             gc = Program.RandomGameConfig(gc);
             
-            // Reset random 
-            RandomFactory.Reset();
-
             // Parse the GameConfiguration data
             Enum.TryParse(values[0], false, out gc.difficultyMode);
             gc.playerName = values[1];

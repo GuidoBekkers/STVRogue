@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using STVrogue.GameLogic;
+using STVrogue.Utils;
 using static STVrogue.Utils.SomeUtils ;
 
 namespace STVrogue.TestInfrastructure
@@ -239,9 +240,9 @@ namespace STVrogue.TestInfrastructure
                 return Judgement.Inconclusive;
 
             sigma.Reset();
-
-            GamePlay prev = sigma;
             sigma.ReplayCurrentTurn();
+            
+            GamePlay prev = new GamePlay(sigma.saveFileLocation);
 
             Boolean ok = p(new Tuple<Game, Game>(prev.GetState(), sigma.GetState()));
 
@@ -254,9 +255,9 @@ namespace STVrogue.TestInfrastructure
 
             while (!sigma.AtTheEnd())
             {
-                prev = sigma;
                 // replay the current turn (and get the next turn)
                 sigma.ReplayCurrentTurn();
+                prev.ReplayCurrentTurn();
                 // check if p holds on the state that resulted from replaying the turn
                 ok = p(new Tuple<Game, Game>(prev.GetState(), sigma.GetState()));
                 if (!ok)

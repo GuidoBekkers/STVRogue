@@ -32,10 +32,10 @@ namespace STVrogue
         private static GameConfiguration _gameConfiguration = new GameConfiguration();
 
         // Returns a random dungeon shape
-        private static DungeonShapeType GetRandomDungeonShape()
+        private static DungeonShapeType GetRandomDungeonShape(Random r)
         {
             var array = DungeonShapeType.GetValues(typeof(DungeonShapeType));
-            return (DungeonShapeType) array.GetValue(GetRandom().Next(array.Length));
+            return (DungeonShapeType) array.GetValue(r.Next(array.Length));
         }
         
         // A string builder for efficient writing to the console
@@ -48,8 +48,8 @@ namespace STVrogue
         {
             PrettyPrintLogo();
             InitGame();
+            _gameConfiguration.seed = Environment.TickCount;
             _gameConfiguration = RandomGameConfig(_gameConfiguration);
-            RandomFactory.Reset(); // Reset the random generator, for easier saving/loading
             game = CreateGame(_gameConfiguration);
             SaveHelper.RecordConfig(_gameConfiguration); // Record the game configuration
             bool gameover = false;
@@ -566,6 +566,7 @@ namespace STVrogue
             {
                 if (e.InnerException is ArgumentException)
                 {
+                    gc.seed = Environment.TickCount;
                     return CreateGame(RandomGameConfig(gc));
                 }
                 else
@@ -582,12 +583,13 @@ namespace STVrogue
         /// </summary>
         public static GameConfiguration RandomGameConfig(GameConfiguration gc)
         {
-            gc.numberOfRooms = GetRandom().Next(5, 20);
-            gc.maxRoomCapacity = GetRandom().Next(10, 15);
-            gc.dungeonShape = GetRandomDungeonShape();
-            gc.initialNumberOfMonsters = GetRandom().Next(3, 6);
-            gc.initialNumberOfHealingPots = GetRandom().Next(1, 10);
-            gc.initialNumberOfRagePots = GetRandom().Next(1, 10);
+            Random r = new Random(gc.seed);
+            gc.numberOfRooms = r.Next(5, 20);
+            gc.maxRoomCapacity = r.Next(10, 15);
+            gc.dungeonShape = GetRandomDungeonShape(r);
+            gc.initialNumberOfMonsters = r.Next(3, 6);
+            gc.initialNumberOfHealingPots = r.Next(1, 10);
+            gc.initialNumberOfRagePots = r.Next(1, 10);
 
             return gc;
         }

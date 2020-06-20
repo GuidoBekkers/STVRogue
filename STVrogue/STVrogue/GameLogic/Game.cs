@@ -26,6 +26,7 @@ namespace STVrogue.GameLogic
         public string playerName;
         public int playerBaseHp = 10;
         public int playerBaseAr = 10;
+        public int seed;
 
         public int GetDifficultyMultiplier(DifficultyMode difficulty)
         {
@@ -74,7 +75,9 @@ namespace STVrogue.GameLogic
         Player player;
         Dungeon dungeon;
         DifficultyMode difficultyMode;
+        public int seed;
         bool gameover = false;
+        public static Random random;
         public HashSet<Monster> livingMonsters;
 
         /// <summary>
@@ -100,6 +103,13 @@ namespace STVrogue.GameLogic
         /// </summary>
         public Game(GameConfiguration conf)
         {
+            // Reset id factory
+            IdFactory.ResetIdFactory();
+            
+            // Set random
+            seed = conf.seed;
+            ResetRandom();
+            
             // Set the difficulty mode
             difficultyMode = conf.difficultyMode;
 
@@ -164,6 +174,11 @@ namespace STVrogue.GameLogic
         public bool Gameover => gameover;
 
         public DifficultyMode DifficultyMode => difficultyMode;
+
+        public void ResetRandom()
+        {
+            random = new Random(seed);
+        }
 
         /// <summary>
         /// Move the creature c from its current location to the given destination room.
@@ -304,7 +319,7 @@ namespace STVrogue.GameLogic
             // If all conditions are met the creature flees to a random room in possibleRooms
             if (canFlee)
             {
-                c.Move(possibleRooms[GetRandom().Next(possibleRooms.Count)]);
+                c.Move(possibleRooms[random.Next(possibleRooms.Count)]);
                 return true;
             }
             else return false;
@@ -546,13 +561,13 @@ namespace STVrogue.GameLogic
             if (m.Location == player.Location)
             {
                 // Set the action to either 1, 2 or 3
-                action = GetRandom().Next(1, 4);
+                action = random.Next(1, 4);
             }
             // if he is not in combat: move or do nothing
             else
             {
                 // Set the action to either 0 or 1
-                action = GetRandom().Next(0, 2);
+                action = random.Next(0, 2);
             }
 
             // Handle the chosen action
@@ -577,7 +592,7 @@ namespace STVrogue.GameLogic
                     if (destinations.Count > 0)
                     {
                         // move to a random room
-                        Move(m, destinations[GetRandom().Next(0, destinations.Count)]);
+                        Move(m, destinations[random.Next(0, destinations.Count)]);
                         
                         // Store this action as the previous action
                         m.PrevAction = CommandType.MOVE;

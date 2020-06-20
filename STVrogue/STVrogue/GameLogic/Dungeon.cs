@@ -58,7 +58,7 @@ namespace STVrogue.GameLogic
                     Room[] roomsArray = rooms.ToArray();
                     for (int i = 0; i < _numberOfRooms / 3; i++)
                     {
-                        roomsArray[GetRandom().Next(0, _numberOfRooms / 2)].Connect(roomsArray[GetRandom().Next(_numberOfRooms / 2 + 1, _numberOfRooms)]);
+                        roomsArray[Game.random.Next(0, _numberOfRooms / 2)].Connect(roomsArray[Game.random.Next(_numberOfRooms / 2 + 1, _numberOfRooms)]);
                     }
                     rooms = roomsArray.ToHashSet();
                     break;
@@ -116,7 +116,7 @@ namespace STVrogue.GameLogic
 
         private int RoomCap()
         {
-            return GetRandom().Next(1, _maxRoomCap + 1);
+            return Game.random.Next(1, _maxRoomCap + 1);
         }
         
         
@@ -249,16 +249,16 @@ namespace STVrogue.GameLogic
                                   r.Capacity
                         ? r.Capacity
                         : remainingMonsters - exitRoomNeigh + 1;
-                    seedAmount = GetRandom().Next(1, maxSeed + 1);
+                    seedAmount = Game.random.Next(1, maxSeed + 1);
                 }
                 else
                 {
                     if(remainingMonsters == 0 || cap == 0)
                         seedAmount = 0;
                     else if (cap >= remainingMonsters)
-                        seedAmount = GetRandom().Next(1, remainingMonsters);
+                        seedAmount = Game.random.Next(1, remainingMonsters);
                     else 
-                        seedAmount = GetRandom().Next(1, cap + 1);
+                        seedAmount = Game.random.Next(1, cap + 1);
                 }
 
                 for (int i = 0; i < seedAmount; i++)
@@ -284,7 +284,7 @@ namespace STVrogue.GameLogic
                 else if (cap >= remainingMonsters)
                     seedAmount = remainingMonsters;
                 else 
-                    seedAmount = GetRandom().Next(1, cap + 1);
+                    seedAmount = Game.random.Next(1, cap + 1);
                 
                 for (int j = 0; j < seedAmount; j++)
                 {
@@ -314,8 +314,8 @@ namespace STVrogue.GameLogic
         //Returns a monster
         private Monster CreateMonster(Room r)
         {
-            int hp = GetRandom().Next(50, 101); //TODO: tweak HP 
-            int ar = GetRandom().Next(1, 11); //TODO: tweak AR  
+            int hp = Game.random.Next(50, 101); //TODO: tweak HP 
+            int ar = Game.random.Next(1, 11); //TODO: tweak AR  
             Monster m = new Monster(IdFactory.GetCreatureId(), "goblin", hp, ar); //ALLE MONSTERS HETEN NU GOBLIN
             m.Location = r;
             monsters.Add(m);
@@ -324,7 +324,7 @@ namespace STVrogue.GameLogic
         
         public void SeedItems(int numberOfHealingPotion, int numberOfRagePotion)
         {
-            Room[] rndmRooms = rooms.OrderBy(x => GetRandom().Next()).ToArray();
+            Room[] rndmRooms = rooms.OrderBy(x => Game.random.Next()).ToArray();
             int remainingHealingPotions = numberOfHealingPotion;
             int remainingRagePotions = numberOfRagePotion;
             
@@ -333,7 +333,7 @@ namespace STVrogue.GameLogic
             {
                 if (rndmRooms[i].Neighbors.Contains(startRoom) && rndmRooms[i] != ExitRoom)
                 {
-                    rndmRooms[i].Items.Add(new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101)));
+                    rndmRooms[i].Items.Add(new HealingPotion(IdFactory.GetItemId(), Game.random.Next(1, 101)));
                     rndmRooms[i].Items.Add(new RagePotion(IdFactory.GetItemId()));
                     remainingHealingPotions--;
                     remainingRagePotions--;  
@@ -399,7 +399,7 @@ namespace STVrogue.GameLogic
         {
             for (int i = 0; i < amount; i++)
             {
-                Item item = new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101));
+                Item item = new HealingPotion(IdFactory.GetItemId(), Game.random.Next(1, 101));
                 room.Items.Add(item);
                 items.Add(item);
             }
