@@ -232,25 +232,26 @@ namespace STVrogue.TestInfrastructure
         {
             this.p = p;
         }
-        
+
         public override Judgement Evaluate(GamePlay sigma)
         {
             if (sigma.Length < 2)
                 return Judgement.Inconclusive;
-            
+
             sigma.Reset();
 
             GamePlay prev = sigma;
             sigma.ReplayCurrentTurn();
 
             Boolean ok = p(new Tuple<Game, Game>(prev.GetState(), sigma.GetState()));
-            
+
             if (!ok)
             {
                 // the predicate p is violated!
                 Log("violation of Always at turn " + sigma.Turn);
                 return Judgement.Invalid;
             }
+
             while (!sigma.AtTheEnd())
             {
                 prev = sigma;
@@ -269,13 +270,14 @@ namespace STVrogue.TestInfrastructure
             // if we reach this point than p holds on every state in the gameplay:
             return Judgement.Valid;
         }
-        
-        // Representing the 'eventually' property
-        public class FutureChange : TemporalSpecification
+    }
+
+    // Representing the 'eventually' property
+        public class EventuallyChange : TemporalSpecification
         {
             Predicate<Tuple<Game, Game>> p;
 
-            public FutureChange(Predicate<Tuple<Game, Game>> p)
+            public EventuallyChange(Predicate<Tuple<Game, Game>> p)
             {
                 this.p = p;
             }
@@ -286,6 +288,6 @@ namespace STVrogue.TestInfrastructure
             }
         }
     }
-}
+
     
     
