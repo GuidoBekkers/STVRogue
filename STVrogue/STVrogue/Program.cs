@@ -615,12 +615,6 @@ namespace STVrogue
         /// <param name="saveFile">the path to the save file</param>
         private static void LoadGame(string saveFile)
         {
-            // Reset the random generator
-            RandomFactory.Reset();
-            
-            // Reset the id factory
-            IdFactory.ResetIdFactory();
-            
             // Create the GamePlay simulator
             GamePlay sim = new GamePlay(saveFile);
 

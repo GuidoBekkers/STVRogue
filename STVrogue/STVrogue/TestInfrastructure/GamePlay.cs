@@ -52,6 +52,12 @@ namespace STVrogue.TestInfrastructure
         /// </summary>
         public GamePlay(string saveFile)
         {
+            // Reset the random generator
+            RandomFactory.Reset();
+            
+            // Reset the id factory
+            IdFactory.ResetIdFactory();
+            
             // Store the save file location
             saveFileLocation = saveFile;
 
@@ -84,6 +90,12 @@ namespace STVrogue.TestInfrastructure
         {
             // Reset the turn number
             turn = 0;
+            
+            // Reset the random generator
+            RandomFactory.Reset();
+            
+            // Reset the id factory
+            IdFactory.ResetIdFactory();
             
             // Reset the game and action list
             LoadSimGame();
