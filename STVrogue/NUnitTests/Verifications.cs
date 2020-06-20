@@ -22,9 +22,9 @@ namespace NUnitTests
             GamePlay g5 = new GamePlay("testSave5.txt");
             // the specification to verify:
             TemporalSpecification spec
-                = new Always(G => 
-                    G.livingMonsters.ToList().TrueForAll(m => m.Hp > 0) && 
-                    G.Player.Hp > 0 && G.Player.Alive);
+                = new Always(G =>
+                        G.livingMonsters.ToList().TrueForAll(m => m.Hp > 0))
+                    .And(new Always(G => !G.Player.Alive || G.Player.Hp > 0));
             // test the specification on the plays:
             Assert.IsTrue(spec.Evaluate(3, g1, g2, g3, g4, g5) == Judgement.Valid);
         }
