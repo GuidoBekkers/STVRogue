@@ -226,9 +226,9 @@ namespace STVrogue.TestInfrastructure
 
     public class AlwaysChange : TemporalSpecification
     {
-        Predicate<Tuple<Game, Game>> p;
+        Predicate<Tuple<GameClone, Game>> p;
 
-        public AlwaysChange(Predicate<Tuple<Game, Game>> p)
+        public AlwaysChange(Predicate<Tuple<GameClone, Game>> p)
         {
             this.p = p;
         }
@@ -239,11 +239,20 @@ namespace STVrogue.TestInfrastructure
                 return Judgement.Inconclusive;
 
             sigma.Reset();
-
-            GamePlay prev = sigma;
+            
+            GameClone clone = new GameClone();
+            Game state = sigma.GetState();
+            clone.livingMonsters = state.livingMonsters.Count;
+            clone.location = state.Player.Location.Id;
+            clone.kp = state.Player.Kp;
+            clone.numberOfItems = state.Dungeon.Items.Count;
+            clone.hp = state.Player.Hp;
+            clone.healUsed = state.HealUsed;
+            clone.startroomNeigh = state.Player.Location.Neighbors.Contains(state.Dungeon.StartRoom);
+            
             sigma.ReplayCurrentTurn();
 
-            Boolean ok = p(new Tuple<Game, Game>(prev.GetState(), sigma.GetState()));
+            Boolean ok = p(new Tuple<GameClone, Game>(clone, sigma.GetState()));
 
             if (!ok)
             {
@@ -254,11 +263,18 @@ namespace STVrogue.TestInfrastructure
 
             while (!sigma.AtTheEnd())
             {
-                prev = sigma;
+                state = sigma.GetState();
+                clone.livingMonsters = state.livingMonsters.Count;
+                clone.location = state.Player.Location.Id;
+                clone.kp = state.Player.Kp;
+                clone.numberOfItems = state.Dungeon.Items.Count;
+                clone.hp = state.Player.Hp;
+                clone.healUsed = state.HealUsed;
+                clone.startroomNeigh = state.Player.Location.Neighbors.Contains(state.Dungeon.StartRoom);
                 // replay the current turn (and get the next turn)
                 sigma.ReplayCurrentTurn();
                 // check if p holds on the state that resulted from replaying the turn
-                ok = p(new Tuple<Game, Game>(prev.GetState(), sigma.GetState()));
+                ok = p(new Tuple<GameClone, Game>(clone, sigma.GetState()));
                 if (!ok)
                 {
                     // the predicate p is violated!
@@ -275,17 +291,31 @@ namespace STVrogue.TestInfrastructure
     // Representing the 'eventually' property
         public class EventuallyChange : TemporalSpecification
         {
-            Predicate<Tuple<Game, Game>> p;
+            Predicate<Tuple<GameClone, Game>> p;
 
-            public EventuallyChange(Predicate<Tuple<Game, Game>> p)
+            public EventuallyChange(Predicate<Tuple<GameClone, Game>> p)
             {
                 this.p = p;
             }
 
             public override Judgement Evaluate(GamePlay sigma)
             {
-                return new Not(new AlwaysChange(x => !p(new Tuple<Game, Game>(x.Item1, x.Item2)))).Evaluate(sigma);
+                return new Not(new AlwaysChange(x => !p(x))).Evaluate(sigma);
             }
+        }
+
+        public class GameClone
+        {
+            public int livingMonsters;
+            public int monstersInRoom;
+            public string location;
+            public int kp;
+            public int numberOfItems;
+            public int hp;
+            public int healUsed;
+            public bool startroomNeigh;
+
+            public GameClone() { }
         }
     }
 
