@@ -17,6 +17,7 @@ namespace STVrogue.GameLogic
     {
         HashSet<Room> rooms = new HashSet<Room>();
         HashSet<Monster> monsters = new HashSet<Monster>();
+        HashSet<Item> items = new HashSet<Item>();
         private readonly int _maxRoomCap;
         private int _numberOfRooms;
         Room startRoom;
@@ -129,6 +130,11 @@ namespace STVrogue.GameLogic
         public HashSet<Monster> Monsters
         {
             get => monsters;
+        }
+        
+        public HashSet<Item> Items
+        {
+            get => items;
         }
 
         public Room StartRoom
@@ -330,7 +336,7 @@ namespace STVrogue.GameLogic
                     rndmRooms[i].Items.Add(new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101)));
                     rndmRooms[i].Items.Add(new RagePotion(IdFactory.GetItemId()));
                     remainingHealingPotions--;
-                    remainingRagePotions--;
+                    remainingRagePotions--;  
                     break;
                 }
             }
@@ -393,7 +399,9 @@ namespace STVrogue.GameLogic
         {
             for (int i = 0; i < amount; i++)
             {
-                room.Items.Add(new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101)));
+                Item item = new HealingPotion(IdFactory.GetItemId(), GetRandom().Next(1, 101));
+                room.Items.Add(item);
+                items.Add(item);
             }
         }
 
@@ -401,7 +409,9 @@ namespace STVrogue.GameLogic
         {
             for (int i = 0; i < amount; i++)
             {
-                room.Items.Add(new RagePotion(IdFactory.GetItemId()));
+                Item item = new RagePotion(IdFactory.GetItemId());
+                room.Items.Add(item);
+                items.Add(item);
             }
         }
     }
