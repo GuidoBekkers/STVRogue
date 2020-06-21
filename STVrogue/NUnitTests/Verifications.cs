@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.Internal.Commands;
 using STVrogue.GameControl;
@@ -101,7 +102,26 @@ namespace NUnitTests
                                          !t.Item2.Player.Alive || t.Item1.location == t.Item2.Player.Location.Id)
                     .Assuming(new EventuallyChange(t => (t.Item1.monstersInRoom > 0
                                                          && !t.Item1.startroomNeigh
-                                                         && t.Item1.hp < t.Item2.Player.Hp)));
+                                                         && t.Item2.HealUsed >= t.Item2.TurnNumber - 1)));
+            // test the specification on the plays:
+            Assert.IsTrue(spec.Evaluate(3, g1, g2, g3, g4, g5) == Judgement.Valid);
+        }
+
+        [Test, Description("player should not be able to flee after using a healing potion")]
+        public void SRageDuration()
+        {
+            //loading gameplays:
+            GamePlay g1 = new GamePlay("testSave1.txt");
+            GamePlay g2 = new GamePlay("testSave2.txt");
+            GamePlay g3 = new GamePlay("testSave3.txt");
+            GamePlay g4 = new GamePlay("testSave4.txt");
+            GamePlay g5 = new GamePlay("testSave5.txt");
+            // the specification to verify:
+            TemporalSpecification spec
+                = new Always(G => ((G.RageUsed >= G.TurnNumber - 5 && G.Player.Enraged) 
+                                                      || !G.Player.Enraged))
+                    .Assuming(new Eventually(G => G.RageUsed != null));
+
             // test the specification on the plays:
             Assert.IsTrue(spec.Evaluate(3, g1, g2, g3, g4, g5) == Judgement.Valid);
         }

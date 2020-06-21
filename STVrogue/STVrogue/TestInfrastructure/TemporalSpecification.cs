@@ -243,6 +243,7 @@ namespace STVrogue.TestInfrastructure
             GameClone clone = new GameClone();
             Game state = sigma.GetState();
             clone.livingMonsters = state.livingMonsters.Count;
+            clone.monstersInRoom = state.Player.Location.Monsters.Count;
             clone.location = state.Player.Location.Id;
             clone.kp = state.Player.Kp;
             clone.numberOfItems = state.Dungeon.Items.Count;
@@ -265,6 +266,7 @@ namespace STVrogue.TestInfrastructure
             {
                 state = sigma.GetState();
                 clone.livingMonsters = state.livingMonsters.Count;
+                clone.monstersInRoom = state.Player.Location.Monsters.Count;
                 clone.location = state.Player.Location.Id;
                 clone.kp = state.Player.Kp;
                 clone.numberOfItems = state.Dungeon.Items.Count;
